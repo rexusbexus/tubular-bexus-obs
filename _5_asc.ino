@@ -1,0 +1,249 @@
+
+
+#define pumpPin 20
+#define valve1 21
+#define valve2 22
+#define valve3 23
+#define valve4 24
+#define valve5 25
+#define valve6 26
+#define valve7 27
+#define valve8 28
+#define valve9 29
+#define valve10 30
+#define flushValve 31
+#define CACvalve 32
+
+
+
+void initASC()
+{
+  initReadData();
+}
+
+void initReadData()
+{
+  xTaskCreate(
+    readData
+    ,  (const portCHAR *) "readData";   // Name
+    ,  128  // This stack size 
+    ,  NULL
+    ,  1  // Priority
+    ,  NULL );
+}
+
+void initPumpControl()
+{
+  pinMode(pumpPin, OUTPUT);
+}
+
+void initValvesControl()
+{
+  pinMode(valve1, OUTPUT);
+  pinMode(valve2, OUTPUT);
+  pinMode(valve3, OUTPUT);
+  pinMode(valve4, OUTPUT);
+  pinMode(valve5, OUTPUT);
+  pinMode(valve6, OUTPUT);
+  pinMode(valve7, OUTPUT);
+  pinMode(valve8, OUTPUT);
+  pinMode(valve9, OUTPUT);
+  pinMode(valve10, OUTPUT);
+  pinMode(flushValve, OUTPUT);
+  pinMode(CACvalve, OUTPUT);
+}
+
+void readData()
+{
+   
+   int *ascParam;
+   int bagcounter = 0;
+   float *currPressure;
+   float meanPressure;
+   
+   TickType_t xLastWakeTime;
+   xLastWakeTime = xTaskGetTickCount ();
+
+   while(1)
+   {
+     static int currMode = getMode();
+     
+     ascParam = getASCParameter(bagcounter);
+     currPressure = readData(2);
+     
+     meanPressure = currPressure + (currPressure+1) + (currPressure+2);
+
+     switch (currMode){
+     /*Normal - Ascent*/
+     case 0:
+     break;
+     case 1:
+     digitalWrite(CACvalve, HIGH);
+     if (meanPressure >= ascParam && meanPressure<= (ascParam+1))
+     {
+        valvesControl(11, 1); delay(10);
+        pumpControl(1); delay(1000);
+        valvesControl(11, 0); delay(10);
+        valvesControl(bagcounter, 1); delay(10); 
+     }
+     else
+     {
+        pumpControl(0); delay(100);
+        valvesControl(bagcounter, 0); delay(10);
+        if (bagcounter<10){
+          bagcounter++;
+        }
+     }
+     break;
+     case 2:
+     if (meanPressure >= ascParam && meanPressure<= (ascParam+1))
+     {
+        valvesControl(11, 1); delay(10);
+        pumpControl(1); delay(1000);
+        valvesControl(11, 0); delay(10);
+        valvesControl(bagcounter, 1); delay(10);   
+     }
+     else
+     {
+        pumpControl(0); delay(100);
+        valvesControl(bagcounter, 0); delay(10);
+        if (bagcounter<10){
+          bagcounter++;
+        }
+     }
+     break;
+     case 3:
+     digitalWrite(CACvalve, LOW);
+     for (bagcounter=1;bagcounter<=10;bagcounter++)
+     {
+       pumpControl(0);
+       valvesControl(bagcounter, 0);
+     }
+   }
+}
+
+
+int* getASCParam(int bag)
+{
+  int dummyParameter[2]
+  xSemaphoreTake(sem, portMAX_DELAY);
+  dummyParameter[0] = ascParameter[bag];
+  dummyParameter[1] = ascParameter[bag+1];
+  xSemaphoreGive(sem);
+  return dummyParameter
+}
+
+void pumpControl(int cond)
+{
+  xSemaphoreTake(sem, portMAX_DELAY);
+  switch (cond){
+    case 0:
+    digitalWrite(pumpPin, LOW);
+    break;
+
+    case 1:
+    digitalWrite(pumpPin, HIGH);
+    break;
+  }
+  xSemaphoreGive(sem);
+}
+
+void valvesControl(int valve, int cond)
+{
+  xSemaphoreTake(sem, portMAX_DELAY);
+  if (cond==1){
+  switch (valve){
+    case 1:
+    digitalWrite(valve1, HIGH);
+    break;
+
+    case 2:
+    digitalWrite(valve2, HIGH);
+    break;
+
+    case 3:
+    digitalWrite(valve3, HIGH);
+    break;
+
+    case 4:
+    digitalWrite(valve4, HIGH);
+    break;
+
+    case 5:
+    digitalWrite(valve5, HIGH);
+    break;
+
+    case 6:
+    digitalWrite(valve6, HIGH);
+    break;
+
+    case 7:
+    digitalWrite(valve7, HIGH);
+    break;
+
+    case 8:
+    digitalWrite(valve8, HIGH);
+    break;
+
+    case 9:
+    digitalWrite(valve9, HIGH);
+    break;
+
+    case 10:
+    digitalWrite(valve10, HIGH);
+    break;
+
+    case 11:
+    digitalWrite(flushValve, HIGH);
+    break;
+  }
+  }
+  else {
+    switch (valve){
+    case 1:
+    digitalWrite(valve1, LOW);
+    break;
+
+    case 2:
+    digitalWrite(valve2, LOW);
+    break;
+
+    case 3:
+    digitalWrite(valve3, LOW);
+    break;
+
+    case 4:
+    digitalWrite(valve4, LOW);
+    break;
+
+    case 5:
+    digitalWrite(valve5, LOW);
+    break;
+
+    case 6:
+    digitalWrite(valve6, LOW);
+    break;
+
+    case 7:
+    digitalWrite(valve7, LOW);
+    break;
+
+    case 8:
+    digitalWrite(valve8, LOW);
+    break;
+
+    case 9:
+    digitalWrite(valve9, LOW);
+    break;
+
+    case 10:
+    digitalWrite(valve10, LOW);
+    break;
+
+    case 11:
+    digitalWrite(flushValve, LOW);
+    break;
+  }
+  xSemaphoreGive(sem);
+}
+
