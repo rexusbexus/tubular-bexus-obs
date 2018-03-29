@@ -8,6 +8,10 @@
 
 #define pressSensorPSpin TBD
 
+#define safeModeThreshold TBD
+#define pressDifferentThresholdneg -TBD
+#define pressDifferentThresholdpos TBD
+
 Melon_MS5607 pressSensor();
 Melon_MS5607 pressSensor2();
 HDC2010 humSensor(hdcADDR);
@@ -39,6 +43,7 @@ void sampler(void *pvParameters)
    int count=0;
    float pressDifference;
    float curPressureMeasurement [2];
+   float meanPressure;
 
    
    TickType_t xLastWakeTime;
@@ -49,15 +54,15 @@ void sampler(void *pvParameters)
       static int currMode = getMode();
 
       /*read temperature and humidity from HDC*/
-      float temperatureHDC = humSensor.readTemp();
+      //float temperatureHDC = humSensor.readTemp();
       float humHDC = humSensor.readHumidity();
 
        /*read temperature and pressure from MS1*/
-      float tempeMS1 = pressSensor.getTemperature();
+      //float tempeMS1 = pressSensor.getTemperature();
       float pressureMS1 = pressSensor.getPressure();
 
        /*read temperature and pressure from MS2*/
-      float tempeMS2 = pressSensor2.getTemperature();
+      //float tempeMS2 = pressSensor2.getTemperature();
       float pressureMS2 = pressSensor2.getPressure();      
 
       curPressureMeasurement = [pressureMS1, pressureMS2];
@@ -65,29 +70,36 @@ void sampler(void *pvParameters)
       /*Save pressure measurements*/
       writeData(curPressureMeasurement, 2);
 
+      meanPressure = (curPressureMeasurement[0] + (curPressureMeasurement[1]))/2;
+
       if (count == 0)
       {
-         tempPressure[count] = pressureMS;
-         count=count+1;
+         tempPressure[count] = meanPressure;
+         count=1;
       }
       else
       {
-         tempPressure[count] = pressureMS;
+         tempPressure[count] = meanPressure;
          pressDifference = tempPressure[1] - tempPressure[0];
+         count=0;
       }
 
       /*Change mode if the condition is satisfied*/
-      if (pressDifference<TBD)
+      if (pressDifference<pressDifferentThresholdneg)
       {
          setMode(normalAscent);
       }
-      else if (pressDifference>TBD)
+      else if (pressDifference>pressDifferentThresholdpos)
       {
          setMode(normalDescent);
       }
+      else if (currMode==normalDescent && meanPressure<=safeModeThreshold)
+      {
+         setMode(safeMode);
+      }
 
       /*Check current sampling rate*/
-      currSamplingRate = getSamplingRate;
+      currSamplingRate = getSamplingRate();
       vTaskDelayUntil(&xLastWakeTime, (currSamplingRate / portTICK_PERIOD_MS) );
    }
 }
@@ -104,8 +116,8 @@ int getSamplingRate(void)
    xSemaphoreTake(sem, portMAX_DELAY);
    int tempSamplingRate
    tempSamplingRate = samplingRate;
-   xSemaphoreGive(sem);
    return tempSamplingRate;
+   xSemaphoreGive(sem);
 }
 
 static void writeData(float curMeasurements [], int type)

@@ -5,7 +5,9 @@
 
 void init()
 {
-    initSensor();
+    
     initMode();
+    initSensor();
+    initHeater();
 }
 

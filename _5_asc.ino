@@ -18,14 +18,16 @@
 
 void initASC()
 {
-  initReadData();
+  initReading();
+  initPumpControl)();
+  initValvesControl();
 }
 
-void initReadData()
+void initReading()
 {
   xTaskCreate(
-    readData
-    ,  (const portCHAR *) "readData";   // Name
+    reading
+    ,  (const portCHAR *) "reading";   // Name
     ,  128  // This stack size 
     ,  NULL
     ,  1  // Priority
@@ -53,11 +55,11 @@ void initValvesControl()
   pinMode(CACvalve, OUTPUT);
 }
 
-void readData()
+void reading()
 {
    
-   int *ascParam;
-   int bagcounter = 0;
+   float *ascParam;
+   int bagcounter = 1;
    float *currPressure;
    float meanPressure;
    
@@ -70,14 +72,16 @@ void readData()
      
      ascParam = getASCParameter(bagcounter);
      currPressure = readData(2);
-     
-     meanPressure = currPressure + (currPressure+1) + (currPressure+2);
+
+     /*Calculating mean pressure from several pressure sensors*/
+     meanPressure = (currPressure + (currPressure+1))/2;
 
      switch (currMode){
-     /*Normal - Ascent*/
-     case 0:
+     /*Standby*/
+     case standbyMode:
      break;
-     case 1:
+     /*Normal - Ascent*/
+     case normalAscent:
      digitalWrite(CACvalve, HIGH);
      if (meanPressure >= ascParam && meanPressure<= (ascParam+1))
      {
@@ -95,7 +99,8 @@ void readData()
         }
      }
      break;
-     case 2:
+     /*Normal - Descent*/
+     case normalDescent:
      if (meanPressure >= ascParam && meanPressure<= (ascParam+1))
      {
         valvesControl(11, 1); delay(10);
@@ -112,23 +117,27 @@ void readData()
         }
      }
      break;
-     case 3:
+     /*SAFE*/
+     case safeMode:
      digitalWrite(CACvalve, LOW);
      for (bagcounter=1;bagcounter<=10;bagcounter++)
      {
        pumpControl(0);
        valvesControl(bagcounter, 0);
      }
+     break;
+   }
+   vTaskDelayUntil(&xLastWakeTime, (500 / portTICK_PERIOD_MS) );
    }
 }
 
 
-int* getASCParam(int bag)
+float* getASCParam(int bag)
 {
-  int dummyParameter[2]
+  float dummyParameter[2]
   xSemaphoreTake(sem, portMAX_DELAY);
-  dummyParameter[0] = ascParameter[bag];
-  dummyParameter[1] = ascParameter[bag+1];
+  dummyParameter[0] = ascParameter[(bag*2)-2];
+  dummyParameter[1] = ascParameter[(bag*2)-1];
   xSemaphoreGive(sem);
   return dummyParameter
 }
