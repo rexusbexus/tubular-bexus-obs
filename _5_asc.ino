@@ -85,17 +85,17 @@ void reading()
      digitalWrite(CACvalve, HIGH);
      if (meanPressure >= ascParam && meanPressure<= (ascParam+1))
      {
-        valvesControl(11, 1); delay(10);
-        pumpControl(1); delay(1000);
-        valvesControl(11, 0); delay(10);
-        valvesControl(bagcounter, 1); delay(10); 
+        valvesControl(11, 1); //delay(10);
+        pumpControl(1); //delay(1000);
+        valvesControl(11, 0); //delay(10);
+        valvesControl(bagcounter, 1); //delay(10); 
      }
      else
      {
-        pumpControl(0); delay(100);
-        valvesControl(bagcounter, 0); delay(10);
-        if (bagcounter<10){
-          bagcounter++;
+        pumpControl(0); //delay(100);
+        valvesControl(bagcounter, 0); //delay(10);
+        if (bagcounter<10 && meanPressure>=(ascParam+1)){
+          //bagcounter++;  // need to figure this out later
         }
      }
      break;
@@ -103,16 +103,16 @@ void reading()
      case normalDescent:
      if (meanPressure >= ascParam && meanPressure<= (ascParam+1))
      {
-        valvesControl(11, 1); delay(10);
-        pumpControl(1); delay(1000);
-        valvesControl(11, 0); delay(10);
-        valvesControl(bagcounter, 1); delay(10);   
+        valvesControl(11, 1); //delay(10);
+        pumpControl(1);
+        valvesControl(11, 0); //delay(10);
+        valvesControl(bagcounter, 1); //delay(10);   
      }
      else
      {
-        pumpControl(0); delay(100);
-        valvesControl(bagcounter, 0); delay(10);
-        if (bagcounter<10){
+        pumpControl(0); //delay(100);
+        valvesControl(bagcounter, 0); //delay(10);
+        if (bagcounter<10 && meanPressure<= ascParam){
           bagcounter++;
         }
      }
@@ -255,4 +255,4 @@ void valvesControl(int valve, int cond)
   }
   xSemaphoreGive(sem);
 }
-
+}

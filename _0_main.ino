@@ -2,6 +2,7 @@
 #include <semphr.h>
 #include <task.h>
 #include <SPI.h>
+#include <stdbool.h>
 
 #include <Melon_MS5607.h> //pressure sensor lib
 #include <HDC2010.h> //humidity sensor lib
