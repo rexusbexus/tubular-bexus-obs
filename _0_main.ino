@@ -14,7 +14,9 @@ static int state;
 static int samplingRate;
 static float tempReading [4]; //array size might change according to the fix quantity
 static float humReading [1];
-static float pressReading [2];
+static float pressReading [2]; //array size might change according to the fix quantity
+static int htrParameter[4];
+static float ascParameter[20];
 
 
 /*init*/

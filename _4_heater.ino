@@ -8,12 +8,12 @@
 void initHeater() {
   
   initReadingData();
-  int htrParameter[4];
+  //int htrParameter[4];
 }
 
 void initReadingData() {
     xTaskCreate(
-    TaskBlink
+    readingData
     ,  (const portCHAR *) "readingData";   // Name
     ,  128  // This stack size 
     ,  NULL
