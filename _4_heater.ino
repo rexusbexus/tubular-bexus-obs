@@ -5,6 +5,10 @@
  * Project: Tubular-Bexus.
  * Authors: Tubular-Bexus software group.
 */
+
+#define htr1_pin 33
+#define htr2_pin 34
+
 void initHeater() {
   
   initReadingData();
@@ -93,7 +97,8 @@ void readingData()
         */
       }
       
-    }  
+    } 
+    vTaskDelayUntil(&xLastWakeTime, (5000 / portTICK_PERIOD_MS) ); 
   }
     
 }
@@ -133,9 +138,12 @@ void setHeaterParameter(int newParameter[4])
  * The heater control child object
  * 
  */
-void heaterControl()
+void heaterControl(htrOne,htrTwo)
 {
-      
+  xSemaphoreTake(sem, portMAX_DELAY);
+  digitalWrite(htr1_pin,htrOne)
+  digitalWrite(htr2_pin,htrTwo)
+  xSemaphoreGive(sem);    
 }
 /*
  * End of the heaterControl child object
