@@ -33,7 +33,10 @@ void initReadingData() {
 void readingData()
 {
   float tempAtHtr [2];
-
+  
+  TickType_t xLastWakeTime;
+  xLastWakeTime = xTaskGetTickCount ();
+  
   while(1)
   {
     //Reads the current mode
@@ -41,7 +44,7 @@ void readingData()
 
     //Reads the temperature at the two sensors
     float tempAtHts[0]  = readData(0);
-    float tempAtHts[1]  = readData(0);//Must make sure to get the correct tempSensors.
+    float tempAtHts[1]  = readData(0);//Must make sure to get the correct tempSensors and add pointer.
     bool  htr1_flag;
     bool  htr2_flag;
     int *htrParam;
