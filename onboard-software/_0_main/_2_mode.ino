@@ -7,6 +7,7 @@
 #define normalAscent 1
 #define normalDesecent 2
 #define safeMode 3
+#define manual 4
 
 void initMode()
 {

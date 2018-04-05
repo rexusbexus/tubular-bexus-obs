@@ -1,4 +1,5 @@
-#include <Arduino_FreeRTOS.h> //Free-RTOS lib
+#include <basic_io_arm.h>
+#include <FreeRTOS_ARM.h>
 #include <semphr.h>
 #include <task.h>
 #include <SPI.h>
@@ -38,6 +39,7 @@ int loremSensor;
 
 
 SemaphoreHandle_t sem = NULL;
+SemaphoreHandle_t semPeriodic = NULL;
 static int state;
 static int samplingRate;
 static float tempReading [nrTempSensors]; //array size might change according to the fix quantity
@@ -62,6 +64,7 @@ EthernetUDP Udp;
 void setup()
 {
     sem = xSemaphoreCreateBinary();
+    semPeriodic = xSemaphoreCreateBinary();
     init();
 
 }

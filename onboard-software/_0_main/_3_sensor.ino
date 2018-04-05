@@ -45,12 +45,13 @@ void sampler(void *pvParameters)
    float curPressureMeasurement [2];
    float meanPressure;
 
-   
+   static signed BaseType_t xHigherPriorityTaskWoken;
    TickType_t xLastWakeTime;
    xLastWakeTime = xTaskGetTickCount ();
 
    while(1)
    {
+      xHigherPriorityTaskWoken = pdFALSE;
       static int currMode = getMode();
 
       /*read temperature and humidity from HDC*/
@@ -96,6 +97,14 @@ void sampler(void *pvParameters)
       else if (currMode==normalDescent && meanPressure<=safeModeThreshold)
       {
          setMode(safeMode);
+      }
+
+
+      /*Listen to GS*/
+      EthernetClient client = server.available();
+      if(client.available>0)
+      {
+         xSemaphoreGiveFromISR(semPeriodic, &xHigherPriorityTaskWoken );
       }
 
       /*Check current sampling rate*/
