@@ -6,7 +6,8 @@
  * Authors: Tubular-Bexus software group.
 */
 
-
+#define htr1_pin 33
+#define htr2_pin 34
 
 void initHeater() {
   

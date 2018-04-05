@@ -1,6 +1,18 @@
 
 
-
+#define pumpPin 20
+#define valve1 21
+#define valve2 22
+#define valve3 23
+#define valve4 24
+#define valve5 25
+#define valve6 26
+#define valve7 27
+#define valve8 28
+#define valve9 29
+#define valve10 30
+#define flushValve 31
+#define CACvalve 32
 
 
 
