@@ -5,6 +5,10 @@
  * Project: Tubular-Bexus.
  * Authors: Tubular-Bexus software group.
 */
+
+#define htr1_pin 33
+#define htr2_pin 34
+
 void initHeater() {
   
   initReadingData();
@@ -29,7 +33,10 @@ void initReadingData() {
 void readingData()
 {
   float tempAtHtr [2];
-
+  
+  TickType_t xLastWakeTime;
+  xLastWakeTime = xTaskGetTickCount ();
+  
   while(1)
   {
     //Reads the current mode
@@ -37,7 +44,7 @@ void readingData()
 
     //Reads the temperature at the two sensors
     float tempAtHts[0]  = readData(0);
-    float tempAtHts[1]  = readData(0);//Must make sure to get the correct tempSensors.
+    float tempAtHts[1]  = readData(0);//Must make sure to get the correct tempSensors and add pointer.
     bool  htr1_flag;
     bool  htr2_flag;
     int *htrParam;
@@ -93,7 +100,8 @@ void readingData()
         */
       }
       
-    }  
+    } 
+    vTaskDelayUntil(&xLastWakeTime, (5000 / portTICK_PERIOD_MS) ); 
   }
     
 }
@@ -133,9 +141,12 @@ void setHeaterParameter(int newParameter[4])
  * The heater control child object
  * 
  */
-void heaterControl()
+void heaterControl(htrOne,htrTwo)
 {
-      
+  xSemaphoreTake(sem, portMAX_DELAY);
+  digitalWrite(htr1_pin,htrOne)
+  digitalWrite(htr2_pin,htrTwo)
+  xSemaphoreGive(sem);    
 }
 /*
  * End of the heaterControl child object
