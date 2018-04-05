@@ -98,6 +98,12 @@ void sampler(void *pvParameters)
          setMode(safeMode);
       }
 
+      /*Check for client*/
+      EthernetClient client = server.available();
+      if (client.available()>0)
+      {
+        xSemaphoreGive
+      }
       /*Check current sampling rate*/
       currSamplingRate = getSamplingRate();
       vTaskDelayUntil(&xLastWakeTime, (currSamplingRate / portTICK_PERIOD_MS) );
@@ -186,16 +192,6 @@ float* readData(int type)
       }
       return dummyData;
       break;
-
-      /* Reading Airflow*/
-      case 3 :
-      float dummyData [2];
-      for (int i=0 ; i < 2 ; i++)
-      {
-          dummyData[i] = pressReading[i];
-      }
-      return dummyData;
-      break;
   }
   xSemaphoreGive(sem);
 
@@ -240,4 +236,5 @@ void initPressSensor()
    pressSensor2.reset();
    pressSensor2.setOversamplingRate(MS5607_OSR2048);
 }
+
 
