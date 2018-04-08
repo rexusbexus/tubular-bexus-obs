@@ -5,7 +5,7 @@
 
 #define standbyMode 0
 #define normalAscent 1
-#define normalDesecent 2
+#define normalDescent 2
 #define safeMode 3
 #define manual 4
 
