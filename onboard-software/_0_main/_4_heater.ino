@@ -17,7 +17,7 @@ void initHeater() {
 void initReadingData() {
     xTaskCreate(
     readingData
-    ,  (const portCHAR *) "readingData";   // Name
+    ,  (const portCHAR *) "readingData"   // Name
     ,  128  // This stack size 
     ,  NULL
     ,  2  // Priority
@@ -29,8 +29,9 @@ void initReadingData() {
  * readingData reads the temperature data at valve center and electronics box.
  * Turn on/off the two heaters accoring to parameters.
  */
-void readingData()
+void readingData(void *pvParameters)
 {
+  (void) pvParameters;
   float tempAtHtr [2];
   
   TickType_t xLastWakeTime;
@@ -40,10 +41,9 @@ void readingData()
   {
     //Reads the current mode
     static int currMode = getMode();
-
     //Reads the temperature at the two sensors
-    float tempAtHts[0]  = readData(0);
-    float tempAtHts[1]  = readData(0);//Must make sure to get the correct tempSensors and add pointer.
+    tempAtHtr[0]  = readData(0);
+    tempAtHtr[1]  = readData(0);//Must make sure to get the correct tempSensors and add pointer.
     bool  htr1_flag;
     bool  htr2_flag;
     int *htrParam;
@@ -73,11 +73,11 @@ void readingData()
         htr2_flag = 0;
     }
     
-    if htr1_flag ^ htr2_flag  // if 0 1 or 1 0
+    if htr1_flag ^^ htr2_flag  // if 0 1 or 1 0
     {
       heaterControl(htr1_flag,htr1_flag);
     }
-    else if htr1_flag & htr2_flag // if 1 1
+    else if htr1_flag && htr2_flag // if 1 1
     {
       /*
        * If both heaters require to be turned on it will choose the one most
@@ -140,7 +140,7 @@ void setHeaterParameter(int newParameter[4])
  * The heater control child object
  * 
  */
-void heaterControl(htrOne,htrTwo)
+void heaterControl(int htrOne, int htrTwo)
 {
   xSemaphoreTake(sem, portMAX_DELAY);
   digitalWrite(htr1_pin,htrOne)

@@ -8,9 +8,9 @@
 
 #define pressSensorPSpin TBD
 
-#define safeModeThreshold TBD
-#define pressDifferentThresholdneg -TBD
-#define pressDifferentThresholdpos TBD
+#define safeModeThreshold 900
+#define pressDifferentThresholdneg -20
+#define pressDifferentThresholdpos 20
 
 Melon_MS5607 pressSensor();
 Melon_MS5607 pressSensor2();
@@ -39,13 +39,14 @@ void sampler(void *pvParameters)
 {
    (void) pvParameters;
 
-   float tempPressure [2];
+   float tempPressure[nrPressSensors];
    int count=0;
    float pressDifference;
-   float curPressureMeasurement [2];
+   float curPressureMeasurement[nrPressSensors];
    float meanPressure;
+   int currSamplingRate;
 
-   static signed BaseType_t xHigherPriorityTaskWoken;
+   static BaseType_t xHigherPriorityTaskWoken;
    TickType_t xLastWakeTime;
    xLastWakeTime = xTaskGetTickCount ();
 
@@ -66,13 +67,22 @@ void sampler(void *pvParameters)
       //float tempeMS2 = pressSensor2.getTemperature();
       float pressureMS2 = pressSensor2.getPressure();      
 
-      curPressureMeasurement = [pressureMS1, pressureMS2];
+      curPressureMeasurement[0] = pressureMS1;
+      curPressureMeasurement[1] = pressureMS2;
+      //curPressureMeasurement[2] = 
+      //curPressureMeasurement[3] = 
+      //curPressureMeasurement [4] = 
+      //curPressureMeasurement[5] = 
 
       /*Save pressure measurements*/
       writeData(curPressureMeasurement, 2);
 
-      meanPressure = (curPressureMeasurement[0] + (curPressureMeasurement[1]))/2;
-
+      for (int j = 0; j < nrPressSensors; j++)
+      {
+        meanPressure = meanPressure + curPressureMeasurement[j];
+      }
+      meanPressure = meanPressure/nrPressSensors;
+      
       if (count == 0)
       {
          tempPressure[count] = meanPressure;
@@ -102,7 +112,7 @@ void sampler(void *pvParameters)
 
       /*Listen to GS*/
       EthernetClient client = server.available();
-      if(client.available>0)
+      if(client.available()>0)
       {
          xSemaphoreGiveFromISR(semPeriodic, &xHigherPriorityTaskWoken );
       }
@@ -122,11 +132,12 @@ static void setSamplingRate(int curSamplingRate)
 
 int getSamplingRate(void)
 {
+   int tempSamplingRate;
    xSemaphoreTake(sem, portMAX_DELAY);
-   int tempSamplingRate
    tempSamplingRate = samplingRate;
-   return tempSamplingRate;
    xSemaphoreGive(sem);
+   return tempSamplingRate;
+   
 }
 
 static void writeData(float curMeasurements [], int type)
@@ -136,7 +147,7 @@ static void writeData(float curMeasurements [], int type)
    switch(type) {
       /*Temperature data*/
       case 0 :
-      for (int i=0 ; i < 5 ; i++)
+      for (int i=0 ; i < nrTempSensors ; i++)
       {
           tempReading[i] = curMeasurements[i];
       }
@@ -152,7 +163,7 @@ static void writeData(float curMeasurements [], int type)
 
       /*Pressure data*/
       case 2 :
-      for (int i=0 ; i < 2 ; i++)
+      for (int i=0 ; i < nrPressSensors ; i++)
       {
           pressReading[i] = curMeasurements[i];
       }
@@ -164,49 +175,56 @@ static void writeData(float curMeasurements [], int type)
 
 float* readData(int type)
 {
-  xSemaphoreTake(sem, portMAX_DELAY);
   switch(type){
       /*Reading Temperature*/
       case 0 :
-      float dummyData [4];
-      for (int i=0 ; i < 5 ; i++)
+      float dummyTemp [nrTempSensors];
+      xSemaphoreTake(sem, portMAX_DELAY);
+      for (int i=0 ; i < nrTempSensors ; i++)
       {
-          dummyData[i] = tempReading[i];
+          dummyTemp[i] = tempReading[i];
       }
-      return dummyData;
+      xSemaphoreGive(sem);
+      return dummyTemp;
       break;
       
       /*Reading Humidity*/
       case 1 :
-      float dummyData [1];
-      for (int i=0 ; i < 1 ; i++)
+      float dummyHum [nrHumidSensors];
+      xSemaphoreTake(sem, portMAX_DELAY);
+      for (int i=0 ; i < nrHumidSensors ; i++)
       {
-          dummyData[i] = humReading[i];
+          dummyHum[i] = humReading[i];
       }
-      return dummyData;
+      xSemaphoreGive(sem);
+      return dummyHum;
       break;
       
       /*Reading Pressure*/
       case 2 :
-      float dummyData [2];
-      for (int i=0 ; i < 2 ; i++)
+      float dummyPress [nrPressSensors];
+      xSemaphoreTake(sem, portMAX_DELAY);
+      for (int i=0 ; i < nrPressSensors ; i++)
       {
-          dummyData[i] = pressReading[i];
+          dummyPress[i] = pressReading[i];
       }
-      return dummyData;
+      xSemaphoreGive(sem);
+      return dummyPress;
       break;
 
       /* Reading Airflow*/
       case 3 :
-      float dummyData [2];
-      for (int i=0 ; i < 2 ; i++)
+      float dummyAf [1];
+      xSemaphoreTake(sem, portMAX_DELAY);
+      for (int i=0 ; i < 1 ; i++)
       {
-          dummyData[i] = pressReading[i];
+          dummyAf[i] = afReading[i];
       }
-      return dummyData;
+      xSemaphoreGive(sem);
+      return dummyAf;
       break;
   }
-  xSemaphoreGive(sem);
+  
 
 }
 
@@ -227,7 +245,7 @@ void initHumSensor()
    humSensor.setHumidRes(FOURTEEN_BIT);
 
    //begin measuring
-   sensor.triggerMeasurement();
+   humSensor.triggerMeasurement();
 }
 
 //float* hdc2010Read()
@@ -241,12 +259,12 @@ void initHumSensor()
 
 void initPressSensor()
 {
-   pressSensor.begin(msADDR1);
    pressSensor.reset();
+   pressSensor.begin(msADDR1);
    pressSensor.setOversamplingRate(MS5607_OSR2048);
 
-   pressSensor2.begin(msADDR2);
    pressSensor2.reset();
+   pressSensor2.begin(msADDR2);
    pressSensor2.setOversamplingRate(MS5607_OSR2048);
 }
 

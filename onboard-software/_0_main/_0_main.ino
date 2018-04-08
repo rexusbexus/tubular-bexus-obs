@@ -1,7 +1,7 @@
-#include <basic_io_arm.h>
+//#include <basic_io_arm.h>
 #include <FreeRTOS_ARM.h>
-#include <semphr.h>
-#include <task.h>
+//#include <semphr.h>
+//#include <task.h>
 #include <SPI.h>
 #include <stdbool.h>
 
@@ -36,16 +36,22 @@
 #define nrAirFSensors   1
 int loremSensor;
 
+#define standbyMode 0
+#define normalAscent 1
+#define normalDescent 2
+#define safeMode 3
+#define manual 4
 
 
-SemaphoreHandle_t sem = NULL;
-SemaphoreHandle_t semPeriodic = NULL;
+
+SemaphoreHandle_t sem;
+SemaphoreHandle_t semPeriodic;
 static int state;
 static int samplingRate;
 static float tempReading [nrTempSensors]; //array size might change according to the fix quantity
 static float humReading [nrHumidSensors];
 static float pressReading [nrPressSensors]; //array size might change according to the fix quantity
-static float humidReading[nrAirFSensors]
+static float afReading[nrAirFSensors];
 static int htrParameter[4];
 static float ascParameter[20];
 double status=0;
@@ -58,14 +64,15 @@ IPAddress subnet(255, 0, 0, 0);
 IPAddress remote(1, 1, 1, 2);
 unsigned int localPort = 8888;
 EthernetUDP Udp;
-
+EthernetServer server = EthernetServer(4000);
 
 /*init*/
 void setup()
 {
-    sem = xSemaphoreCreateBinary();
+    sem = xSemaphoreCreateMutex();
     semPeriodic = xSemaphoreCreateBinary();
-    init();
+    initAll();
+    vTaskStartScheduler();
 
 }
 

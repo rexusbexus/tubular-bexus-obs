@@ -3,13 +3,13 @@
 
 ***************************************************/
 
-void init()
+void initAll()
 {
     
     initMode();
     initSensor();
     initHeater();
-    initTelecommand()
-    initASC()
+    initTelecommand();
+    initASC();
 }
 
