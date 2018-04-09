@@ -22,7 +22,7 @@ function varargout = groundStation_GUI(varargin)
 
 % Edit the above text to modify the response to help groundStation_GUI
 
-% Last Modified by GUIDE v2.5 05-Apr-2018 10:42:13
+% Last Modified by GUIDE v2.5 08-Apr-2018 18:39:26
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,11 +55,37 @@ function groundStation_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for groundStation_GUI
 handles.output = hObject;
 
+% Initialise tabs
+handles.tabManager = TabManager( hObject );
+
+% Set-up a selection changed function on the create tab groups
+tabGroups = handles.tabManager.TabGroups;
+for tgi=1:length(tabGroups)
+    set(tabGroups(tgi),'SelectionChangedFcn',@tabChangedCB)
+end
+
+%logo generation
+tubular_logo = imread('tubular_logo.png');
+bexrex_logo = imread('bexrex_logo.png');
+
+axes(handles.tubular_logo);
+imshow(tubular_logo);
+
+axes(handles.bexus_logo);
+imshow(bexrex_logo);
+%end of logo generation
+
 % Update handles structure
 guidata(hObject, handles);
 
 % UIWAIT makes groundStation_GUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
+
+% Called when a user clicks on a tab
+function tabChangedCB(src, eventdata)
+
+disp(['Changing tab from ' eventdata.OldValue.Title ' to ' eventdata.NewValue.Title ] );
+
 
 
 % --- Outputs from this function are returned to the command line.
@@ -99,3 +125,92 @@ function udp_stop_Callback(hObject, eventdata, handles)
 % hObject    handle to udp_stop (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+
+function edit2_Callback(hObject, eventdata, handles)
+% hObject    handle to edit2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit2 as text
+%        str2double(get(hObject,'String')) returns contents of edit2 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in check_mode_setting.
+function check_mode_setting_Callback(hObject, eventdata, handles)
+% hObject    handle to check_mode_setting (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of check_mode_setting
+
+
+% --- Executes on button press in check_heater_control.
+function check_heater_control_Callback(hObject, eventdata, handles)
+% hObject    handle to check_heater_control (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of check_heater_control
+
+
+% --- Executes on button press in check_pump_control.
+function check_pump_control_Callback(hObject, eventdata, handles)
+% hObject    handle to check_pump_control (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of check_pump_control
+
+
+% --- Executes on button press in check_valves_control.
+function check_valves_control_Callback(hObject, eventdata, handles)
+% hObject    handle to check_valves_control (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of check_valves_control
+
+
+% --- Executes on button press in send_telecommand.
+function send_telecommand_Callback(hObject, eventdata, handles)
+% hObject    handle to send_telecommand (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+function edit3_Callback(hObject, eventdata, handles)
+% hObject    handle to edit3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit3 as text
+%        str2double(get(hObject,'String')) returns contents of edit3 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
