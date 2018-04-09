@@ -3,6 +3,8 @@
 #include <MS5xxx.h>
 #include <Wire.h>
 
+#include <StandardCplusplus.h>
+#include <vector>
 
 #include <SPI.h>
 #include <stdbool.h>
