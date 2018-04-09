@@ -54,7 +54,7 @@ void sampler(void *pvParameters)
    while(1)
    {
       xHigherPriorityTaskWoken = pdFALSE;
-      static int currMode = getMode();
+      int8_t currMode = getMode();
 
       pressSensorread();
 
