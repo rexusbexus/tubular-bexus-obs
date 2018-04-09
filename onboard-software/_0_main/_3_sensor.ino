@@ -12,15 +12,16 @@
 #define pressDifferentThresholdneg -20
 #define pressDifferentThresholdpos 20
 
-Melon_MS5607 pressSensor();
-Melon_MS5607 pressSensor2();
+MS5xxx pressSensor(&Wire);
+MS5xxx pressSensor2(&Wire);
+MS5xxx pressSensor3(&Wire);
 HDC2010 humSensor(hdcADDR);
+M2M_LM75A tempSensor;
 
 void initSensor()
 {
    initSampler;
    initHumSensor;
-   initPressSensor;
 }
 
 void initSampler()
@@ -43,7 +44,7 @@ void sampler(void *pvParameters)
    int count=0;
    float pressDifference;
    float curPressureMeasurement[nrPressSensors];
-   float meanPressure;
+   float meanPressureValveC;
    int currSamplingRate;
 
    static BaseType_t xHigherPriorityTaskWoken;
@@ -55,21 +56,26 @@ void sampler(void *pvParameters)
       xHigherPriorityTaskWoken = pdFALSE;
       static int currMode = getMode();
 
+      pressSensorread();
+
       /*read temperature and humidity from HDC*/
       //float temperatureHDC = humSensor.readTemp();
       float humHDC = humSensor.readHumidity();
 
        /*read temperature and pressure from MS1*/
       //float tempeMS1 = pressSensor.getTemperature();
-      float pressureMS1 = pressSensor.getPressure();
+      float pressureMS1 = pressSensor.GetPres();
 
        /*read temperature and pressure from MS2*/
       //float tempeMS2 = pressSensor2.getTemperature();
-      float pressureMS2 = pressSensor2.getPressure();      
+      float pressureMS2 = pressSensor.GetPres();   
 
+      /*read temperature and pressure from MS2*/
+      float pressureMS3 = pressSensor3.GetPres();
+         
       curPressureMeasurement[0] = pressureMS1;
       curPressureMeasurement[1] = pressureMS2;
-      //curPressureMeasurement[2] = 
+      curPressureMeasurement[2] = pressureMS3;
       //curPressureMeasurement[3] = 
       //curPressureMeasurement [4] = 
       //curPressureMeasurement[5] = 
@@ -77,20 +83,16 @@ void sampler(void *pvParameters)
       /*Save pressure measurements*/
       writeData(curPressureMeasurement, 2);
 
-      for (int j = 0; j < nrPressSensors; j++)
-      {
-        meanPressure = meanPressure + curPressureMeasurement[j];
-      }
-      meanPressure = meanPressure/nrPressSensors;
+      meanPressureValveC = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       
       if (count == 0)
       {
-         tempPressure[count] = meanPressure;
+         tempPressure[count] = meanPressureValveC;
          count=1;
       }
       else
       {
-         tempPressure[count] = meanPressure;
+         tempPressure[count] = meanPressureValveC;
          pressDifference = tempPressure[1] - tempPressure[0];
          count=0;
       }
@@ -104,7 +106,7 @@ void sampler(void *pvParameters)
       {
          setMode(normalDescent);
       }
-      else if (currMode==normalDescent && meanPressure<=safeModeThreshold)
+      else if (currMode==normalDescent && meanPressureValveC<=safeModeThreshold)
       {
          setMode(safeMode);
       }
@@ -248,24 +250,14 @@ void initHumSensor()
    humSensor.triggerMeasurement();
 }
 
-//float* hdc2010Read()
-//{
-//   float temperatureHDC = humSensor.readTemp();
-//   float humHDC = humSensor.readHumidity();
-//   static float measurements [2] = { temperatureHDC, humHDC};
-//
-//   return measurements;
-//}
-
-void initPressSensor()
+void pressSensorread()
 {
-   pressSensor.reset();
-   pressSensor.begin(msADDR1);
-   pressSensor.setOversamplingRate(MS5607_OSR2048);
-
-   pressSensor2.reset();
-   pressSensor2.begin(msADDR2);
-   pressSensor2.setOversamplingRate(MS5607_OSR2048);
+  pressSensor.ReadProm();
+  pressSensor.Readout();
+  pressSensor2.ReadProm();
+  pressSensor2.Readout();
+  pressSensor3.ReadProm();
+  pressSensor3.Readout();
 }
 
 
