@@ -44,7 +44,7 @@ void sampler(void *pvParameters)
    int count=0;
    float pressDifference;
    float curPressureMeasurement[nrPressSensors];
-   float meanPressureValveC;
+   float meanPressureAmbient;
    int currSamplingRate;
 
    static BaseType_t xHigherPriorityTaskWoken;
@@ -83,16 +83,16 @@ void sampler(void *pvParameters)
       /*Save pressure measurements*/
       writeData(curPressureMeasurement, 2);
 
-      meanPressureValveC = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
+      meanPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       
       if (count == 0)
       {
-         tempPressure[count] = meanPressureValveC;
+         tempPressure[count] = meanPressureAmbient;
          count=1;
       }
       else
       {
-         tempPressure[count] = meanPressureValveC;
+         tempPressure[count] = meanPressureAmbient;
          pressDifference = tempPressure[1] - tempPressure[0];
          count=0;
       }
@@ -106,7 +106,7 @@ void sampler(void *pvParameters)
       {
          setMode(normalDescent);
       }
-      else if (currMode==normalDescent && meanPressureValveC<=safeModeThreshold)
+      else if (currMode==normalDescent && meanPressureAmbient<=safeModeThreshold)
       {
          setMode(safeMode);
       }
@@ -175,12 +175,16 @@ static void writeData(float curMeasurements [], int type)
    xSemaphoreGive(sem);
 }
 
-float* readData(int type)
+std::vector<float> readData(int type)
 {
+  std::vector<float> dummyTemp(nrTempSensors);
+  std::vector<float> dummyHum(nrHumidSensors);
+  std::vector<float> dummyPress(nrPressSensors);
+  std::vector<float> dummyAf(1);
   switch(type){
       /*Reading Temperature*/
       case 0 :
-      float dummyTemp [nrTempSensors];
+      
       xSemaphoreTake(sem, portMAX_DELAY);
       for (int i=0 ; i < nrTempSensors ; i++)
       {
@@ -192,7 +196,7 @@ float* readData(int type)
       
       /*Reading Humidity*/
       case 1 :
-      float dummyHum [nrHumidSensors];
+      
       xSemaphoreTake(sem, portMAX_DELAY);
       for (int i=0 ; i < nrHumidSensors ; i++)
       {
@@ -204,7 +208,7 @@ float* readData(int type)
       
       /*Reading Pressure*/
       case 2 :
-      float dummyPress [nrPressSensors];
+      
       xSemaphoreTake(sem, portMAX_DELAY);
       for (int i=0 ; i < nrPressSensors ; i++)
       {
@@ -216,7 +220,7 @@ float* readData(int type)
 
       /* Reading Airflow*/
       case 3 :
-      float dummyAf [1];
+      
       xSemaphoreTake(sem, portMAX_DELAY);
       for (int i=0 ; i < 1 ; i++)
       {
