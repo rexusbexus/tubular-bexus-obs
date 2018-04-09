@@ -68,7 +68,7 @@ void reading(void *pvParameters)
 
    while(1)
    {
-      int currMode = getMode();
+      int8_t currMode = getMode();
      
      dummyParam = getASCParam(bagcounter);
      ascParam[0] = dummyParam[0];
@@ -245,6 +245,9 @@ void valvesControl(int valve, int cond)
 
     case 11:
     digitalWrite(flushValve, LOW);
+    break;
+
+    default:
     break;
   }
   xSemaphoreGive(sem);

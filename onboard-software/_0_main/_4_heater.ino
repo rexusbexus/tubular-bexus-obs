@@ -6,14 +6,13 @@
  * Authors: Tubular-Bexus software group.
 */
 
-float *htrParam[4];
-float htrParameter[4];
+ int *htrParam;
 
 
 void initHeater() {
   
   initReadingData();
- // int htrParameter[4];
+  int htrParameter[4];
 
 }
 
@@ -43,7 +42,7 @@ void readingData(void *pvParameters)
   while(1)
   {
     //Reads the current mode
-    static int currMode = getMode();
+    int8_t currMode = getMode();
     //Reads the temperature at the two sensors
     tempAtHtr[0]  = *readData(0);
     tempAtHtr[1]  = *readData(0);//Must make sure to get the correct tempSensors and add pointer.
@@ -52,31 +51,31 @@ void readingData(void *pvParameters)
     
 
     //Compares with parameters
-    if (tempAtHtr[0]<=0 || tempAtHtr[0]==16777215 || tempAtHtr[1]<=0 || tempAtHtr[1]>=16777215)
+    if (tempAtHtr[0]=<0 || tempAtHtr[0]=>16777215 || tempAtHtr[1]=<0 || tempAtHtr[1]=>16777215)
     {
       /*
        * Check if within correct value of parameters
        * Also works for errors in tempAtHts[]
        */
     }    
-    else if (*(htrParam[0])<tempAtHtr[0])
+    else if (*(htrParam+0)<tempAtHtr[0])
     {
         htr1_flag = 1;
     }
-    else if (*(htrParam[1])>tempAtHtr[0])
+    else if (*(htrParam+1)>tempAtHtr[0])
     {
         htr1_flag = 0;
     }
-    else if (*(htrParam[2])<tempAtHtr[1])
+    else if (*(htrParam+2)<tempAtHtr[1])
     {
         htr2_flag = 1;
     }
-    else if (*(htrParam[3])>tempAtHtr[1])
+    else if (*(htrParam+3)>tempAtHtr[1])
     {
         htr2_flag = 0;
     }
     
-    if (htr1_flag ^ htr2_flag)  // if 0 1 or 1 0
+    if (htr1_flag ^^ htr2_flag)  // if 0 1 or 1 0
     {
       heaterControl(htr1_flag,htr1_flag);
     }
@@ -86,11 +85,11 @@ void readingData(void *pvParameters)
        * If both heaters require to be turned on it will choose the one most
        * largest difference between their paramters and actual temperature.
        */
-      if ((*(htrParam[0]) - tempAtHtr[0])>( *(htrParam[2]) - tempAtHtr[1]))
+      if ((*(htrParam+0) - tempAtHtr[0])>( *(htrParam+2) - tempAtHtr[1]))
       {
         heaterControl(1,0);
       }
-      else if ((*(htrParam[0]) - tempAtHtr[0])<( *(htrParam[2]) - tempAtHtr[1]))
+      else if ((*(htrParam+0) - tempAtHtr[0])<( *(htrParam+2) - tempAtHtr[1]))
       {
         heaterControl(0,1);
       }
@@ -116,23 +115,20 @@ void readingData(void *pvParameters)
  *  int * heaterParameter returns the pointer
  *  to htrParam.
  */
-void *readHeaterParameter()
+int *readHeaterParameter()
 {
-  int i=0;
+  //static int htrParam[4];
   xSemaphoreTake(sem, portMAX_DELAY);
-  //htrParam = htrParameter;
-  for ( i = 0; i < 3; i++) {
-      htrParam[i] = &htrParameter[i];
-   }
+  htrParam = &htrParameter;
   xSemaphoreGive(sem);    
-  //return htrParam;
+  return htrParam;
 }
 
 /* setHeaterParameter has an array of four(4) 
  *  elemnets and will replace the htrParameter array
  *  with new values
  */
-void setHeaterParameter(float newParameter[4])
+void setHeaterParameter(int newParameter[4])
 {
   xSemaphoreTake(sem, portMAX_DELAY);
   htrParameter[0]=(newParameter[0]);//,*newParameter+1,*newParameter+2,*newParameter+3);

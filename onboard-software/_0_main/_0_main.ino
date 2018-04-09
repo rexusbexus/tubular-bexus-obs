@@ -43,17 +43,9 @@
 #define nrAirFSensors   1
 int loremSensor;
 
-#define standbyMode 0
-#define normalAscent 1
-#define normalDescent 2
-#define safeMode 3
-#define manual 4
-
-
-
 SemaphoreHandle_t sem;
 SemaphoreHandle_t semPeriodic;
-static int state;
+static int8_t state;
 static int samplingRate;
 static float tempReading [nrTempSensors]; //array size might change according to the fix quantity
 static float humReading [nrHumidSensors];
