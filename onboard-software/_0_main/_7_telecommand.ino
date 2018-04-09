@@ -8,7 +8,7 @@ void initTelecommand()
 
   xTaskCreate(
     telecommand
-    ,  (const portCHAR *) "telecommand";   // Name
+    ,  (const portCHAR *) "telecommand"   // Name
     ,  128  // This stack size 
     ,  NULL
     ,  3  // Priority

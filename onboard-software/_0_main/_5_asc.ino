@@ -5,10 +5,20 @@
  * 
  */
 
+std::vector<float> getASCParam(int bag)
+{
+  std::vector<float> dummyParameter(2);
+  xSemaphoreTake(sem, portMAX_DELAY);
+  dummyParameter[0] = ascParameter[(bag*2)-2];
+  dummyParameter[1] = ascParameter[(bag*2)-1];
+  xSemaphoreGive(sem);
+  return dummyParameter;
+}
+
 void initASC()
 {
   initReading();
-  initPumpControl)();
+  initPumpControl();
   initValvesControl();
 }
 
@@ -16,7 +26,7 @@ void initReading()
 {
   xTaskCreate(
     reading
-    ,  (const portCHAR *) "reading";   // Name
+    ,  (const portCHAR *) "reading"   // Name
     ,  128  // This stack size 
     ,  NULL
     ,  1  // Priority
@@ -44,26 +54,29 @@ void initValvesControl()
   pinMode(CACvalve, OUTPUT);
 }
 
-void reading()
+void reading(void *pvParameters)
 {
-   
-   float *ascParam;
+   (void) pvParameters;
+   std::vector<float> dummyParam(2);
+   float ascParam[2];
    int bagcounter = 1;
-   float *currPressure;
-   float meanPressure;
+   std::vector<float> currPressure(nrPressSensors);
+   float meanPressureAmbient;
    
    TickType_t xLastWakeTime;
    xLastWakeTime = xTaskGetTickCount ();
 
    while(1)
    {
-     static int currMode = getMode();
+      int currMode = getMode();
      
-     ascParam = getASCParameter(bagcounter);
+     dummyParam = getASCParam(bagcounter);
+     ascParam[0] = dummyParam[0];
+     ascParam[1] = dummyParam[1];
      currPressure = readData(2);
 
      /*Calculating mean pressure from several pressure sensors*/
-     meanPressure = (currPressure + (currPressure+1))/2;
+     meanPressureAmbient = (currPressure[0]+currPressure[1])/2;
 
      switch (currMode){
      /*Standby*/
@@ -72,7 +85,7 @@ void reading()
      /*Normal - Ascent*/
      case normalAscent:
      digitalWrite(CACvalve, HIGH);
-     if (meanPressure >= ascParam && meanPressure<= (ascParam+1))
+     if (meanPressureAmbient >= ascParam[0] && meanPressureAmbient<= (ascParam[1]))
      {
         valvesControl(11, 1); //delay(10);
         pumpControl(1); //delay(1000);
@@ -83,14 +96,14 @@ void reading()
      {
         pumpControl(0); //delay(100);
         valvesControl(bagcounter, 0); //delay(10);
-        if (bagcounter<10 && meanPressure>=(ascParam+1)){
+        if (bagcounter<10 && meanPressureAmbient>=(ascParam[1])){
           //bagcounter++;  // need to figure this out later
         }
      }
      break;
      /*Normal - Descent*/
      case normalDescent:
-     if (meanPressure >= ascParam && meanPressure<= (ascParam+1))
+     if (meanPressureAmbient >= ascParam[0] && meanPressureAmbient<= (ascParam[1]))
      {
         valvesControl(11, 1); //delay(10);
         pumpControl(1);
@@ -101,7 +114,7 @@ void reading()
      {
         pumpControl(0); //delay(100);
         valvesControl(bagcounter, 0); //delay(10);
-        if (bagcounter<10 && meanPressure<= ascParam){
+        if (bagcounter<10 && meanPressureAmbient<= ascParam[0]){
           bagcounter++;
         }
      }
@@ -116,20 +129,12 @@ void reading()
      }
      break;
    }
-   vTaskDelayUntil(&xLastWakeTime, (500 / portTICK_PERIOD_MS) );
+   vTaskDelayUntil(&xLastWakeTime, (800 / portTICK_PERIOD_MS) );
    }
 }
 
 
-float* getASCParam(int bag)
-{
-  float dummyParameter[2]
-  xSemaphoreTake(sem, portMAX_DELAY);
-  dummyParameter[0] = ascParameter[(bag*2)-2];
-  dummyParameter[1] = ascParameter[(bag*2)-1];
-  xSemaphoreGive(sem);
-  return dummyParameter
-}
+
 
 void pumpControl(int cond)
 {
