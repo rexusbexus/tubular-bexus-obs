@@ -1,24 +1,7 @@
 #include <M2M_LM75A.h>
-
 #include <MS5611.h>
 #include <MS5xxx.h>
 #include <Wire.h>
-
-#include <cmsis_os.h>
-#include <croutine.h>
-#include <event_groups.h>
-#include <FreeRTOS.h>
-#include <FreeRTOSConfig.h>
-#include <FreeRTOSConfig_Default.h>
-#include <list.h>
-#include <mpu_prototypes.h>
-#include <portmacro.h>
-#include <queue.h>
-#include <semphr.h>
-#include <StackMacros.h>
-#include <STM32FreeRTOS.h>
-#include <task.h>
-#include <timers.h>
 
 
 #include <SPI.h>
@@ -26,6 +9,9 @@
 
 #include <Ethernet2.h>
 #include <EthernetUdp2.h>
+
+//#include <basic_io_arm.h>
+#include <FreeRTOS_ARM.h>
 
 //#include <Melon_MS5607.h> //pressure sensor lib
 #include <HDC2010.h> //humidity sensor lib
