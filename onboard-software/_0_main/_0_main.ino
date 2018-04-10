@@ -51,7 +51,7 @@ static float tempReading [nrTempSensors]; //array size might change according to
 static float humReading [nrHumidSensors];
 static float pressReading [nrPressSensors]; //array size might change according to the fix quantity
 static float afReading[nrAirFSensors];
-static int htrParameter[4];
+//static int htrParameter[4];
 static float ascParameter[20];
 double status=0;
 
