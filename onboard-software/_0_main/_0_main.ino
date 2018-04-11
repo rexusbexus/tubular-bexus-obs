@@ -1,10 +1,11 @@
+#include <ArduinoSTL.h>
+#include <vector>
 #include <M2M_LM75A.h>
 #include <MS5611.h>
 #include <MS5xxx.h>
 #include <Wire.h>
 
-#include <StandardCplusplus.h>
-#include <vector>
+
 
 #include <SPI.h>
 #include <stdbool.h>
