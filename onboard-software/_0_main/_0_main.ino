@@ -1,10 +1,11 @@
+#include <ArduinoSTL.h>
+#include <vector>
 #include <M2M_LM75A.h>
 #include <MS5611.h>
 #include <MS5xxx.h>
 #include <Wire.h>
 
-#include <StandardCplusplus.h>
-#include <vector>
+
 
 #include <SPI.h>
 #include <stdbool.h>
@@ -51,7 +52,7 @@ static float tempReading [nrTempSensors]; //array size might change according to
 static float humReading [nrHumidSensors];
 static float pressReading [nrPressSensors]; //array size might change according to the fix quantity
 static float afReading[nrAirFSensors];
-static int htrParameter[4];
+//static int htrParameter[4];
 static float ascParameter[20];
 double status=0;
 
