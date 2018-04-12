@@ -38,9 +38,9 @@
 #define htr1_pin 33
 #define htr2_pin 34
 
-#define nrTempSensors   6
+#define nrTempSensors   9
 #define nrPressSensors  6
-#define nrHumidSensors  2
+#define nrHumidSensors  1
 #define nrAirFSensors   1
 int loremSensor;
 
