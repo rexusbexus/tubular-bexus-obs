@@ -4,7 +4,7 @@
 #include <MS5611.h>
 #include <MS5xxx.h>
 #include <Wire.h>
-
+#include <SD.h>
 
 
 #include <SPI.h>
@@ -69,6 +69,7 @@ EthernetServer server = EthernetServer(4000);
 /*init*/
 void setup()
 {
+    Serial.begin(9600);
     sem = xSemaphoreCreateMutex();
     semPeriodic = xSemaphoreCreateBinary();
     initAll();

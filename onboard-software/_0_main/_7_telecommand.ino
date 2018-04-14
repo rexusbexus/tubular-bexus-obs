@@ -22,10 +22,10 @@ std::vector<std::vector<int8_t>> scanBuffer(int8_t bufferD, int r, int c, int da
   int8_t separator;
   int i = 0;
   int k = 0;
-  std::vector<std::vector<int8_t>> command(r, std::vector(c,0));
+  std::vector<std::vector<int8_t>> command(r, std::vector<int8_t>(c,0));
   for (int n = 0; n < r; n++)
   {
-    while(bufferD[i] ~= ',')
+    while(bufferD[i] != ",")
     {
       command[n][k] = bufferD[i];
       i++;
@@ -73,7 +73,7 @@ void telecommand(void *pvParameters)
 
       r = checkComma(data_tcp, r, datasize);
 
-      std::vector<std::vector<int8_t>> command (r, std:vector(c, 0));
+      std::vector<std::vector<int8_t>> command (r, std::vector<int8_t>(c, 0));
 
       /*declare all command variables*/
       int8_t nrParam;
@@ -85,19 +85,19 @@ void telecommand(void *pvParameters)
       /*checkCommandsource*/
       if (checkCommand(data_tcp) == true)
       {
-          command = scanbuffer(data_tcp, r, c);
+          command = scanBuffer(data_tcp, r, c, datasize);
           int8_t nrSubCommand = command[2][1];
           
           int k = 0; //int e = 0;
           while (k < r)
           {
-            if (command[k][0] = "m" && command[k][1] = "d")
+            if (command[k][0] == "m" && command[k][1] == "d")
             {
               nrParam = command[k+1][0];
               mode[0] = command[k+2][0];
               
             }
-            if (command[k][0] = "h" && command[k][1] = "t" && command[k][2] = "r")
+            if (command[k][0] == "h" && command[k][1] == "t" && command[k][2] == "r")
             {
               nrParam = command[k+1][0];
               for (int z = 0; z < nrParam; z++)
@@ -108,7 +108,7 @@ void telecommand(void *pvParameters)
                 }
               }
             }
-            if (command[k][0] = "a" & command[k][1] = "s" && command[k][2] = "c")
+            if (command[k][0] == "a" & command[k][1] == "s" && command[k][2] == "c")
             {
                nrParam = command[k+1][0];
               for (int z = 0; z < nrParam; z++)
@@ -119,7 +119,7 @@ void telecommand(void *pvParameters)
                 }
               }
             }
-            if (command[k][0] = "s" & command[k][1] = "s")
+            if (command[k][0] == "s" & command[k][1] == "s")
             {
               nrParam = command[k+1][0];
               ss[0] = command[k+2][0];
@@ -139,7 +139,7 @@ int checkComma(int8_t data[], int j, int8_t datasize)
 {
   for (int n = 0; n < datasize; n++)
   {
-    if (data[n] == ',')
+    if (data[n] == ",")
     {
       j++;
     }
