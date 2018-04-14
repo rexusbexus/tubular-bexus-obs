@@ -20,7 +20,7 @@ void telecommand()
 {
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount ();
-  int mode;
+  int8_t mode;
   int commandSize; 
 
   while(1)

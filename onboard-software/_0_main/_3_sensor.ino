@@ -15,13 +15,25 @@
 MS5xxx pressSensor(&Wire);
 MS5xxx pressSensor2(&Wire);
 MS5xxx pressSensor3(&Wire);
+MS5xxx pressSensor4(&Wire);
+MS5xxx pressSensor5(&Wire);
+MS5xxx pressSensor6(&Wire);
 HDC2010 humSensor(hdcADDR);
-M2M_LM75A tempSensor;
+M2M_LM75A temptSensor;
+M2M_LM75A temptSensor2;
+M2M_LM75A temptSensor3;
+M2M_LM75A temptSensor4;
+M2M_LM75A temptSensor5;
+M2M_LM75A temptSensor6;
+M2M_LM75A temptSensor7;
+M2M_LM75A temptSensor8;
+M2M_LM75A temptSensor9;
 
 void initSensor()
 {
    initSampler;
    initHumSensor;
+   initTemptSensors;
 }
 
 void initSampler()
@@ -45,7 +57,9 @@ void sampler(void *pvParameters)
    float pressDifference;
    float curPressureMeasurement[nrPressSensors];
    float meanPressureAmbient;
+   float curTemperatureMeasurement[nrTempSensors];
    int currSamplingRate;
+   float curHumMeasurement[nrHumidSensors];
 
    static BaseType_t xHigherPriorityTaskWoken;
    TickType_t xLastWakeTime;
@@ -54,34 +68,35 @@ void sampler(void *pvParameters)
    while(1)
    {
       xHigherPriorityTaskWoken = pdFALSE;
-      static int currMode = getMode();
+      int8_t currMode = getMode();
 
       pressSensorread();
 
-      /*read temperature and humidity from HDC*/
-      //float temperatureHDC = humSensor.readTemp();
-      float humHDC = humSensor.readHumidity();
+      /*read humidity from HDC*/
+      curHumMeasurement[0] = humSensor.readHumidity();
 
-       /*read temperature and pressure from MS1*/
-      //float tempeMS1 = pressSensor.getTemperature();
-      float pressureMS1 = pressSensor.GetPres();
-
-       /*read temperature and pressure from MS2*/
-      //float tempeMS2 = pressSensor2.getTemperature();
-      float pressureMS2 = pressSensor.GetPres();   
-
-      /*read temperature and pressure from MS2*/
-      float pressureMS3 = pressSensor3.GetPres();
+      curTemperatureMeasurement[0] = temptSensor.getTemperature();
+      curTemperatureMeasurement[1] = temptSensor2.getTemperature();
+      curTemperatureMeasurement[2] = temptSensor3.getTemperature();
+      curTemperatureMeasurement[3] = temptSensor4.getTemperature();
+      curTemperatureMeasurement[4] = temptSensor5.getTemperature();
+      curTemperatureMeasurement[5] = temptSensor6.getTemperature();
+      curTemperatureMeasurement[6] = temptSensor7.getTemperature();
+      curTemperatureMeasurement[7] = temptSensor8.getTemperature();
+      curTemperatureMeasurement[8] = temptSensor9.getTemperature();
          
-      curPressureMeasurement[0] = pressureMS1;
-      curPressureMeasurement[1] = pressureMS2;
-      curPressureMeasurement[2] = pressureMS3;
-      //curPressureMeasurement[3] = 
-      //curPressureMeasurement [4] = 
-      //curPressureMeasurement[5] = 
+      curPressureMeasurement[0] = pressSensor.GetPres();
+      curPressureMeasurement[1] = pressSensor2.GetPres();
+      curPressureMeasurement[2] = pressSensor3.GetPres();
+      curPressureMeasurement[3] = pressSensor4.GetPres();
+      curPressureMeasurement[4] = pressSensor5.GetPres();
+      curPressureMeasurement[5] = pressSensor6.GetPres();
 
-      /*Save pressure measurements*/
+      /*Save sensors measurements*/
       writeData(curPressureMeasurement, 2);
+      writeData(curTemperatureMeasurement, 0);
+      writeData(curHumMeasurement, 1);
+      
 
       meanPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       
@@ -252,6 +267,19 @@ void initHumSensor()
 
    //begin measuring
    humSensor.triggerMeasurement();
+}
+
+void initTemptSensors()
+{
+  temptSensor.begin();
+  temptSensor2.begin();
+  temptSensor3.begin();
+  temptSensor4.begin();
+  temptSensor5.begin();
+  temptSensor6.begin();
+  temptSensor7.begin();
+  temptSensor8.begin();
+  temptSensor9.begin();
 }
 
 void pressSensorread()

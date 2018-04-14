@@ -3,11 +3,11 @@
 
 ***************************************************/
 
-#define standbyMode 0
-#define normalAscent 1
-#define normalDescent 2
-#define safeMode 3
-#define manual 4
+#define standbyMode int8_t(0)
+#define normalAscent int8_t(1)
+#define normalDescent int8_t(2)
+#define safeMode int8_t(3)
+#define manual int8_t(4)
 
 void initMode()
 {

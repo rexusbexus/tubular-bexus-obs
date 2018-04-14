@@ -42,7 +42,7 @@ void readingData(void *pvParameters)
   while(1)
   {
     //Reads the current mode
-    static int currMode = getMode();
+    int8_t currMode = getMode();
     //Reads the temperature at the two sensors
     tempAtHtr[0]  = *readData(0);
     tempAtHtr[1]  = *readData(0);//Must make sure to get the correct tempSensors and add pointer.

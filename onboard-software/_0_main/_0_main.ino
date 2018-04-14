@@ -39,17 +39,9 @@
 
 #define nrTempSensors   6
 #define nrPressSensors  6
-#define nrHumidSensors  2
+#define nrHumidSensors  1
 #define nrAirFSensors   1
 int loremSensor;
-
-#define standbyMode 0
-#define normalAscent 1
-#define normalDescent 2
-#define safeMode 3
-#define manual 4
-
-
 
 SemaphoreHandle_t sem;
 SemaphoreHandle_t semPeriodic;
@@ -76,6 +68,7 @@ EthernetServer server = EthernetServer(4000);
 /*init*/
 void setup()
 {
+    Serial.begin(9600);
     sem = xSemaphoreCreateMutex();
     semPeriodic = xSemaphoreCreateBinary();
     initAll();
