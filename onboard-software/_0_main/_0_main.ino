@@ -70,6 +70,7 @@ EthernetServer server = EthernetServer(4000);
 void setup()
 {
     Serial.begin(9600);
+    server.begin();
     sem = xSemaphoreCreateMutex();
     semPeriodic = xSemaphoreCreateBinary();
     initAll();
