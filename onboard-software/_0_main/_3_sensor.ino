@@ -7,6 +7,7 @@
 #define msADDR2 0x78
 
 #define pressSensorPSpin TBD
+#define sdCS 4
 
 #define safeModeThreshold 900
 #define pressDifferentThresholdneg -20
@@ -33,6 +34,7 @@ void initSensor()
 {
    initSampler;
    initHumSensor;
+   SD.begin(sdCS);
 }
 
 void initSampler()
@@ -56,6 +58,7 @@ void sampler(void *pvParameters)
    float pressDifference;
    float curPressureMeasurement[nrPressSensors];
    float curTemperatureMeasurement[nrTempSensors];
+   float curHumMeasurement[nrHumidSensors];
    float meanPressureAmbient;
    int currSamplingRate;
 
@@ -65,6 +68,7 @@ void sampler(void *pvParameters)
 
    while(1)
    {
+      
       xHigherPriorityTaskWoken = pdFALSE;
       int8_t currMode = getMode();
 
@@ -72,7 +76,7 @@ void sampler(void *pvParameters)
 
       /*read humidity from HDC*/
       //float temperatureHDC = humSensor.readTemp();
-      float humHDC = humSensor.readHumidity();
+      curHumMeasurement[0] = humSensor.readHumidity();
 
       /*Read pressure from sensors*/
       curPressureMeasurement[0] = pressSensor.GetPres();
@@ -97,7 +101,13 @@ void sampler(void *pvParameters)
       writeData(curPressureMeasurement, 2);
 
       /*Save temperature measurements*/
-      writeData(curTemperatureMeasurement, 1);
+      writeData(curTemperatureMeasurement, 0);
+
+      /*Save humidity measurements*/
+      writeData(curHumMeasurement, 1);
+
+      /*Save all data to SD*/
+      savingFileToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement);
 
       meanPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       
@@ -139,6 +149,38 @@ void sampler(void *pvParameters)
       currSamplingRate = getSamplingRate();
       vTaskDelayUntil(&xLastWakeTime, (currSamplingRate / portTICK_PERIOD_MS) );
    }
+}
+
+void savingFileToSD(float temperatureData[], float humData[], float pressData[])
+{
+  String dataString = "";
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  for (int i = 0; i < nrTempSensors; i++)
+  {
+    dataString += String(temperatureData[i]);
+    if (i == (nrTempSensors - 1))
+    {
+      dataString += "||";
+    }
+  }
+  for (int i = 0; i < nrHumidSensors; i++)
+  {
+    dataString += String(humData[i]);
+    if (i == (nrHumidSensors - 1))
+    {
+      dataString += "||";
+    }
+  }
+  for (int i = 0; i < nrPressSensors; i++)
+  {
+    dataString += String(pressData[i]);
+    if (i == (nrPressSensors - 1))
+    {
+      dataString += "||";
+    }
+  }
+  dataFile.println(dataString);
+  dataFile.close();
 }
 
 static void setSamplingRate(int curSamplingRate)
