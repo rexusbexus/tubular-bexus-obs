@@ -33,6 +33,9 @@ This Github project serves to be our Software repository.
 
 ## Would you like to know more?
 [REXUS/BEXUS website](http://rexusbexus.net/)
+
 [TUBULAR Website](https://rexusbexus.github.io/tubular/)
+
 [Instagram](https://instagram.com/tubularbexus)
+
 [Facebook](https://facebook.com/tubularbexus)
