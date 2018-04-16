@@ -22,21 +22,37 @@
 
 
 /*Global variables*/
-#define pumpPin 20
-#define valve1 21
-#define valve2 22
-#define valve3 23
-#define valve4 24
-#define valve5 25
-#define valve6 26
-#define valve7 27
-#define valve8 28
-#define valve9 29
-#define valve10 30
-#define flushValve 31
-#define CACvalve 32
-#define htr1_pin 33
-#define htr2_pin 34
+/*
+ * Pin 20, 21 reserved for SDA and SCL for I2C connection with temperature sensors and humidity sensor
+ */
+#define pumpPin 22
+#define valve1 23
+#define valve2 24
+#define valve3 25
+#define valve4 26
+#define valve5 27
+#define valve6 28
+#define valve7 29
+#define valve8 30
+#define valve9 31
+#define valve10 32
+#define flushValve 33
+#define CACvalve 34
+#define htr1_pin 35
+#define htr2_pin 36
+/*
+   Pressusre sensors and  will use MOSI-SDI, MISO-SDO, SCK-SCLK, and digital pins-(CSB)chipselect pins.
+*/
+/*The followings are chipselect pins */
+#define pressSensorPin1 37
+#define pressSensorPin2 38
+#define pressSensorPin3 39
+#define pressSensorPin4 40
+#define pressSensorPin5 41
+#define pressSensorPin6 42
+/*Airflow sensor will be connected to pin 43 */
+#define airFsensorPin   A10
+#define sdPin           10
 
 #define nrTempSensors   9
 #define nrPressSensors  6
