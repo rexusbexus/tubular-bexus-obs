@@ -70,7 +70,7 @@ static float humReading [nrHumidSensors];
 static float pressReading [nrPressSensors]; //array size might change according to the fix quantity
 static float afReading[nrAirFSensors];
 //static int htrParameter[4];
-static float ascParameter[20];
+static float ascParameter[16];
 double status=0;
 
 byte mac[] = { 0x2C, 0xF7, 0xF1, 0x08, 0x0F, 0x57 };
@@ -82,6 +82,11 @@ IPAddress remote(1, 1, 1, 2);
 unsigned int localPort = 8888;
 EthernetUDP Udp;
 EthernetServer server = EthernetServer(4000);
+
+typedef union {
+    float val;
+    uint8_t bytes[4];
+} floatval;
 
 /*init*/
 void setup()

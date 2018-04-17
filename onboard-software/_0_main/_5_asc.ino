@@ -133,6 +133,15 @@ void reading(void *pvParameters)
    }
 }
 
+void setASCParameter(float newParameter[16])
+{
+  xSemaphoreTake(sem, portMAX_DELAY);
+  for (int i = 0; i < 16; i++)
+  {
+    htrParameter[i]=newParameter[i];//,*newParameter+1,*newParameter+2,*newParameter+3);
+  }
+  xSemaphoreGive(sem);
+}
 
 
 
