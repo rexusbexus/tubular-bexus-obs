@@ -134,7 +134,7 @@ void telecommand(void *pvParameters)
               ss[0] = command[k+2][0];
             }
           }
-          executeMode();
+          executeMode(mode);
           executeHTR();
           executeASC();
           executeSS();
@@ -168,5 +168,41 @@ boolean checkCommand(byte data[])
   }
 }
 
+void executeMode(int8_t mode[])
+{
+  setMode(mode[0]);
+}
 
+void executeHTR(int8_t heaters[][])
+{
+  float dummyParam [4];
+  floatval param;
+  heaterControl(heaters[0][0], heaters [1][0]);
+  for (int i = 2; i<6; i++)
+  {
+    for (int k = 0; k < 3; k++) 
+    {
+      param.bytes[k] = {heaters[i][k];
+    }
+    dummyParam[i-2] = param.val;
+  }
+  setHeaterParameter(dummyParam);
+}
+
+void executeASC()
+{
+  float dummyParam [4];
+  floatval param;
+ 
+  for (int i = 2; i<27; i++)
+  {
+    for (int k = 0; k < 3; k++) 
+    {
+      param.bytes[k] = {heaters[i][k];
+    }
+    param.bytes[3] = byte(0);
+    dummyParam[i-2] = param.val;
+  }
+  setASCParameter(dummyParam);
+}
 
