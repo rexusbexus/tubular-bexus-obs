@@ -29,6 +29,7 @@ M2M_LM75A tempSensor6;
 M2M_LM75A tempSensor7;
 M2M_LM75A tempSensor8;
 M2M_LM75A tempSensor9;
+AWM43300V afSensor(airFsensorPin);
 
 void initSensor()
 {
@@ -59,6 +60,7 @@ void sampler(void *pvParameters)
    float curPressureMeasurement[nrPressSensors];
    float curTemperatureMeasurement[nrTempSensors];
    float curHumMeasurement[nrHumidSensors];
+   float curAFMeasurement[nrAirFSensors];
    float meanPressureAmbient;
    int currSamplingRate;
 
@@ -97,6 +99,9 @@ void sampler(void *pvParameters)
       curTemperatureMeasurement[7] = tempSensor8.getTemperature();
       curTemperatureMeasurement[8] = tempSensor9.getTemperature();
 
+      /*Read airflow from sensor*/
+      curAFMeasurement[0] = afSensor.getAF();
+
       /*Save pressure measurements*/
       writeData(curPressureMeasurement, 2);
 
@@ -106,6 +111,9 @@ void sampler(void *pvParameters)
       /*Save humidity measurements*/
       writeData(curHumMeasurement, 1);
 
+      /*Save humidity measurements*/
+      writeData(curAFMeasurement, 3);
+      
       /*Save all data to SD*/
       savingFileToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement);
 
@@ -226,6 +234,14 @@ static void writeData(float curMeasurements [], int type)
       for (int i=0 ; i < nrPressSensors ; i++)
       {
           pressReading[i] = curMeasurements[i];
+      }
+      break;
+
+      /*Airflow data*/
+      case 2 :
+      for (int i=0 ; i < nrAirFSensors ; i++)
+      {
+          afReading[i] = curMeasurements[i];
       }
       break;
    }
