@@ -88,7 +88,7 @@ void telecommand(void *pvParameters)
       byte nrParam;
       byte mode[1];
       byte heaters[6][3];
-      byte asc[22][3];
+      byte asc[27][3];
       byte ss[1];
 
       /*checkCommandsource*/
@@ -135,9 +135,13 @@ void telecommand(void *pvParameters)
             }
           }
           executeMode(mode);
-          executeHTR();
-          executeASC();
-          executeSS();
+          if (state == manual)
+          {
+            executeHTR();
+            executeASC();
+            executeSS();
+          }
+          
       }
       
     }
@@ -186,23 +190,56 @@ void executeHTR(int8_t heaters[][])
     }
     dummyParam[i-2] = param.val;
   }
+  param.bytes[3] = byte(0);
   setHeaterParameter(dummyParam);
 }
 
-void executeASC()
+void executeASC(byte asc[][])
 {
   float dummyParam [4];
+  byte pumpvalve[11];
   floatval param;
+
+  for(int i = 0; i < 11; i++)
+  {
+    pumpvalve[i] = asc[i][0];
+  }
  
-  for (int i = 2; i<27; i++)
+  for (int i = 11; i<27; i++)
   {
     for (int k = 0; k < 3; k++) 
     {
-      param.bytes[k] = {heaters[i][k];
+      param.bytes[k] = asc[i][k];
     }
     param.bytes[3] = byte(0);
     dummyParam[i-2] = param.val;
   }
   setASCParameter(dummyParam);
+}
+
+void openValve(byte pumpvalve[])
+{
+  if (pumpvalve[0] == 0)
+  {
+    pumpControl(pumpvalve[0]);
+    for (int i = 1; i < 11; i++)
+    {
+      valvesControl(i, pumpvalve[i]);
+    }
+  }
+  else if (pumpvalve[0] == 1)
+  {
+    valvesControl(11, 1); //delay(10);
+    pumpControl(pumpvalve[0]);
+    valvesControl(11, 0); //delay(10);
+    for (int i = 1; i < 11; i++)
+    {
+      valvesControl(i, pumpvalve[i]);
+    }
+  }
+  valvesControl(11, 1); //delay(10);
+  pumpControl(1);
+  valvesControl(11, 0); //delay(10);
+  valvesControl(bagcounter, 1); //delay(10); 
 }
 

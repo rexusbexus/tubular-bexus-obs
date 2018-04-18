@@ -119,6 +119,7 @@ void reading(void *pvParameters)
         }
      }
      break;
+     
      /*SAFE*/
      case safeMode:
      digitalWrite(CACvalve, LOW);
@@ -127,6 +128,9 @@ void reading(void *pvParameters)
        pumpControl(0);
        valvesControl(bagcounter, 0);
      }
+     break;
+
+     case manual:
      break;
    }
    vTaskDelayUntil(&xLastWakeTime, (800 / portTICK_PERIOD_MS) );

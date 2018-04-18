@@ -1,12 +1,9 @@
-#include <AWM43300V.h>
+
 #include <ArduinoSTL.h>
 #include <vector>
-#include <M2M_LM75A.h>
-#include <MS5611.h>
-#include <MS5xxx.h>
+
 #include <Wire.h>
 #include <SD.h>
-
 
 #include <SPI.h>
 #include <stdbool.h>
@@ -14,12 +11,14 @@
 #include <Ethernet2.h>
 #include <EthernetUdp2.h>
 
-//#include <basic_io_arm.h>
 #include <FreeRTOS_ARM.h>
 
-//#include <Melon_MS5607.h> //pressure sensor lib
+#include <M2M_LM75A.h>
+#include <MS5611.h>
+#include <MS5xxx.h>
+#include <AWM43300V.h>
 #include <HDC2010.h> //humidity sensor lib
-//#include <Temperature_LM75_Derived.h> //temperature sensor lib
+
 
 
 /*Global variables*/
