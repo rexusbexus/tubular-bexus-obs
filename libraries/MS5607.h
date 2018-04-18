@@ -9,15 +9,11 @@ reset_sequence()
     protected:
         
     Public:
-        uint16_t PROMbyte;
-        uint32_t uADCvalue;
-        uint16_t = convertD1;
-        uint16_t = convertD2;
-        reset_sequence();
-        convertionD1(int i);
-        convertionD2(int i);
-        PROMread(uint8_t i);
-        readADC();
+        void reset_sequence();
+        void convertionD1(int i);
+        void convertionD2(int i);
+        uint16_t PROMread(uint8_t i);
+        uint132_t readADC();
     
     
 };
