@@ -135,11 +135,11 @@ void telecommand(void *pvParameters)
             }
           }
           executeMode(mode);
-          if (state == manual)
+          if (state == manual )
           {
-            executeHTR();
-            executeASC();
-            executeSS();
+            executeHTR(heaters);
+            executeASC(asc);
+            executeSS(ss);
           }
           
       }
@@ -172,12 +172,12 @@ boolean checkCommand(byte data[])
   }
 }
 
-void executeMode(int8_t mode[])
+void executeMode(byte mode[])
 {
   setMode(mode[0]);
 }
 
-void executeHTR(int8_t heaters[][])
+void executeHTR(byte heaters[][3])
 {
   float dummyParam [4];
   floatval param;
@@ -186,7 +186,7 @@ void executeHTR(int8_t heaters[][])
   {
     for (int k = 0; k < 3; k++) 
     {
-      param.bytes[k] = {heaters[i][k];
+      param.bytes[k] = heaters[i][k];
     }
     dummyParam[i-2] = param.val;
   }
@@ -194,7 +194,7 @@ void executeHTR(int8_t heaters[][])
   setHeaterParameter(dummyParam);
 }
 
-void executeASC(byte asc[][])
+void executeASC(byte asc[][3])
 {
   float dummyParam [4];
   byte pumpvalve[11];
@@ -217,7 +217,7 @@ void executeASC(byte asc[][])
   setASCParameter(dummyParam);
 }
 
-void openValve(byte pumpvalve[])
+void openCloseValveManual(byte pumpvalve[])
 {
   if (pumpvalve[0] == 0)
   {
@@ -237,9 +237,10 @@ void openValve(byte pumpvalve[])
       valvesControl(i, pumpvalve[i]);
     }
   }
-  valvesControl(11, 1); //delay(10);
-  pumpControl(1);
-  valvesControl(11, 0); //delay(10);
-  valvesControl(bagcounter, 1); //delay(10); 
+}
+
+void executeSS(byte ss[1])
+{
+  setSamplingRate(ss[0]);
 }
 

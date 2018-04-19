@@ -238,7 +238,7 @@ static void writeData(float curMeasurements [], int type)
       break;
 
       /*Airflow data*/
-      case 2 :
+      case 3 :
       for (int i=0 ; i < nrAirFSensors ; i++)
       {
           afReading[i] = curMeasurements[i];
