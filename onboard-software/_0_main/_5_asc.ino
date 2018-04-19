@@ -1,9 +1,10 @@
 /*
- * 
- * 
- * 
- * 
- */
+ * Name: asc object
+ * Purpose: To read the pressure sensor from buffer
+ * and accordingly activate sampling logic.
+ * Project: Tubular-Bexus.
+ * Authors: Tubular-Bexus software group.
+*/
 
 std::vector<float> getASCParam(int bag)
 {
@@ -87,17 +88,13 @@ void reading(void *pvParameters)
      digitalWrite(CACvalve, HIGH);
      if (meanPressureAmbient >= ascParam[0] && meanPressureAmbient<= (ascParam[1]))
      {
-        valvesControl(11, 1); //delay(10);
-        pumpControl(1); //delay(1000);
-        valvesControl(11, 0); //delay(10);
-        valvesControl(bagcounter, 1); //delay(10); 
+        samplingLogic(bagcounter);
      }
      else
      {
-        pumpControl(0); //delay(100);
-        valvesControl(bagcounter, 0); //delay(10);
-        if (bagcounter<10 && meanPressureAmbient>=(ascParam[1])){
-          //bagcounter++;  // need to figure this out later
+        closeValve(bagcounter);
+        if (bagcounter<8 && meanPressureAmbient>=(ascParam[1])){
+          bagcounter++;  // need to figure this out later
         }
      }
      break;
@@ -105,16 +102,12 @@ void reading(void *pvParameters)
      case normalDescent:
      if (meanPressureAmbient >= ascParam[0] && meanPressureAmbient<= (ascParam[1]))
      {
-        valvesControl(11, 1); //delay(10);
-        pumpControl(1);
-        valvesControl(11, 0); //delay(10);
-        valvesControl(bagcounter, 1); //delay(10);   
+        samplingLogic(bagcounter);  
      }
      else
      {
-        pumpControl(0); //delay(100);
-        valvesControl(bagcounter, 0); //delay(10);
-        if (bagcounter<10 && meanPressureAmbient<= ascParam[0]){
+        closeValve(bagcounter);
+        if (bagcounter<8 && meanPressureAmbient<= ascParam[0]){
           bagcounter++;
         }
      }
@@ -123,14 +116,15 @@ void reading(void *pvParameters)
      /*SAFE*/
      case safeMode:
      digitalWrite(CACvalve, LOW);
-     for (bagcounter=1;bagcounter<=10;bagcounter++)
+     for (int sd = 1;sd <= 8; sd++)
      {
        pumpControl(0);
-       valvesControl(bagcounter, 0);
+       valvesControl(sd, 0);
      }
      break;
 
      case manual:
+     
      break;
    }
    vTaskDelayUntil(&xLastWakeTime, (800 / portTICK_PERIOD_MS) );
@@ -147,7 +141,19 @@ void setASCParameter(float newParameter[16])
   xSemaphoreGive(sem);
 }
 
+void samplingLogic(int bagcounter)
+{
+  valvesControl(11, 1); //delay(10);
+  pumpControl(1);
+  valvesControl(11, 0); //delay(10);
+  valvesControl(bagcounter, 1); //delay(10);  
+}
 
+void closeValve(int bagcounter)
+{
+  pumpControl(0); //delay(100);
+  valvesControl(bagcounter, 0); //delay(10);
+}
 
 void pumpControl(int cond)
 {
