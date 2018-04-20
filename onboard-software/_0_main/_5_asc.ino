@@ -83,6 +83,7 @@ void reading(void *pvParameters)
      /*Standby*/
      case standbyMode:
      break;
+     
      /*Normal - Ascent*/
      case normalAscent:
      digitalWrite(CACvalve, HIGH);
@@ -98,6 +99,7 @@ void reading(void *pvParameters)
         }
      }
      break;
+     
      /*Normal - Descent*/
      case normalDescent:
      if (meanPressureAmbient >= ascParam[0] && meanPressureAmbient<= (ascParam[1]))
