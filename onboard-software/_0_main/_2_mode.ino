@@ -11,7 +11,7 @@
 
 void initMode()
 {
-
+   setMode(standbyMode);
 }
 
 int getMode()

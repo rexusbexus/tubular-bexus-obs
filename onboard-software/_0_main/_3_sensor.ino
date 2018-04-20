@@ -56,7 +56,7 @@ void sampler(void *pvParameters)
 
    float tempPressure[nrPressSensors];
    int count=0;
-   float pressDifference;
+   float pressDifference = 0;
    float curPressureMeasurement[nrPressSensors];
    float curTemperatureMeasurement[nrTempSensors];
    float curHumMeasurement[nrHumidSensors];
