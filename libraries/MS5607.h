@@ -2,10 +2,11 @@
 #define MS5607_h
 
 #include <Arduino.h>
+#include <SPI.h>
 
 class MS5607
 {
-reset_sequence()
+//reset_sequence()
     protected:
         
     Public:
