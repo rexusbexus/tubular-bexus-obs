@@ -145,7 +145,9 @@ void sampler(void *pvParameters)
          setMode(safeMode);
       }
 
-
+      /*Transmit telemetry to GS*/
+      transmit();
+      
       /*Listen to GS*/
       EthernetClient client = server.available();
       if(client.available()>0)
