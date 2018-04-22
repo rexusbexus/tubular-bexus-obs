@@ -70,7 +70,7 @@ static float pressReading [nrPressSensors]; //array size might change according 
 static float afReading[nrAirFSensors];
 //static int htrParameter[4];
 static float ascParameter[16];
-double status=0;
+int16_t status=0;
 
 byte mac[] = { 0x2C, 0xF7, 0xF1, 0x08, 0x0F, 0x57 };
 IPAddress ip(1, 1, 1, 1); //Local IPv4 adress
