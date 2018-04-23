@@ -13,7 +13,7 @@ void transmit() {
 
   Udp.beginPacket(remote, localPort);
   Udp.write("gs,");
-  Udp.write(now());
+  Udp.write(rtc.unixtime());
   Udp.write(",ps,");
   Udp.write(nrPressSensors);
   for (int i = 0; i < nrPressSensors; i++) //Loop number of time there are press sensors
