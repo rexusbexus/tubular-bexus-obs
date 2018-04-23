@@ -22,7 +22,7 @@ function varargout = groundStation_GUI(varargin)
 
 % Edit the above text to modify the response to help groundStation_GUI
 
-% Last Modified by GUIDE v2.5 08-Apr-2018 18:39:26
+% Last Modified by GUIDE v2.5 23-Apr-2018 13:01:33
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -98,6 +98,15 @@ function varargout = groundStation_GUI_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
+function NetworkDispose2(t)
+    %stopasync(t);
+    fclose(t);delete(t);
+    delete(t);
+    clear t;
+    
+    
+   % echotcpip('off');
+
 
 % --- Executes on button press in tcp_initialize.
 function tcp_initialize_Callback(hObject, eventdata, handles)
@@ -105,13 +114,42 @@ function tcp_initialize_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+remPort=4000;      
+host='1.1.1.1';  
+locPort=4000;
+
+t = tcpip(host,'RemotePort',remPort,'LocalPort',locPort, 'NetworkRole','Client', 'Timeout', 2);
+t.InputBufferSize = 10000;
+t.OutputBufferSize = 10000;
+% t.ReadAsyncMode = 'continuous';
+% t.BytesAvailableFcnCount = 2;
+% t.BytesAvailableFcnMode = 'byte';
+% t.BytesAvailableFcn = {@update_tcpoutput, handles};
+handles.t=t;
+
+
+fopen(t);
+
+if (~strcmp(t.Status,'open'))
+    %NetworkError(t,'Connection failed!');
+    set(handles.constat_tcp, 'String', 'Failed');
+else
+    set(handles.constat_tcp, 'String', 'Connected');
+end
+
+%readasync(t);
+
+guidata(gcbf, handles);
+
 
 % --- Executes on button press in tcp_stop.
 function tcp_stop_Callback(hObject, eventdata, handles)
 % hObject    handle to tcp_stop (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+t=handles.t;
+NetworkDispose2(t);
+set(handles.constat_tcp, 'String', 'Disconnected');
 
 % --- Executes on button press in udp_initialize.
 function udp_initialize_Callback(hObject, eventdata, handles)
