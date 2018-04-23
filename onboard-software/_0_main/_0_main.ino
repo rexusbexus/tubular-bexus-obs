@@ -18,6 +18,7 @@
 #include <MS5xxx.h>
 #include <AWM43300V.h>
 #include <HDC2010.h> //humidity sensor lib
+#include <RTCDue.h>
 
 
 
@@ -97,6 +98,10 @@ void setup()
     initAll();
     vTaskStartScheduler();
 
+    RTCDue rtc(XTAL);//Init start RTC object.
+    rtc.begin();
+    rtc.setTime(0,0,0);
+    rtc.setDate(1,1,2018);
 }
 
 void loop() {
