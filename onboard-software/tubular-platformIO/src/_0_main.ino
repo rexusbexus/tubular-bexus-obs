@@ -1,4 +1,4 @@
-
+#ifndef UNIT_TEST
 #include <ArduinoSTL.h>
 #include <vector>
 
@@ -55,3 +55,4 @@ void loop() {
   // put your main code here, to run repeatedly:
 
 }
+#endif

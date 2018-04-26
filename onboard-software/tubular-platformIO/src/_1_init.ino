@@ -11,8 +11,8 @@
 #include "_5_asc.h"
 #include "_7_telecommand.h"
 
-
-
+SemaphoreHandle_t sem;
+SemaphoreHandle_t semPeriodic;
 
 void initAll()
 {

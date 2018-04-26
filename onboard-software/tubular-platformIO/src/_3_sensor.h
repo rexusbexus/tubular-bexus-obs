@@ -5,6 +5,7 @@
 #include <vector>
 #include "_1_init.h"
 #include "_2_mode.h"
+#include "sensorManager.h"
 
 #define hdcADDR 0x40
 #define msADDR1 0x76
@@ -12,10 +13,6 @@
 
 #define pressSensorPSpin TBD
 #define sdCS 4
-
-#define safeModeThreshold 900
-#define pressDifferentThresholdneg -20
-#define pressDifferentThresholdpos 20
 
 /*
    Pressusre sensors and  will use MOSI-SDI, MISO-SDO, SCK-SCLK, and digital pins-(CSB)chipselect pins.
@@ -31,16 +28,12 @@
 #define airFsensorPin   A10
 #define sdPin           10
 
-#define nrTempSensors   9
-#define nrPressSensors  6
-#define nrHumidSensors  1
-#define nrAirFSensors   1
+#define safeModeThreshold 900
+#define pressDifferentThresholdneg -20
+#define pressDifferentThresholdpos 20
 
-static int samplingRate;
-static float tempReading [nrTempSensors]; //array size might change according to the fix quantity
-static float humReading [nrHumidSensors];
-static float pressReading [nrPressSensors]; //array size might change according to the fix quantity
-static float afReading[nrAirFSensors];
+extern int samplingRate;
+
 
 void initSensor();
 static void setSamplingRate(int curSamplingRate);

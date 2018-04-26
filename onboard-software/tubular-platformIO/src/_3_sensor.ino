@@ -32,6 +32,8 @@ M2M_LM75A tempSensor8;
 M2M_LM75A tempSensor9;
 AWM43300V afSensor(airFsensorPin);
 
+int samplingRate;
+
 void pressSensorread()
 {
   pressSensor.ReadProm();
@@ -91,8 +93,8 @@ void sampler(void *pvParameters)
 {
    (void) pvParameters;
 
-   float tempPressure[nrPressSensors];
-   int count=0;
+   //float tempPressure[nrPressSensors];
+   //int count=0;
    float pressDifference = 0;
    float curPressureMeasurement[nrPressSensors];
    float curTemperatureMeasurement[nrTempSensors];
@@ -109,7 +111,7 @@ void sampler(void *pvParameters)
    {
       
       xHigherPriorityTaskWoken = pdFALSE;
-      int8_t currMode = getMode();
+      uint8_t currMode = getMode();
 
       pressSensorread();
 
@@ -156,30 +158,21 @@ void sampler(void *pvParameters)
 
       meanPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       
-      if (count == 0)
-      {
-         tempPressure[count] = meanPressureAmbient;
-         count=1;
-      }
-      else
-      {
-         tempPressure[count] = meanPressureAmbient;
-         pressDifference = tempPressure[1] - tempPressure[0];
-         count=0;
-      }
+      /*Calculating Pressure Difference*/
+      calculatingPressureDifference(meanPressureAmbient);
 
       /*Change mode if the condition is satisfied*/
       if (pressDifference<pressDifferentThresholdneg)
       {
-         setMode(normalAscent);
+        setMode(normalAscent);
       }
       else if (pressDifference>pressDifferentThresholdpos)
       {
-         setMode(normalDescent);
+          setMode(normalDescent);
       }
       else if (currMode==normalDescent && meanPressureAmbient<=safeModeThreshold)
       {
-         setMode(safeMode);
+        setMode(safeMode);
       }
 
       /*Transmit telemetry to GS*/
@@ -250,101 +243,16 @@ int getSamplingRate(void)
 static void writeData(float curMeasurements [], int type)
 {
    xSemaphoreTake(sem, portMAX_DELAY);
-   
-   switch(type) {
-      /*Temperature data*/
-      case 0 :
-      for (int i=0 ; i < nrTempSensors ; i++)
-      {
-          tempReading[i] = curMeasurements[i];
-      }
-      break;
-      
-      /*Humidity data*/
-      case 1 :  
-      for (int i=0 ; i < 1 ; i++)
-      {
-          humReading [i] = curMeasurements[i];
-      }
-      break;
-
-      /*Pressure data*/
-      case 2 :
-      for (int i=0 ; i < nrPressSensors ; i++)
-      {
-          pressReading[i] = curMeasurements[i];
-      }
-      break;
-
-      /*Airflow data*/
-      case 3 :
-      for (int i=0 ; i < nrAirFSensors ; i++)
-      {
-          afReading[i] = curMeasurements[i];
-      }
-      break;
-   }
-   
+   writeDataToSensorBuffers(curMeasurements, type);
    xSemaphoreGive(sem);
 }
 
 std::vector<float> readData(int type)
 {
-  std::vector<float> dummyTemp(nrTempSensors);
-  std::vector<float> dummyHum(nrHumidSensors);
-  std::vector<float> dummyPress(nrPressSensors);
-  std::vector<float> dummyAf(1);
-  switch(type){
-      /*Reading Temperature*/
-      case 0 :
-      
-      xSemaphoreTake(sem, portMAX_DELAY);
-      for (int i=0 ; i < nrTempSensors ; i++)
-      {
-          dummyTemp[i] = tempReading[i];
-      }
-      xSemaphoreGive(sem);
-      return dummyTemp;
-      break;
-      
-      /*Reading Humidity*/
-      case 1 :
-      
-      xSemaphoreTake(sem, portMAX_DELAY);
-      for (int i=0 ; i < nrHumidSensors ; i++)
-      {
-          dummyHum[i] = humReading[i];
-      }
-      xSemaphoreGive(sem);
-      return dummyHum;
-      break;
-      
-      /*Reading Pressure*/
-      case 2 :
-      
-      xSemaphoreTake(sem, portMAX_DELAY);
-      for (int i=0 ; i < nrPressSensors ; i++)
-      {
-          dummyPress[i] = pressReading[i];
-      }
-      xSemaphoreGive(sem);
-      return dummyPress;
-      break;
-
-      /* Reading Airflow*/
-      case 3 :
-      
-      xSemaphoreTake(sem, portMAX_DELAY);
-      for (int i=0 ; i < 1 ; i++)
-      {
-          dummyAf[i] = afReading[i];
-      }
-      xSemaphoreGive(sem);
-      return dummyAf;
-      break;
-  }
-  
-
+  std::vector<float> dataFromBuffer(nrTempSensors);
+  xSemaphoreTake(sem, portMAX_DELAY);
+  readDataFromSensorBuffers(type);
+  xSemaphoreGive(sem);
 }
 
 void initTempSensors()
