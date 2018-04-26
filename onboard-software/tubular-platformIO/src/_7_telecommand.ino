@@ -58,7 +58,7 @@ void telecommand(void *pvParameters)
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount ();
 
-  byte curMode;
+  uint8_t curMode;
   int commandSize; 
   std::vector<byte> mode;
   std::vector<byte> htr;

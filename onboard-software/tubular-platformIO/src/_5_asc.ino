@@ -71,7 +71,7 @@ void reading(void *pvParameters)
 
    while(1)
    {
-      int8_t currMode = getMode();
+      uint8_t currMode = getMode();
      
      dummyParam = getASCParam(bagcounter);
      ascParam[0] = dummyParam[0];
@@ -140,7 +140,7 @@ void setASCParameter(float newParameter[16])
   xSemaphoreTake(sem, portMAX_DELAY);
   for (int i = 0; i < 16; i++)
   {
-    htrParameter[i]=newParameter[i];//,*newParameter+1,*newParameter+2,*newParameter+3);
+    htrParameter[i]=newParameter[i];
   }
   xSemaphoreGive(sem);
 }

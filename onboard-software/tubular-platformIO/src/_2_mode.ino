@@ -3,22 +3,26 @@
 
 ***************************************************/
 #include "_2_mode.h"
+#include <FreeRTOS_ARM.h>
+#include "_1_init.h"
+
+uint8_t state;
 
 void initMode()
 {
    setMode(standbyMode);
 }
 
-int getMode()
+uint8_t getMode()
 {
-   int tempt;
+   uint8_t tempt;
    xSemaphoreTake(sem, portMAX_DELAY);
    tempt = state;
    xSemaphoreGive(sem);
    return(tempt);
 }
 
-static void setMode(int8_t curMode)
+void setMode(uint8_t curMode)
 {
    xSemaphoreTake(sem, portMAX_DELAY);
    state = curMode;
