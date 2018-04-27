@@ -22,7 +22,7 @@ function varargout = groundStation_GUI(varargin)
 
 % Edit the above text to modify the response to help groundStation_GUI
 
-% Last Modified by GUIDE v2.5 23-Apr-2018 13:01:33
+% Last Modified by GUIDE v2.5 26-Apr-2018 14:30:35
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -54,6 +54,11 @@ function groundStation_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for groundStation_GUI
 handles.output = hObject;
+
+global tabledata;
+global tabledata2;
+tabledata=zeros(10,2);
+tabledata2=zeros(10,2);
 
 % Initialise tabs
 handles.tabManager = TabManager( hObject );
@@ -157,6 +162,26 @@ function udp_initialize_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+u = udp('1.1.1.1',8888);
+u.InputBufferSize = 10000;
+u.OutputBufferSize = 10000;
+u.ReadAsyncMode = 'continuous';
+u.BytesAvailableFcn = {@update_udpoutput, handles};
+u.BytesAvailableFcnMode = 'byte';
+handles.u=u;
+
+
+fopen(u);
+
+if (~strcmp(u.Status,'open'))
+    %NetworkError(u,'Connection failed!');
+    set(handles.constat_udp, 'String', 'Connection Closed');
+else
+    set(handles.constat_udp, 'String', 'Connection Opened');
+end
+disp('Hello');
+guidata(gcbf, handles);
+
 
 % --- Executes on button press in udp_stop.
 function udp_stop_Callback(hObject, eventdata, handles)
@@ -164,6 +189,21 @@ function udp_stop_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+u=handles.u;
+fclose(u);
+delete(u);
+clear u;
+
+set(handles.constat_udp, 'String', 'Connection Closed');
+
+function update_udpoutput(u, evt, handles)
+global tabledata;
+data=fread(u)';
+
+tabledata = [tabledata(2:end,:); data]
+set(handles.axes4, 'Data', tabledata);
+
+drawnow;
 
 
 function edit2_Callback(hObject, eventdata, handles)
