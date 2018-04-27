@@ -228,7 +228,13 @@ function check_valves_control_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of check_valves_control
 
-
+function command = buildCommand(handles)
+id = 'tub,';
+if (get(handles.check_mode_setting, 'Value') == 1)
+    modeCommand = buildModeCommand(handles);
+heaterCommand = buildHeaterCommand(handles);
+ascCommand = buildAscCommand(handles);
+command = [id modeCommand heaterCommand ascCommand]; 
 
 
 function commandToBuild = buildModeCommand(handles)
@@ -354,29 +360,3 @@ function compile_command_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 command = buildCommand(handles);
 set(handles.telecommand_format, 'String', command);
-disp(breakpoint);
-
-function command = buildCommand(handles)
-id = 'tub,';
-modeCommand = [];
-heaterCommand = [];
-ascCommand = [];
-if (get(handles.check_mode_setting, 'Value') == 1)
-    modeCommand = buildModeCommand(handles);
-end
-if (get(handles.check_heater_control, 'Value') == 1)
-    heaterCommand = buildHeaterCommand(handles);
-end
-if (get(handles.check_valves_control, 'Value') == 1)
-        ascCommand = buildAscCommand(handles);
-end
-
-
-commandB = [id modeCommand heaterCommand ascCommand]; 
-if (length(commandB) >9)
-    commandSize = length(commandB) + 3;
-else
-    commandSize = length(commandB) + 2;
-end
-strCommandSize = sprintf('%d,',commandSize);
-command = [id strCommandSize modeCommand heaterCommand ascCommand];
