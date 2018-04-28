@@ -208,7 +208,7 @@ void telecommand(void *pvParameters)
                 }
               }
             }
-            if (command[k][0] == a & command[k][1] == s && command[k][2] == c)
+            if (command[k][0] == a && command[k][1] == s && command[k][2] == c)
             {
                nrParam = command[k+1][0];
               for (int z = 0; z < nrParam; z++)
@@ -219,7 +219,7 @@ void telecommand(void *pvParameters)
                 }
               }
             }
-            if (command[k][0] == s & command[k][1] == s)
+            if (command[k][0] == s && command[k][1] == s)
             {
               nrParam = command[k+1][0];
               ss[0] = command[k+2][0];
