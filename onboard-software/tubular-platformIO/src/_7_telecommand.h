@@ -9,7 +9,6 @@
 #include "_3_sensor.h"
 #include "_4_heater.h"
 #include "_5_asc.h"
-#include "_6_telemetry.h"
 
 void initTelecommand();
 

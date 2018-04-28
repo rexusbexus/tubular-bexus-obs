@@ -1,5 +1,4 @@
 #include "sensorManager.h"
-// #include "_2_mode.h"
 
 float tempReading [nrTempSensors];
 float humReading [nrHumidSensors];

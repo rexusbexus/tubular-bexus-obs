@@ -36,7 +36,7 @@ extern int samplingRate;
 
 
 void initSensor();
-static void setSamplingRate(int curSamplingRate);
+void setSamplingRate(int curSamplingRate);
 std::vector<float> readData(int type);
 
 #endif
