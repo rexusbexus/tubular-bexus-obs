@@ -12,7 +12,6 @@ typedef union {
     uint8_t bytes[4];
 } floatval;
 
-RTCDue rtc(XTAL);//Init start RTC object.
 
 
 void initAll();
