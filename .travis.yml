@@ -11,16 +11,8 @@ env:
     - PLATFORMIO_CI_SRC=onboard-software/tubular-platformIO/test
 	
 install:
-    # Check GCC versions
-
-    # Install Coveralls
-    #- pip install -U cpp-coveralls
-
     # Install PlatformIO
     - pip install -U platformio
-	
-	# Login to PioPlus
-    - pio account login --username muhput-7@student.ltu.se --password tubular
 	
 before_script:
     # Run tests
