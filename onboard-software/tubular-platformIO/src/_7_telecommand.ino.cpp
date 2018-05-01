@@ -12,24 +12,27 @@
 
 
 ethernet ethernet2;
+extern std::vector<std::vector<byte>> mode;
+extern std::vector<std::vector<byte>> heaters;
+extern std::vector<std::vector<byte>> asc;
+extern std::vector<std::vector<byte>> ss; 
 
 
-
-void executeMode(std::vector<std::vector<byte>> &mode)
+void executeMode(std::vector<std::vector<byte>> &modeC)
 {
-  setMode(mode[0][0]);
+  setMode(modeC[0][0]);
 }
 
-void executeHTR(std::vector<std::vector<byte>> &heaters)
+void executeHTR(std::vector<std::vector<byte>> &heatersC)
 {
   float dummyParam [4];
   floatval param;
-  heaterControl(heaters[0][0], heaters [1][0]);
+  heaterControl(heatersC[0][0], heatersC [1][0]);
   for (int i = 2; i<6; i++)
   {
     for (int k = 0; k < 3; k++) 
     {
-      param.bytes[k] = heaters[i][k];
+      param.bytes[k] = heatersC[i][k];
     }
     dummyParam[i-2] = param.val;
   }
@@ -37,7 +40,7 @@ void executeHTR(std::vector<std::vector<byte>> &heaters)
   setHeaterParameter(dummyParam);
 }
 
-void executeASC(std::vector<std::vector<byte>> &sc)
+void executeASC(std::vector<std::vector<byte>> &scC)
 {
   float dummyParam [4];
   byte pumpvalve[11];
@@ -45,14 +48,14 @@ void executeASC(std::vector<std::vector<byte>> &sc)
 
   for(int i = 0; i < 11; i++)
   {
-    pumpvalve[i] = sc[i][0];
+    pumpvalve[i] = scC[i][0];
   }
  
   for (int i = 11; i<27; i++)
   {
     for (int k = 0; k < 3; k++) 
     {
-      param.bytes[k] = sc[i][k];
+      param.bytes[k] = scC[i][k];
     }
     param.bytes[3] = byte(0);
     dummyParam[i-2] = param.val;
@@ -82,9 +85,9 @@ void openCloseValveManual(byte pumpvalve[])
   }
 }
 
-void executeSS(std::vector<std::vector<byte>> &sensor)
+void executeSS(std::vector<std::vector<byte>> &sensorC)
 {
-  setSamplingRate(sensor[0][0]);
+  setSamplingRate(sensorC[0][0]);
 }
 
 
@@ -96,15 +99,11 @@ void telecommand(void *pvParameters)
 
   uint8_t curMode;
   int commandSize; 
-  byte **modes;
-  byte **htr;
-  byte **sc;
-  byte **sensor;
   /*declare all command variables*/
-  std::vector<std::vector<byte>> mode(1, std::vector<byte>(1, 0));
-  std::vector<std::vector<byte>> heaters(6, std::vector<byte>(3, 0));
-  std::vector<std::vector<byte>> asc(27, std::vector<byte>(3, 0));
-  std::vector<std::vector<byte>> ss(1, std::vector<byte>(1, 0));
+  // std::vector<std::vector<byte>> mode(1, std::vector<byte>(1, 0));
+  // std::vector<std::vector<byte>> heaters(6, std::vector<byte>(3, 0));
+  // std::vector<std::vector<byte>> asc(27, std::vector<byte>(3, 0));
+  // std::vector<std::vector<byte>> ss(1, std::vector<byte>(1, 0));
 
   while(1)
   {
@@ -128,12 +127,12 @@ void telecommand(void *pvParameters)
 
       if (checkCommand(data_tcp) == true)
       {
-        mode = collectingCommand(data_tcp, row, col, datasize, 1);
-        heaters = collectingCommand(data_tcp, row, col, datasize, 2);
-        asc = collectingCommand(data_tcp, row, col, datasize, 3);
-        ss = collectingCommand(data_tcp, row, col, datasize, 4);
+        // mode = collectingCommand(data_tcp, row, col, datasize, 1);
+        // heaters = collectingCommand(data_tcp, row, col, datasize, 2);
+        // asc = collectingCommand(data_tcp, row, col, datasize, 3);
+        // ss = collectingCommand(data_tcp, row, col, datasize, 4);
 
-        
+        collectingCommand (data_tcp, row, col, datasize);
 
         /*Execute Command*/
         executeMode(mode);
