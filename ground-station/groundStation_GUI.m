@@ -395,7 +395,7 @@ function compile_command_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 command = buildCommand(handles);
 set(handles.telecommand_format, 'String', command);
-disp(breakpoint);
+%disp(breakpoint);
 
 function command = buildCommand(handles)
 id = 'tub,';
@@ -414,14 +414,11 @@ end
 
 
 %<<<<<<< master
-commandB = [id modeCommand heaterCommand ascCommand]; 
-if (length(commandB) >9)
-    commandSize = length(commandB) + 3;
-else
-    commandSize = length(commandB) + 2;
-end
-strCommandSize = sprintf('%d,',commandSize);
-command = [id strCommandSize modeCommand heaterCommand ascCommand];
+nrSubCommand = get(handles.check_mode_setting, 'Value') + ...
+               get(handles.check_heater_control, 'Value') +...
+               get(handles.check_valves_control, 'Value');
+strSubCommand = sprintf('%d,', nrSubCommand);
+command = [id strSubCommand modeCommand heaterCommand ascCommand];
 %=======
 % --- Executes during object creation, after setting all properties.
 function edit3_CreateFcn(hObject, eventdata, handles)
