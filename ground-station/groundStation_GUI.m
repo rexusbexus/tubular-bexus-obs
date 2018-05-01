@@ -170,7 +170,6 @@ u.BytesAvailableFcn = {@update_udpoutput, handles};
 u.BytesAvailableFcnMode = 'byte';
 handles.u=u;
 
-
 fopen(u);
 
 if (~strcmp(u.Status,'open'))
@@ -180,6 +179,10 @@ else
     set(handles.constat_udp, 'String', 'Connection Opened');
 end
 disp('Hello');
+u
+data=fread(u)';
+disp(data);
+u
 guidata(gcbf, handles);
 
 
@@ -199,10 +202,9 @@ set(handles.constat_udp, 'String', 'Connection Closed');
 function update_udpoutput(u, evt, handles)
 global tabledata;
 data=fread(u)';
-
+disp('data');
 tabledata = [tabledata(2:end,:); data]
 set(handles.axes4, 'Data', tabledata);
-
 drawnow;
 
 
