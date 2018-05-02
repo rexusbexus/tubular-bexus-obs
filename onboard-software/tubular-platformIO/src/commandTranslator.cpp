@@ -56,50 +56,74 @@ boolean checkCommand(byte data[])
 
 
 void collectingCommand (byte data_tcp[], int row, int col, byte datasize)
-{   
-    std::vector<std::vector<byte>> command (row, std::vector<byte>(col, 0)); 
-    byte nrParam;
+{
+    std::vector<std::vector<byte>> command (row, std::vector<byte>(col, 0));
+    int nrParam;
     command = scanBuffer(data_tcp, row, col, datasize);
-    byte nrSubCommand = command[2][1];
-          
-    for (byte k = 2; k < row; k++)
+    int nrSubCommand = command[1][0]-'0';
+    int k = 2;
+    for (int jenis = 1; jenis <= nrSubCommand; jenis++)
     {
         if (command[k][0] == 'm' && command[k][1] == 'd')
         {
-            nrParam = command[k+1][0];
+            nrParam = command[k+1][0] - '0';
             mode[0][0] = command[k+2][0];
-            k=k+2;
+            k=k+2+nrParam;
         }
+
+        if (k==(row))
+        {
+            break;
+        }
+
         if (command[k][0] == 'h' && command[k][1] == 't')
         {
-            nrParam = command[k+1][0];
+            nrParam = command[k+1][0] - '0';
             for (int z = 0; z < nrParam; z++)
             {
                 for (int x = 0; x < col; x++)
                 {
                     heaters[z][x] = command[k+2+z][x];
-                }  
-            }
-            k=k+nrParam+2;
-        }
-        if (command[k][0] == 's' && command[k][1] == 'c')
-        {
-            nrParam = command[k+1][0];
-            for (int z = 0; z < nrParam; z++)
-            {
-                for (int x = 0; x < col; x++)
-                {
-                    asc[z][x] = command[k+2+z][x];
                 }
             }
-            k=k+nrParam+2;
+            k=k+2+nrParam;
         }
+
+        if (k==(row))
+        {
+            break;
+        }
+
+        if (command[k][0] == 's' && command[k][1] == 'c')
+        {
+            nrParam = command[k+1][0] - '0';
+            for (int b = 0; b < nrParam; b++)
+            {
+                for (int v = 0; v < col; v++)
+                {
+                    asc[b][v] = command[k+2+b][v];
+                }
+            }
+            k=k+2+nrParam;
+        }
+
+        if (k==(row))
+        {
+            break;
+        }
+
         if (command[k][0] == 's' && command[k][1] == 's')
         {
-            nrParam = command[k+1][0];
+            nrParam = command[k+1][0] - '0';
             ss[0][0] = command[k+2][0];
-            k=k+nrParam+2;
+            k=k+2+nrParam;
         }
+
+        if (k==(row))
+        {
+            break;
+        }
+        //k++;
     }
         // switch (which)
         // {
@@ -111,5 +135,5 @@ void collectingCommand (byte data_tcp[], int row, int col, byte datasize)
         // return asc;
         // case 4:
         // return ss;
-        // }  
+        // }
 }
