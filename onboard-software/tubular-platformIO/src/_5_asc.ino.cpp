@@ -6,6 +6,7 @@
  * Authors: Tubular-Bexus software group.
 */
 #ifndef UNIT_TEST
+#include <SD.h>
 #include "_5_asc.h"
 
 float ascParameter[16];
@@ -20,6 +21,29 @@ std::vector<float> getASCParam(int bag)
   return dummyParameter;
 }
 
+std::vector<float> processInitialParameters(byte scParameters[])
+{
+  std::vector<float> newParameter(16);
+  for (int scP = 0; scP < 16; scP++)
+  {
+    newParameter[scP] = scParameters[scP] - '0';
+  }
+  return newParameter;
+}
+
+void initAscParameters()
+{
+  File dataParam = SD.open("parameters.txt");
+  byte scParameters[] = {dataParam.read()};
+  float newParameter[16];
+  std::vector<float> newParameterV = {processInitialParameters(scParameters)};
+  for (int scP = 0; scP < 16; scP++)
+  {
+    newParameter[scP] = newParameterV[scP];
+  }
+  dataParam.close();
+  setASCParameter(newParameter);
+}
 
 
 void initValvesControl()
@@ -82,51 +106,53 @@ void pumpControl(int cond)
 void valvesControl(int valve, int cond)
 {
   xSemaphoreTake(sem, portMAX_DELAY);
-  if (cond==1){
-  switch (valve){
-    case 1:
-    digitalWrite(valve1, HIGH);
-    break;
+  if (cond==1)
+  {
+    switch (valve)
+    {
+      case 1:
+      digitalWrite(valve1, HIGH);
+      break;
 
-    case 2:
-    digitalWrite(valve2, HIGH);
-    break;
+      case 2:
+      digitalWrite(valve2, HIGH);
+      break;
 
-    case 3:
-    digitalWrite(valve3, HIGH);
-    break;
+      case 3:
+      digitalWrite(valve3, HIGH);
+      break;
 
-    case 4:
-    digitalWrite(valve4, HIGH);
-    break;
+      case 4:
+      digitalWrite(valve4, HIGH);
+      break;
 
-    case 5:
-    digitalWrite(valve5, HIGH);
-    break;
+      case 5:
+      digitalWrite(valve5, HIGH);
+      break;
 
-    case 6:
-    digitalWrite(valve6, HIGH);
-    break;
+      case 6:
+      digitalWrite(valve6, HIGH);
+      break;
 
-    case 7:
-    digitalWrite(valve7, HIGH);
-    break;
+      case 7:
+      digitalWrite(valve7, HIGH);
+      break;
 
-    case 8:
-    digitalWrite(valve8, HIGH);
-    break;
+      case 8:
+      digitalWrite(valve8, HIGH);
+      break;
 
-    case 9:
-    digitalWrite(valve9, HIGH);
-    break;
+      case 9:
+      digitalWrite(valve9, HIGH);
+      break;
 
-    case 10:
-    digitalWrite(valve10, HIGH);
-    break;
+      case 10:
+      digitalWrite(valve10, HIGH);
+      break;
 
-    case 11:
-    digitalWrite(flushValve, HIGH);
-    break;
+      case 11:
+      digitalWrite(flushValve, HIGH);
+      break;
   }
   }
   else {

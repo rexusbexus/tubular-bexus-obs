@@ -77,7 +77,7 @@ void initHumSensor()
    humSensor.triggerMeasurement();
 }
 
-void savingFileToSD(float temperatureData[], float humData[], float pressData[])
+void savingDataToSD(float temperatureData[], float humData[], float pressData[])
 {
   String dataString = "";
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
@@ -225,7 +225,7 @@ void sampler(void *pvParameters)
       writeData(curAFMeasurement, 3);
       
       /*Save all data to SD*/
-      savingFileToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement);
+      savingDataToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement);
 
       meanPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       
@@ -275,8 +275,8 @@ void initSampler()
 
 void initSensor()
 {
+   SD.begin(sdCS);
    initSampler();
    initHumSensor();
-   SD.begin(sdCS);
 }
 #endif

@@ -24,7 +24,7 @@
 #define flushValve 33
 #define CACvalve 34
 
-extern float ascParameter[16];
+//extern float ascParameter[16];
 void initASC();
 void setASCParameter(float newParameter[16]);
 void valvesControl(int valve, int cond);
