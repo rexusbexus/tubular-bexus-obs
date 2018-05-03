@@ -21,12 +21,22 @@ std::vector<float> getASCParam(int bag)
   return dummyParameter;
 }
 
-std::vector<float> processInitialParameters(byte scParameters[])
+std::vector<float> processInitialParameters(int scParameters[])
 {
   std::vector<float> newParameter(16);
-  for (int scP = 0; scP < 16; scP++)
+  int i = 0; int k = 0;
+  int sizeParam = sizeof(scParameters)/sizeof(byte);
+  while(i < sizeParam)
   {
-    newParameter[scP] = scParameters[scP] - '0';
+    if (scParameters[i] != ',')
+    {
+      newParameter[k] = scParameters[i] - '0';
+      i++; k++;
+    }
+    else
+    {
+      i++;
+    }
   }
   return newParameter;
 }
@@ -34,7 +44,7 @@ std::vector<float> processInitialParameters(byte scParameters[])
 void initAscParameters()
 {
   File dataParam = SD.open("parameters.txt");
-  byte scParameters[] = {dataParam.read()};
+  int scParameters[] = {dataParam.read()};
   float newParameter[16];
   std::vector<float> newParameterV = {processInitialParameters(scParameters)};
   for (int scP = 0; scP < 16; scP++)
