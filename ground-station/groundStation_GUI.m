@@ -206,8 +206,87 @@ function update_udpoutput(u, evt, handles)
 global tabledata;
 data=fread(u)';
 
+gsString = strfind(data,'gs')
+if gsString(1)==1
+    %disp('lorem ipsum')
+    l = 1;
+    k = 1;
+    j = 1;
+    i = 4;
+    time_stamp = uint8(data(i:(i+3)));
+    time_stamp = swapbytes(typecast(time_stamp, 'uint32'));
+    i=i+3;
+    
+    while i<dataSize(1)
+        textq = char(data(i:(i+1)));
+        switch(textq)
+            case 'ts'
+                i=i+3;
+                for j=1:(data(i)-48)
+                    i=i+2;
+                    temp = uint8([data(i:(i+3))]);
+                    %disp([text(i:(i+3))]);
+                    temp = typecast(temp, 'uint32');
+                    tempSensorVal(j) = swapbytes(temp);
+                    i=i+3;
+                    disp('ts');
+                end
+            case 'ps'
+                i=i+3;
+                for j=1:(data(i)-48)
+                    i=i+2;
+                    temp = uint8([data(i:(i+3))]);
+                    %disp([text(i:(i+3))]);
+                    temp = typecast(temp, 'uint32');
+                    presSensorVal(j) = swapbytes(temp);
+                    i=i+3;
+                    disp('ps');
+                end
+            case 'hs'
+                i=i+3;
+                for j=1:(data(i)-48)
+                    i=i+2;
+                    temp = uint8([data(i:(i+3))]);
+                    %disp([text(i:(i+3))]);
+                    temp = typecast(temp, 'uint32');
+                    humidSensorVal(j) = swapbytes(temp);
+                    i=i+3;
+                    disp('hs');
+                end
+            case 'as'
+                i=i+3;
+                for j=1:(data(i)-48)
+                    i=i+2;
+                    temp = uint8([data(i:(i+3))]);
+                    %disp([text(i:(i+3))]);
+                    temp = typecast(temp, 'uint32');
+                    airFSensorVal(j) = swapbytes(temp);
+                    i=i+4;
+                    disp('as');
+                end
+            case 'st'
+                i=i+3;
+                    statusVal = dec2bin(data(i:(i+1)));
+                    %disp([text(i:(i+1))]);
+                    i=i+1;
+                    disp('st');
+                
+            case 'md'
+                i=i+3;
+                modeVal = [data(i)-48];
+                %disp(text(i));
+                disp('md');
+                break
+        end
+        
+        i=i+1;
+    end
+    
+end
+
 tabledata = [tabledata(2:end,:); data]
 set(handles.axes4, 'Data', tabledata);
+%TODO make all the relavant infofrmation appear in GUI,
 
 drawnow;
 
