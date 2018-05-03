@@ -81,6 +81,12 @@ axes(handles.bexus_logo);
 imshow(bexrex_logo);
 %end of logo generation
 
+%image for valves pump indicator
+green_light = imread('green-light-small.png');
+red_light = imread('red-light-small.png');
+setInitialState(handles, red_light);
+%end
+
 %telecommand initialization
 command = [];
 handles.command = command;
@@ -88,6 +94,31 @@ handles.command = command;
 
 % Update handles structure
 guidata(hObject, handles);
+
+function setInitialState(handles, red_light)
+%set initial state
+axes(handles.ind_valve1);
+imshow(red_light);
+axes(handles.ind_valve2);
+imshow(red_light);
+axes(handles.ind_valve3);
+imshow(red_light);
+axes(handles.ind_valve4);
+imshow(red_light);
+axes(handles.ind_valve5);
+imshow(red_light);
+axes(handles.ind_valve6);
+imshow(red_light);
+axes(handles.ind_valve7);
+imshow(red_light);
+axes(handles.ind_valve8);
+imshow(red_light);
+axes(handles.ind_flush);
+imshow(red_light);
+axes(handles.ind_cac);
+imshow(red_light);
+axes(handles.ind_pump);
+imshow(red_light);
 
 % UIWAIT makes groundStation_GUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
