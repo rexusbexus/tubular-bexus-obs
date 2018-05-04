@@ -7,11 +7,12 @@
 #include <SD.h>
 #include <Wire.h>
 #include <M2M_LM75A.h>
-#include <MS5611.h>
-#include <MS5xxx.h>
+// #include <MS5611.h>
+// #include <MS5xxx.h>
 #include <AWM43300V.h>
 #include <HDC2010.h> //humidity sensor lib
 #include <Ethernet2.h>
+#include <MS5607.h>
 
 
 #include "ethernet.h"
@@ -20,12 +21,12 @@
 
 ethernet ethernet1;
 
-MS5xxx pressSensor(&Wire); //Ambient Pressure Sensor
-MS5xxx pressSensor2(&Wire); //Ambient Pressure Sensor
-MS5xxx pressSensor3(&Wire); //Ambient Pressure Sensor
-MS5xxx pressSensor4(&Wire); //ValveCenter Pressure Sensor
-MS5xxx pressSensor5(&Wire); //ValveCenter Pressure Sensor
-MS5xxx pressSensor6(&Wire); //ValveCenter Pressure Sensor
+MS5607 pressSensor(pressSensorPin1); //Ambient Pressure Sensor
+MS5607 pressSensor2(pressSensorPin2); //Ambient Pressure Sensor
+MS5607 pressSensor3(pressSensorPin3); //Ambient Pressure Sensor
+MS5607 pressSensor4(pressSensorPin4); //ValveCenter Pressure Sensor
+MS5607 pressSensor5(pressSensorPin5); //ValveCenter Pressure Sensor
+MS5607 pressSensor6(pressSensorPin6); //ValveCenter Pressure Sensor
 HDC2010 humSensor(hdcADDR);
 M2M_LM75A tempSensor;
 M2M_LM75A tempSensor2;
@@ -42,18 +43,19 @@ int samplingRate;
 
 void pressSensorread()
 {
-  pressSensor.ReadProm();
-  pressSensor.Readout();
-  pressSensor2.ReadProm();
-  pressSensor2.Readout();
-  pressSensor3.ReadProm();
-  pressSensor3.Readout();
-  pressSensor4.ReadProm();
-  pressSensor4.Readout();
-  pressSensor5.ReadProm();
-  pressSensor5.Readout();
-  pressSensor6.ReadProm();
-  pressSensor6.Readout();
+  int i = 0;
+  pressSensor.readADC_calc(i);;
+  // pressSensor.Readout();
+  pressSensor2.readADC_calc(i);
+  // pressSensor2.Readout();
+  pressSensor3.readADC_calc(i);;
+  // pressSensor3.Readout();
+  pressSensor4.readADC_calc(i);;
+  // pressSensor4.Readout();
+  pressSensor5.readADC_calc(i);;
+  // pressSensor5.Readout();
+  pressSensor6.readADC_calc(i);;
+  // pressSensor6.Readout();
 }
 
 
@@ -135,10 +137,11 @@ static void writeData(float curMeasurements [], int type)
 
 std::vector<float> readData(int type)
 {
-  std::vector<float> dataFromBuffer(nrTempSensors);
+  std::vector<float> dataFromBuffer;
   xSemaphoreTake(sem, portMAX_DELAY);
-  readDataFromSensorBuffers(type);
+  dataFromBuffer = readDataFromSensorBuffers(type);
   xSemaphoreGive(sem);
+  return dataFromBuffer;
 }
 
 void initTempSensors()
@@ -191,12 +194,12 @@ void sampler(void *pvParameters)
       curHumMeasurement[0] = humSensor.readHumidity();
 
       /*Read pressure from sensors*/
-      curPressureMeasurement[0] = pressSensor.GetPres();
-      curPressureMeasurement[1] = pressSensor2.GetPres();   
-      curPressureMeasurement[2] = pressSensor3.GetPres();
-      curPressureMeasurement[3] = pressSensor4.GetPres();
-      curPressureMeasurement[4] = pressSensor5.GetPres();   
-      curPressureMeasurement[5] = pressSensor6.GetPres();
+      curPressureMeasurement[0] = pressSensor.getPressure();
+      curPressureMeasurement[1] = pressSensor2.getPressure();   
+      curPressureMeasurement[2] = pressSensor3.getPressure();
+      curPressureMeasurement[3] = pressSensor4.getPressure();
+      curPressureMeasurement[4] = pressSensor5.getPressure();   
+      curPressureMeasurement[5] = pressSensor6.getPressure();
 
       /*Read temperature from sensors*/
       curTemperatureMeasurement[0] = tempSensor.getTemperature();
