@@ -32,8 +32,6 @@
 #define pressDifferentThresholdneg -20
 #define pressDifferentThresholdpos 20
 
-extern int samplingRate;
-
 
 void initSensor();
 void setSamplingRate(int curSamplingRate);
