@@ -23,7 +23,7 @@ function varargout = groundStation_GUI(varargin)
 % Edit the above text to modify the response to help groundStation_GUI
 
 
-% Last Modified by GUIDE v2.5 27-Apr-2018 09:30:08
+% Last Modified by GUIDE v2.5 05-May-2018 15:20:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -314,13 +314,63 @@ if gsString(1)==1
     end
     
 end
+%%   Telemetry sources 
+ %   tempSensorVal;  Contains the values of the temperature sensor(s)
+ %   pressSensorVal; Contains the values of the pressure sensor(s)
+ %   humidSensorVal; Contains the values of the humidity sensor(s)
+ %   airFSensorVal;  Contains the values of the airFlow sensor(s)
+ %   statusVal;      Contains the data of the valves status
+ %   modeVal;        Contains the mode state of the onboard software
+ %   time_stamp;     Contains the time stamp of the transmission
+ %
+ %
+%%   Write Pressure 
+pressSensorMean = sum(pressSensorVal)/length(pressSensorVal);
+tabledata = [ time_stamp, pressSensorVal, pressSensorMean ; tabledata(1:end-1,:)];
+set(handles.table_pressure, 'PressureData', tabledata);
 
-tabledata = [tabledata(2:end,:); data]
-set(handles.axes4, 'Data', tabledata);
-%TODO make all the relavant infofrmation appear in GUI,
+%%   Write temperature
+tempSensorMean =sum(tempSensorVal)/length(tempSensorVal);
+tabledata = [ time_stamp, tempSensorVal, tempSensorMean; tabledata(1:end-1,:)];
+set(handles.table_temperature, 'TemperatureData', tabledata);
 
+%%   Write Humidity
+humidSensorMean = sum(humidSensorVal)/length(humidSensorVal);
+tabledata = [ time_stamp, humidSensorVal, humidSensorMean; tabledata(1:end-1,:)];
+set(handles.table_humidity, 'GumidityData', tabledata);
+
+%%   Write airflow
+airFSensorMean = sum(airFSensorVal)/length(airFSensorVal);
+tabledata = [ time_stamp, airFSensorVal, airFSensorMean; tabledata(1:end-1,:)];
+set(handles.table_airflow, 'AirflowData', tabledata);
+
+%%   Write status of valves
+     %TODO
+     
+%%   Write mode state
+     %TODO
+     
+%% Calculate height and plot it as a function of time
+ % Sources: Vertical pressure variation, read 2018-05-05
+ %          https://en.wikipedia.org/wiki/Vertical_pressure_variation
+ 
+ T_0_refernce   = 288.5;        % K
+ L_lapse_rate   = -6.5*10^(-3); % K/m
+ press_refernce = 1013;         % mbar
+ R_gas_constant = 287.053;      % J/(kg K)
+ gravity        = 9.81;         % m/s^2
+ 
+ calcHeight = T_0_refernce/L_lapse_rate *((pressSensorMean/press_refernce)...
+              ^(-(L_lapse_rate*R_gas_constant/gravity))-1);
+    % TODO plot new points in figure. Make it so that it does not
+    % overwrites older points in plot. Adjust axes accordingly to
+    % the time and not the number of points. Make axes go from 0 
+    % too current time + 25% of elapsed time.
+ 
 drawnow;
 
+%% Write data to file
+ % TODO write save file
 
 function edit2_Callback(hObject, eventdata, handles)
 % hObject    handle to edit2 (see GCBO)
@@ -523,7 +573,6 @@ if (get(handles.check_valves_control, 'Value') == 1)
 end
 
 
-%<<<<<<< master
 nrSubCommand = get(handles.check_mode_setting, 'Value') + ...
                get(handles.check_heater_control, 'Value') +...
                get(handles.check_valves_control, 'Value');
@@ -541,4 +590,3 @@ function edit3_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-%>>>>>>> UDP-&-telemetry-groundstation
