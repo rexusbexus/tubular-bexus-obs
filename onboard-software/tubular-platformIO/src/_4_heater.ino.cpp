@@ -6,6 +6,7 @@
  * Authors: Tubular-Bexus software group.
 */
 #ifndef UNIT_TEST
+#include <SD.h>
 #include <ArduinoSTL.h>
 #include <vector>
 
@@ -13,6 +14,41 @@
 
 std::vector<float> htrParam(4);
 float htrParameter[4];
+
+
+std::vector<float> processInitialHtrParameters(uint8_t htrParameters[])
+{
+  std::vector<float> newParameter(4);
+  int i = 0; int k = 0;
+  int sizeParam = sizeof(htrParameters)/sizeof(uint8_t);
+  while(i < sizeParam)
+  {
+    if (htrParameters[i] != ',')
+    {
+      newParameter[k] = htrParameters[i] - '0';
+      i++; k++;
+    }
+    else
+    {
+      i++;
+    }
+  }
+  return newParameter;
+}
+
+void initHtrParameters()
+{
+  File dataParam = SD.open("htrParameters.txt");
+  uint8_t htrParameters[] = {dataParam.read()};
+  float newParameter[4];
+  std::vector<float> newParameterV = {processInitialHtrParameters(htrParameters)};
+  for (int scP = 0; scP < 4; scP++)
+  {
+    newParameter[scP] = newParameterV[scP];
+  }
+  dataParam.close();
+  setHeaterParameter(newParameter);
+}
 
 
 /*
@@ -160,6 +196,7 @@ void initReadingData() {
 }
 
 void initHeater() {
+  initHtrParameters();
   pinMode(htr1_pin, OUTPUT);
   pinMode(htr2_pin, OUTPUT);
   initReadingData();
