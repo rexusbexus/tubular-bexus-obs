@@ -160,7 +160,8 @@ void initReadingData() {
 }
 
 void initHeater() {
-  
+  pinMode(htr1_pin, OUTPUT);
+  pinMode(htr2_pin, OUTPUT);
   initReadingData();
  // int htrParameter[4];
 
