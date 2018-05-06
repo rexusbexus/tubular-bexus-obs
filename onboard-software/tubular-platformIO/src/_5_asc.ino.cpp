@@ -8,6 +8,7 @@
 #ifndef UNIT_TEST
 #include <SD.h>
 #include "_5_asc.h"
+#include "ascLogic.h"
 
 float ascParameter[16];
 
@@ -55,6 +56,15 @@ void initAscParameters()
   setASCParameter(newParameter);
 }
 
+void setASCParameter(float newParameter[16])
+{
+  xSemaphoreTake(sem, portMAX_DELAY);
+  for (int i = 0; i < 16; i++)
+  {
+    ascParameter[i]=newParameter[i];
+  }
+  xSemaphoreGive(sem);
+}
 
 void initValvesControl()
 {
@@ -70,18 +80,6 @@ void initValvesControl()
   pinMode(valve10, OUTPUT);
   pinMode(flushValve, OUTPUT);
   pinMode(CACvalve, OUTPUT);
-}
-
-
-
-void setASCParameter(float newParameter[16])
-{
-  xSemaphoreTake(sem, portMAX_DELAY);
-  for (int i = 0; i < 16; i++)
-  {
-    ascParameter[i]=newParameter[i];
-  }
-  xSemaphoreGive(sem);
 }
 
 void samplingLogic(int bagcounter)
@@ -215,7 +213,40 @@ void valvesControl(int valve, int cond)
     break;
   }
   xSemaphoreGive(sem);
+  }
 }
+
+int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
+{
+  digitalWrite(CACvalve, HIGH);
+  if (normalSamplingLogic(meanPressureAmbient, ascParam))
+  {
+    samplingLogic(bagcounter);
+  }
+  else
+  {
+    closeValve(bagcounter);
+    if (bagcounter<8 && meanPressureAmbient>=(ascParam[1])){
+      bagcounter++; 
+    }
+  }
+  return bagcounter;
+}
+
+int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
+{
+  if (normalSamplingLogic(meanPressureAmbient, ascParam))
+  {
+    samplingLogic(bagcounter);  
+  }
+  else
+  {
+    closeValve(bagcounter);
+    if (bagcounter<8 && meanPressureAmbient<= ascParam[0]){
+      bagcounter++;
+    }
+  }
+  return bagcounter;
 }
 
 void reading(void *pvParameters)
@@ -235,8 +266,8 @@ void reading(void *pvParameters)
       uint8_t currMode = getMode();
      
      dummyParam = getASCParam(bagcounter);
-     ascParam[0] = dummyParam[0];
-     ascParam[1] = dummyParam[1];
+     ascParam[0] = dummyParam[0]; // lower limit
+     ascParam[1] = dummyParam[1]; // upper limit
      currPressure = readData(2);
 
      /*Calculating mean pressure from several pressure sensors*/
@@ -249,33 +280,12 @@ void reading(void *pvParameters)
      
      /*Normal - Ascent*/
      case normalAscent:
-     digitalWrite(CACvalve, HIGH);
-     if (meanPressureAmbient >= ascParam[0] && meanPressureAmbient<= (ascParam[1]))
-     {
-        samplingLogic(bagcounter);
-     }
-     else
-     {
-        closeValve(bagcounter);
-        if (bagcounter<8 && meanPressureAmbient>=(ascParam[1])){
-          bagcounter++;  // need to figure this out later
-        }
-     }
+     bagcounter = ascentSequence(meanPressureAmbient, ascParam, bagcounter);
      break;
      
      /*Normal - Descent*/
      case normalDescent:
-     if (meanPressureAmbient >= ascParam[0] && meanPressureAmbient<= (ascParam[1]))
-     {
-        samplingLogic(bagcounter);  
-     }
-     else
-     {
-        closeValve(bagcounter);
-        if (bagcounter<8 && meanPressureAmbient<= ascParam[0]){
-          bagcounter++;
-        }
-     }
+     bagcounter = descentSequence(meanPressureAmbient, ascParam, bagcounter);
      break;
      
      /*SAFE*/
@@ -295,8 +305,6 @@ void reading(void *pvParameters)
    vTaskDelayUntil(&xLastWakeTime, (800 / portTICK_PERIOD_MS) );
    }
 }
-
-
 
 void initReading()
 {
