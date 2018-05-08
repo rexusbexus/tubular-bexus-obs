@@ -58,8 +58,10 @@ handles.output = hObject;
 
 global tabledata;
 global tabledata2;
+global calcHeightVector;
 tabledata=zeros(10,2);
 tabledata2=zeros(10,2);
+calcHeightVector=0;
 
 % Initialise tabs
 handles.tabManager = TabManager( hObject );
@@ -234,15 +236,12 @@ clear u;
 set(handles.constat_udp, 'String', 'Connection Closed');
 
 function update_udpoutput(u, evt, handles)
-global tabledata;
+global tabledata calcHeightVector;
 data=fread(u)';
 
-gsString = strfind(data,'gs')
+gsString = strfind(data,'gs');
 if gsString(1)==1
-    %disp('lorem ipsum')
-    l = 1;
-    k = 1;
-    j = 1;
+    
     i = 4;
     time_stamp = uint8(data(i:(i+3)));
     time_stamp = swapbytes(typecast(time_stamp, 'uint32'));
@@ -297,10 +296,10 @@ if gsString(1)==1
                 end
             case 'st'
                 i=i+3;
-                    statusVal = dec2bin(data(i:(i+1)));
-                    %disp([text(i:(i+1))]);
-                    i=i+1;
-                    disp('st');
+                statusVal = uint16(data(i:(i+1)));
+                %disp([text(i:(i+1))]);
+                i=i+1;
+                disp('st');
                 
             case 'md'
                 i=i+3;
@@ -345,10 +344,34 @@ tabledata = [ time_stamp, airFSensorVal, airFSensorMean; tabledata(1:end-1,:)];
 set(handles.table_airflow, 'AirflowData', tabledata);
 
 %%   Write status of valves
-     %TODO
+light_hanles = light_handles(handles);
+for i=0:15
+    if(bitget(statusVal,16-i)==1)
+        axes(light_hanles(i+1));
+        imshow(green_light);
+    else
+        axes(light_hanles(i+1));
+        imshow(red_light);
+    end
+end
+     
      
 %%   Write mode state
-     %TODO
+switch(modeVal)
+    case 0
+        modeDisp = 'Standby mode';
+    case 1
+        modeDisp = 'Normal mode - ascent';
+    case 2
+        modeDisp = 'Normal mode - descent';
+    case 3
+        modeDisp = 'safe mode';
+    case 4
+        modeDisp = 'Manual mode';
+    otherwise
+        modeDisp = 'Unknown mode';     
+end
+set(handles.status_mode, 'mode', modeDisp);
      
 %% Calculate height and plot it as a function of time
  % Sources: Vertical pressure variation, read 2018-05-05
@@ -361,17 +384,32 @@ set(handles.table_airflow, 'AirflowData', tabledata);
  gravity        = 9.81;         % m/s^2
  
  calcHeight = T_0_refernce/L_lapse_rate *((pressSensorMean/press_refernce)...
-              ^(-(L_lapse_rate*R_gas_constant/gravity))-1);
-    % TODO plot new points in figure. Make it so that it does not
-    % overwrites older points in plot. Adjust axes accordingly to
-    % the time and not the number of points. Make axes go from 0 
-    % too current time + 25% of elapsed time.
+     ^(-(L_lapse_rate*R_gas_constant/gravity))-1);
  
-drawnow;
+ calcHeightVector = [calcHeightVector calcHeight];
+ set(handles.axes4, 'altitude', calcHeightVector);
+ 
+ drawnow;
 
 %% Write data to file
- % TODO write save file
+ %save('TUBULAR.mat','data','-append')
 
+ function light_handles_vector = light_handles(handles)
+ % Creates an array of handles of the valve states in the GUI for
+ % easier management
+ light_handles_vector(1)    = handles.ind_flush;
+ light_handles_vector(2)    = handles.ind_cac;
+ light_handles_vector(3)    = handles.ind_pump;
+ light_handles_vector(4)    = handles.ind_valve1;
+ light_handles_vector(5)    = handles.ind_valve2;
+ light_handles_vector(6)    = handles.ind_valve3;
+ light_handles_vector(7)    = handles.ind_valve4;
+ light_handles_vector(8)    = handles.ind_valve5;
+ light_handles_vector(9)    = handles.ind_valve6;
+ light_handles_vector(10)   = handles.ind_valve7;
+ light_handles_vector(11)   = handles.ind_valve8;
+ 
+ 
 function edit2_Callback(hObject, eventdata, handles)
 % hObject    handle to edit2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
