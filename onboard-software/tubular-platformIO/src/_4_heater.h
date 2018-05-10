@@ -5,6 +5,7 @@
 #define htr2_pin 36
 
 #include <Arduino.h>
+#include "advancedFunctions.h"
 
 #include "_1_init.h"
 #include "_2_mode.h"

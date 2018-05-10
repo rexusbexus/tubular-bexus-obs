@@ -130,7 +130,7 @@ void readingData(void *pvParameters)
     struct heater htrflag = heaterCompare();
     heaterControl(htrflag.htr1_flag,htrflag.htr2_flag);
 
-    
+    wdt.restart();
     vTaskDelayUntil(&xLastWakeTime, (5000 / portTICK_PERIOD_MS) ); 
   }
     
