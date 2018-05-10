@@ -18,7 +18,7 @@ int16_t status=0;
 unsigned int localPort = 8888;
 IPAddress remote(1, 1, 1, 2);
 EthernetUDP Udp;
-RTCDue rtc1(XTAL);
+extern RTCDue rtc;
 
 void transmit() {
   std::vector<float>  tempData = readData(0);
@@ -28,7 +28,7 @@ void transmit() {
 
   Udp.beginPacket(remote, localPort);
   Udp.write("gs,");
-  Udp.write(rtc1.unixtime());
+  Udp.write(rtc.unixtime());
   Udp.write(",ps,");
   Udp.write(nrPressSensors);
   for (int i = 0; i < nrPressSensors; i++) //Loop number of time there are press sensors
