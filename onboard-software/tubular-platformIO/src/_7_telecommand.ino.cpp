@@ -11,7 +11,7 @@
 #define ascCommand 3
 
 
-ethernet ethernet2;
+extern ethernet ethernet;
 extern std::vector<std::vector<byte>> mode;
 extern std::vector<std::vector<byte>> heaters;
 extern std::vector<std::vector<byte>> asc;
@@ -112,7 +112,7 @@ void telecommand(void *pvParameters)
       
       int row = 0;
       int col = 3;
-      EthernetClient client = ethernet2.checkClientAvailibility();
+      EthernetClient client = ethernet.checkClientAvailibility();
       byte datasize = client.available();
       byte data_tcp[datasize]; //test if using byte type will have different result
       curMode = getMode();
