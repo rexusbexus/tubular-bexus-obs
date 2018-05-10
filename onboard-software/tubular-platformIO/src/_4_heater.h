@@ -12,6 +12,6 @@
 
 void initHeater();
 void setHeaterParameter(float newParameter[4]);
-void heaterControl(int htrOne, int htrTwo);
+void heaterControl(bool htrOne, bool htrTwo);
 
 #endif

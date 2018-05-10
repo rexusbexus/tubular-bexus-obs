@@ -9,12 +9,14 @@
 #include <SD.h>
 #include <ArduinoSTL.h>
 #include <vector>
+#include "heaterLogic.h"
 
 #include "_4_heater.h"
 
-std::vector<float> htrParam(4);
+extern std::vector<float> htrParam;
+extern std::vector<float> tempAtHtr;
 float htrParameter[4];
-
+//std::vector<char> htr_flag[2];
 
 std::vector<float> processInitialHtrParameters(uint8_t htrParameters[])
 {
@@ -93,7 +95,7 @@ void setHeaterParameter(float newParameter[4])
  * The heater control child object
  * 
  */
-void heaterControl(int htrOne, int htrTwo)
+void heaterControl(bool htrOne, bool htrTwo)
 {
   xSemaphoreTake(sem, portMAX_DELAY);
   digitalWrite(htr1_pin,htrOne);
@@ -110,9 +112,9 @@ void heaterControl(int htrOne, int htrTwo)
 void readingData(void *pvParameters)
 {
   (void) pvParameters;
-  std::vector<float> tempAtHtr(2);
-  bool  htr1_flag;
-  bool  htr2_flag;
+  
+  //bool htr1_flag;// = htr_flag(0);
+  //bool htr2_flag;// = htr_flag(1);
   
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount ();
@@ -123,66 +125,18 @@ void readingData(void *pvParameters)
     static uint8_t currMode = getMode();
     //Reads the temperature at the two sensors
     tempAtHtr  = readData(0);
- //   tempAtHtr[1]  = *readData(0);//Must make sure to get the correct tempSensors and add pointer.
-    
-    
+ //   tempAtHtr[1]  = *readData(0);//Must make sure to get the correct tempSensors.
+  ;;
+    struct heater htrflag = heaterCompare();
+    heaterControl(htrflag.htr1_flag,htrflag.htr2_flag);
 
-    //Compares with parameters
-    if (tempAtHtr[0]<=0 || tempAtHtr[0]==16777215 || tempAtHtr[1]<=0 || tempAtHtr[1]>=16777215)
-    {
-      /*
-       * Check if within correct value of parameters
-       * Also works for errors in tempAtHts[]
-       */
-    }    
-    else if (htrParam[0]<tempAtHtr[0])
-    {
-        htr1_flag = 1;
-    }
-    else if ((htrParam[1])>tempAtHtr[0])
-    {
-        htr1_flag = 0;
-    }
-    else if ((htrParam[2])<tempAtHtr[1])
-    {
-        htr2_flag = 1;
-    }
-    else if ((htrParam[3])>tempAtHtr[1])
-    {
-        htr2_flag = 0;
-    }
     
-    if (htr1_flag ^ htr2_flag)  // if 0 1 or 1 0
-    {
-      heaterControl(htr1_flag,htr1_flag);
-    }
-    else if (htr1_flag && htr2_flag) // if 1 1
-    {
-      /*
-       * If both heaters require to be turned on it will choose the one most
-       * largest difference between their paramters and actual temperature.
-       */
-      if (((htrParam[0]) - tempAtHtr[0])>( (htrParam[2]) - tempAtHtr[1]))
-      {
-        heaterControl(1,0);
-      }
-      else if (((htrParam[0]) - tempAtHtr[0])<( (htrParam[0]) - tempAtHtr[1]))
-      {
-        heaterControl(0,1);
-      }
-      else // if 0 0
-      {
-        heaterControl(htr1_flag,htr1_flag);
-        /*
-        * The heaters does not need to operate
-        */
-      }
-      
-    } 
     vTaskDelayUntil(&xLastWakeTime, (5000 / portTICK_PERIOD_MS) ); 
   }
     
 }
+
+
 
 void initReadingData() {
     xTaskCreate(
