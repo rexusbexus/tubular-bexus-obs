@@ -19,7 +19,8 @@
 #include "_1_init.h"
 #include "_6_telemetry.h"
 
-ethernet ethernet1;
+extern ethernet ethernet;
+extern RTCDue rtc;
 
 MS5607 pressSensor(pressSensorPin1); //Ambient Pressure Sensor
 MS5607 pressSensor2(pressSensorPin2); //Ambient Pressure Sensor
@@ -157,9 +158,51 @@ void initTempSensors()
   tempSensor9.begin();
 }
 
+bool checkSimulationOrNot()
+{
+  File sim = SD.open("simulation-trigger.txt");
+  if (sim)
+  {
+    sim.close();
+    return false;
+  }
+  else
+  {
+    sim.close();
+    return true;
+  }
+}
 
+struct pressureSimulation{
+  int simulationTime;
+  float pressureSim;
+};
 
+struct pressureSimulation getPressureSimulationData ()
+{
+  File sim = SD.open("pressureTriggerSim.txt");
+  uint8_t buf [100];
+  int simTime[3] = {0};
+  int i = 0;
+  struct pressureSimulation pressSim_struct;
+  while (sim.available())
+  {
+    uint8_t n = sim.read(buf, sizeof(buf));
+    
+    if (n != ',')
+    {
+      simTime[i] = n;
+      i++;
+    }
+    else
+    {
+      break;
+    }
+  }
+  
+  
 
+}
 
 
 
@@ -180,55 +223,63 @@ void sampler(void *pvParameters)
    static BaseType_t xHigherPriorityTaskWoken;
    TickType_t xLastWakeTime;
    xLastWakeTime = xTaskGetTickCount ();
+   bool simulationOrNot = checkSimulationOrNot();
 
    while(1)
    {
       
       xHigherPriorityTaskWoken = pdFALSE;
       uint8_t currMode = getMode();
+      if (simulationOrNot == false)
+      {
+        pressSensorread();
 
-      pressSensorread();
+        /*read humidity from HDC*/
+        //float temperatureHDC = humSensor.readTemp();
+        curHumMeasurement[0] = humSensor.readHumidity();
 
-      /*read humidity from HDC*/
-      //float temperatureHDC = humSensor.readTemp();
-      curHumMeasurement[0] = humSensor.readHumidity();
+        /*Read pressure from sensors*/
+        curPressureMeasurement[0] = pressSensor.getPressure();
+        curPressureMeasurement[1] = pressSensor2.getPressure();   
+        curPressureMeasurement[2] = pressSensor3.getPressure();
+        curPressureMeasurement[3] = pressSensor4.getPressure();
+        curPressureMeasurement[4] = pressSensor5.getPressure();   
+        curPressureMeasurement[5] = pressSensor6.getPressure();
 
-      /*Read pressure from sensors*/
-      curPressureMeasurement[0] = pressSensor.getPressure();
-      curPressureMeasurement[1] = pressSensor2.getPressure();   
-      curPressureMeasurement[2] = pressSensor3.getPressure();
-      curPressureMeasurement[3] = pressSensor4.getPressure();
-      curPressureMeasurement[4] = pressSensor5.getPressure();   
-      curPressureMeasurement[5] = pressSensor6.getPressure();
-
-      /*Read temperature from sensors*/
-      curTemperatureMeasurement[0] = tempSensor.getTemperature();
-      curTemperatureMeasurement[1] = tempSensor2.getTemperature();
-      curTemperatureMeasurement[2] = tempSensor3.getTemperature();
-      curTemperatureMeasurement[3] = tempSensor4.getTemperature();
-      curTemperatureMeasurement[4] = tempSensor5.getTemperature();
-      curTemperatureMeasurement[5] = tempSensor6.getTemperature();
-      curTemperatureMeasurement[6] = tempSensor7.getTemperature();
-      curTemperatureMeasurement[7] = tempSensor8.getTemperature();
-      curTemperatureMeasurement[8] = tempSensor9.getTemperature();
-
-      /*Read airflow from sensor*/
-      curAFMeasurement[0] = afSensor.getAF();
-
-      /*Save pressure measurements*/
-      writeData(curPressureMeasurement, 2);
-
-      /*Save temperature measurements*/
-      writeData(curTemperatureMeasurement, 0);
-
-      /*Save humidity measurements*/
-      writeData(curHumMeasurement, 1);
-
-      /*Save humidity measurements*/
-      writeData(curAFMeasurement, 3);
+        /*Read temperature from sensors*/
+        curTemperatureMeasurement[0] = tempSensor.getTemperature();
+        curTemperatureMeasurement[1] = tempSensor2.getTemperature();
+        curTemperatureMeasurement[2] = tempSensor3.getTemperature();
+        curTemperatureMeasurement[3] = tempSensor4.getTemperature();
+        curTemperatureMeasurement[4] = tempSensor5.getTemperature();
+        curTemperatureMeasurement[5] = tempSensor6.getTemperature();
+        curTemperatureMeasurement[6] = tempSensor7.getTemperature();
+        curTemperatureMeasurement[7] = tempSensor8.getTemperature();
+        curTemperatureMeasurement[8] = tempSensor9.getTemperature();
       
-      /*Save all data to SD*/
-      savingDataToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement);
+        /*Read airflow from sensor*/
+        curAFMeasurement[0] = afSensor.getAF();
+      }
+      else
+      {
+        /*Simulation*/
+
+      }
+
+        /*Save pressure measurements*/
+        writeData(curPressureMeasurement, 2);
+
+        /*Save temperature measurements*/
+        writeData(curTemperatureMeasurement, 0);
+
+        /*Save humidity measurements*/
+        writeData(curHumMeasurement, 1);
+
+        /*Save humidity measurements*/
+        writeData(curAFMeasurement, 3);
+      
+        /*Save all data to SD*/
+        savingDataToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement);
 
       meanPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       
@@ -253,7 +304,7 @@ void sampler(void *pvParameters)
       transmit();
       
       /*Listen to GS*/
-      EthernetClient client = ethernet1.checkClientAvailibility();
+      EthernetClient client = ethernet.checkClientAvailibility();
       if(client.available()>0)
       {
          xSemaphoreGiveFromISR(semPeriodic, &xHigherPriorityTaskWoken );
