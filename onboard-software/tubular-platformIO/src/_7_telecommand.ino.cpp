@@ -40,6 +40,32 @@ void executeHTR(std::vector<std::vector<byte>> &heatersC)
   setHeaterParameter(dummyParam);
 }
 
+void openCloseValveManual(byte pumpvalve[])
+{
+  for (int i = 1; i < 11; i++)
+    {
+      valvesControl(i, 0);
+    }
+  if (pumpvalve[0] == 0)
+  {
+    pumpControl(pumpvalve[0]);
+    for (int i = 1; i < 11; i++)
+    {
+      valvesControl(i, pumpvalve[i]);
+    }
+  }
+  else if (pumpvalve[0] == 1)
+  {
+    valvesControl(11, 1); //delay(10);
+    pumpControl(pumpvalve[0]);
+    valvesControl(11, 0); //delay(10);
+    for (int i = 1; i < 11; i++)
+    {
+      valvesControl(i, pumpvalve[i]);
+    }
+  }
+}
+
 void executeASC(std::vector<std::vector<byte>> &scC)
 {
   float dummyParam [4];
@@ -61,29 +87,10 @@ void executeASC(std::vector<std::vector<byte>> &scC)
     dummyParam[i-2] = param.val;
   }
   setASCParameter(dummyParam);
+  openCloseValveManual(pumpvalve);
 }
 
-void openCloseValveManual(byte pumpvalve[])
-{
-  if (pumpvalve[0] == 0)
-  {
-    pumpControl(pumpvalve[0]);
-    for (int i = 1; i < 11; i++)
-    {
-      valvesControl(i, pumpvalve[i]);
-    }
-  }
-  else if (pumpvalve[0] == 1)
-  {
-    valvesControl(11, 1); //delay(10);
-    pumpControl(pumpvalve[0]);
-    valvesControl(11, 0); //delay(10);
-    for (int i = 1; i < 11; i++)
-    {
-      valvesControl(i, pumpvalve[i]);
-    }
-  }
-}
+
 
 void executeSS(std::vector<std::vector<byte>> &sensorC)
 {
