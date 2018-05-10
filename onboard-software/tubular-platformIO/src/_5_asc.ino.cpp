@@ -11,6 +11,8 @@
 #include "ascLogic.h"
 
 float ascParameter[16];
+extern RTCDue rtc;
+int secondsOpen;
 
 std::vector<float> getASCParam(int bag)
 {
@@ -219,29 +221,43 @@ void valvesControl(int valve, int cond)
 int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 {
   digitalWrite(CACvalve, HIGH);
-  if (normalSamplingLogic(meanPressureAmbient, ascParam))
+  int secondsNow = rtc.getSeconds() + (rtc.getMinutes()*60) + (rtc.getHours()*3600);
+  int valveBag = digitalRead(valve1 + bagcounter - 1);
+  if (normalSamplingLogic(meanPressureAmbient, ascParam) && valveBag == 0)
   {
+    secondsOpen = secondsNow;
     samplingLogic(bagcounter);
+    
+  }
+  else if (secondsNow > (secondsOpen+30) && valveBag == 1)
+  {
+    closeValve(bagcounter);
   }
   else
   {
-    closeValve(bagcounter);
     if (bagcounter<8 && meanPressureAmbient>=(ascParam[1])){
       bagcounter++; 
     }
   }
   return bagcounter;
+  
 }
 
 int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 {
-  if (normalSamplingLogic(meanPressureAmbient, ascParam))
+  int secondsNow = rtc.getSeconds() + (rtc.getMinutes()*60) + (rtc.getHours()*3600);
+  int valveBag = digitalRead(valve1 + bagcounter - 1);
+  if (normalSamplingLogic(meanPressureAmbient, ascParam) && valveBag == 0)
   {
+    secondsOpen = secondsNow;
     samplingLogic(bagcounter);  
+  }
+  else if (secondsNow > (secondsOpen+30) && valveBag == 1)
+  {
+    closeValve(bagcounter);
   }
   else
   {
-    closeValve(bagcounter);
     if (bagcounter<8 && meanPressureAmbient<= ascParam[0]){
       bagcounter++;
     }

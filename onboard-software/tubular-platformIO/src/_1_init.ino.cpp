@@ -25,10 +25,19 @@ void initSemaphore()
 
 void initRTC()
 {
-    
+    /* Change these values to set the current initial time */
+    const uint8_t seconds = 0;
+    const uint8_t minutes = 0;
+    const uint8_t hours = 0;
+
+    /* Change these values to set the current initial date */
+    const uint8_t day = 1;
+    const uint8_t month = 1;
+    const uint16_t year = 2018;
+
     rtc.begin();
-    rtc.setTime(0,0,0);
-    rtc.setDate(1,1,2018);
+    rtc.setTime(hours,minutes,seconds);
+    rtc.setDate(day,month,year);
 }    
 
 void initAll()
