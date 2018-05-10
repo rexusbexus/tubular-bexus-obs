@@ -10,6 +10,7 @@
 #include "_4_heater.h"
 #include "_5_asc.h"
 #include "_7_telecommand.h"
+#include "_8_monitor.h"
 #include "ethernet.h"
 
 SemaphoreHandle_t sem;

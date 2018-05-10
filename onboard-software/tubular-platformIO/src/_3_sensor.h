@@ -3,9 +3,11 @@
 
 #include <ArduinoSTL.h>
 #include <vector>
+#include "advancedFunctions.h"
 #include "_1_init.h"
 #include "_2_mode.h"
 #include "sensorManager.h"
+#include <RTCDue.h>
 
 #define hdcADDR 0x40
 #define msADDR1 0x76

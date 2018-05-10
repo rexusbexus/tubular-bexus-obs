@@ -3,6 +3,7 @@
 
 #include <ArduinoSTL.h>
 #include <vector>
+#include "advancedFunctions.h"
 
 #include "_1_init.h"
 #include "_3_sensor.h"
