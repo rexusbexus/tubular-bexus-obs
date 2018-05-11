@@ -18,38 +18,54 @@ extern std::vector<float> tempAtHtr;
 float htrParameter[4];
 //std::vector<char> htr_flag[2];
 
-std::vector<float> processInitialHtrParameters(uint8_t htrParameters[])
+std::vector<float> processInitialHtrParameters(char htrParameters[])
 {
   std::vector<float> newParameter(4);
-  int i = 0; int k = 0;
-  int sizeParam = sizeof(htrParameters)/sizeof(uint8_t);
-  while(i < sizeParam)
+  char buf[6];
+  int i = 0; int z = 0;
+  int sizeParam = sizeof(htrParameters)/sizeof(byte);
+  while(z<4)
   {
-    if (htrParameters[i] != ',')
+    int k = 0;
+    while(1)
     {
-      newParameter[k] = htrParameters[i] - '0';
+      if (htrParameters[i] == ',')
+      {
+        i++;
+        break;
+      }
+      buf[k] = htrParameters[i];
+      
       i++; k++;
     }
-    else
-    {
-      i++;
-    }
+    newParameter[z] = atof(buf);
+    z++;
   }
   return newParameter;
 }
 
 void initHtrParameters()
 {
-  File dataParam = SD.open("htrParameters.txt");
-  uint8_t htrParameters[] = {dataParam.read()};
-  float newParameter[4];
-  std::vector<float> newParameterV = {processInitialHtrParameters(htrParameters)};
-  for (int scP = 0; scP < 4; scP++)
+  File dataParam = SD.open("htr.txt");
+  if (dataParam)
   {
-    newParameter[scP] = newParameterV[scP];
+    char htrParameters[dataParam.size()];
+    int i = 0;
+    while (dataParam.available())
+    {
+        htrParameters[i] = dataParam.read();
+        i++;
+    }
+    float newParameter[4];
+    std::vector<float> newParameterV = processInitialHtrParameters(htrParameters);
+    for (int scP = 0; scP < 4; scP++)
+    {
+        newParameter[scP] = newParameterV[scP];
+    }
+    dataParam.close();
+    setHeaterParameter(newParameter);
   }
-  dataParam.close();
-  setHeaterParameter(newParameter);
+  
 }
 
 

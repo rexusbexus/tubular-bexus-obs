@@ -43,6 +43,7 @@ void initRTC()
 
 void initAll()
 {
+    pinMode(13, OUTPUT);
     ethernet.initEthernet();
     initSemaphore();
     initRTC();

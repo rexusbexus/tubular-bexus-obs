@@ -40,7 +40,7 @@ M2M_LM75A tempSensor8;
 M2M_LM75A tempSensor9;
 AWM43300V afSensor(airFsensorPin);
 
-int samplingRate;
+int samplingRate = 500;
 
 void pressSensorread()
 {
@@ -160,7 +160,7 @@ void initTempSensors()
 
 bool checkSimulationOrNot()
 {
-  File sim = SD.open("simulation-trigger.txt");
+  File sim = SD.open("trig.txt");
   if (sim)
   {
     sim.close();
@@ -174,34 +174,106 @@ bool checkSimulationOrNot()
 }
 
 struct pressureSimulation{
-  int simulationTime;
-  float pressureSim;
+  int simulationTime[8];
+  int pressureSim[8];
 };
 
-struct pressureSimulation getPressureSimulationData ()
+std::vector<int> getPressure(char all_data[])
 {
-  File sim = SD.open("pressureTriggerSim.txt");
-  uint8_t buf [100];
-  int simTime[3] = {0};
-  int i = 0;
-  struct pressureSimulation pressSim_struct;
-  while (sim.available())
+  char buf[8];
+  std::vector<int> pressure(8);
+  int i = 0;  int b = 0;
+  while(b<8)
   {
-    uint8_t n = sim.read(buf, sizeof(buf));
-    
-    if (n != ',')
+    int k = 0;
+    while(1)
     {
-      simTime[i] = n;
+      if (all_data[i] == ',')
+      {
+        i++;
+        break;
+      }
+      buf[k] = all_data[i];
+      
+      i++; k++;
+    }
+    pressure[b] = atoi(buf);
+    
+    b++;
+  }
+  return pressure;
+}
+
+std::vector<int> getSeconds(char all_data[])
+{
+  char buf[8];
+  std::vector<int> seconds(8);
+  int i = 0;  int b = 0;
+  while(b<8)
+  {
+    int k = 0;
+    while(1)
+    {
+      if (all_data[i] == ',')
+      {
+        i++;
+        break;
+      }
+      buf[k] = all_data[i];
+      
+      i++; k++;
+    }
+    seconds[b] = atoi(buf);
+    
+    b++;
+  }
+  return seconds;
+}
+
+pressureSimulation getPressureSimulationData ()
+{
+  File sim = SD.open("siP.txt", FILE_READ);
+  pressureSimulation pressSim_struct;
+  if (sim)
+  {
+    char all_data[sim.size()];
+    int i = 0;
+    
+    while (sim.available())
+    {
+      all_data[i] = sim.read();
       i++;
     }
-    else
+    
+    std::vector<int> pressure = getPressure(all_data);
+    for (int g = 0; g < 8; g++)
     {
-      break;
+      pressSim_struct.pressureSim[g] = pressure[g];
     }
+    sim.close();
   }
-  
-  
 
+  File simT = SD.open("siPT.txt", FILE_READ);
+  
+  if(simT)
+  {
+    char all_data[simT.size()];
+    int i = 0;
+    
+    while (simT.available())
+    {
+      all_data[i] = simT.read();
+      i++;
+    }
+    
+    std::vector<int> seconds = getSeconds(all_data);
+    for (int g = 0; g < 8; g++)
+    {
+      pressSim_struct.simulationTime[g] = seconds[g];
+    }
+    simT.close();
+  }
+  return pressSim_struct;
 }
 
 
@@ -227,26 +299,16 @@ void sampler(void *pvParameters)
 
    while(1)
    {
-      
+      /*Test*/
+        digitalWrite(13, HIGH);
       xHigherPriorityTaskWoken = pdFALSE;
       uint8_t currMode = getMode();
-      if (simulationOrNot == false)
-      {
-        pressSensorread();
 
-        /*read humidity from HDC*/
+      /*read humidity from HDC*/
         //float temperatureHDC = humSensor.readTemp();
         curHumMeasurement[0] = humSensor.readHumidity();
 
-        /*Read pressure from sensors*/
-        curPressureMeasurement[0] = pressSensor.getPressure();
-        curPressureMeasurement[1] = pressSensor2.getPressure();   
-        curPressureMeasurement[2] = pressSensor3.getPressure();
-        curPressureMeasurement[3] = pressSensor4.getPressure();
-        curPressureMeasurement[4] = pressSensor5.getPressure();   
-        curPressureMeasurement[5] = pressSensor6.getPressure();
-
-        /*Read temperature from sensors*/
+      /*Read temperature from sensors*/
         curTemperatureMeasurement[0] = tempSensor.getTemperature();
         curTemperatureMeasurement[1] = tempSensor2.getTemperature();
         curTemperatureMeasurement[2] = tempSensor3.getTemperature();
@@ -256,14 +318,54 @@ void sampler(void *pvParameters)
         curTemperatureMeasurement[6] = tempSensor7.getTemperature();
         curTemperatureMeasurement[7] = tempSensor8.getTemperature();
         curTemperatureMeasurement[8] = tempSensor9.getTemperature();
+        
       
         /*Read airflow from sensor*/
         curAFMeasurement[0] = afSensor.getAF();
+
+      if (simulationOrNot == false)
+      {
+        pressSensorread();
+
+        /*Read pressure from sensors*/
+        curPressureMeasurement[0] = pressSensor.getPressure();
+        curPressureMeasurement[1] = pressSensor2.getPressure();   
+        curPressureMeasurement[2] = pressSensor3.getPressure();
+        curPressureMeasurement[3] = pressSensor4.getPressure();
+        curPressureMeasurement[4] = pressSensor5.getPressure();   
+        curPressureMeasurement[5] = pressSensor6.getPressure();
+
       }
       else
       {
+        
         /*Simulation*/
-
+        pressureSimulation press_sim_data = getPressureSimulationData();
+        int secondsNow = rtc.getSeconds() + (rtc.getMinutes()*60) + (rtc.getHours()*3600);
+        for (int seq = 0; seq < 7; seq++)
+        {
+          if (secondsNow > press_sim_data.simulationTime[seq] && secondsNow < press_sim_data.simulationTime[seq+1])
+          {
+            /*Read pressure from sensors*/
+            curPressureMeasurement[0] = press_sim_data.pressureSim[seq];
+            curPressureMeasurement[1] = press_sim_data.pressureSim[seq];
+            curPressureMeasurement[2] = press_sim_data.pressureSim[seq];
+            curPressureMeasurement[3] = press_sim_data.pressureSim[seq];
+            curPressureMeasurement[4] = press_sim_data.pressureSim[seq]; 
+            curPressureMeasurement[5] = press_sim_data.pressureSim[seq];
+          }
+        }
+        if (secondsNow > press_sim_data.simulationTime[7])
+          {
+            /*Read pressure from sensors*/
+            curPressureMeasurement[0] = press_sim_data.pressureSim[7];
+            curPressureMeasurement[1] = press_sim_data.pressureSim[7];
+            curPressureMeasurement[2] = press_sim_data.pressureSim[7];
+            curPressureMeasurement[3] = press_sim_data.pressureSim[7];
+            curPressureMeasurement[4] = press_sim_data.pressureSim[7]; 
+            curPressureMeasurement[5] = press_sim_data.pressureSim[7];
+          }
+        
       }
 
         /*Save pressure measurements*/
