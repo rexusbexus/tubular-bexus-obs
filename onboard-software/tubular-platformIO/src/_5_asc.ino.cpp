@@ -24,38 +24,56 @@ std::vector<float> getASCParam(int bag)
   return dummyParameter;
 }
 
-std::vector<float> processInitialAscParameters(uint8_t scParameters[])
+std::vector<float> processInitialAscParameters(char scParameters[])
 {
   std::vector<float> newParameter(16);
-  int i = 0; int k = 0;
+  char buf[6];
+  int i = 0; int z = 0;
   int sizeParam = sizeof(scParameters)/sizeof(byte);
-  while(i < sizeParam)
+  while(z<16)
   {
-    if (scParameters[i] != ',')
+    int k = 0;
+    while(1)
     {
-      newParameter[k] = scParameters[i] - '0';
+      if (scParameters[i] == ',')
+      {
+        i++;
+        break;
+      }
+      buf[k] = scParameters[i];
+      
       i++; k++;
     }
-    else
-    {
-      i++;
-    }
+    newParameter[z] = atof(buf);
+    z++;
   }
   return newParameter;
 }
 
 void initAscParameters()
 {
-  File dataParam = SD.open("ascParameters.txt");
-  uint8_t scParameters[] = {dataParam.read()};
-  float newParameter[16];
-  std::vector<float> newParameterV = {processInitialAscParameters(scParameters)};
-  for (int scP = 0; scP < 16; scP++)
+  
+  File dataParam = SD.open("asc.txt", FILE_READ);
+  if (dataParam)
   {
-    newParameter[scP] = newParameterV[scP];
+    char scParameters[dataParam.size()];
+    int i = 0;
+    while (dataParam.available())
+    {
+        scParameters[i] = dataParam.read();
+        i++;
+    }
+    float newParameter[16];
+    std::vector<float> newParameterV = processInitialAscParameters(scParameters);
+    for (int scP = 0; scP < 16; scP++)
+    {
+        newParameter[scP] = newParameterV[scP];
+    }
+    dataParam.close();
+    setASCParameter(newParameter);
   }
-  dataParam.close();
-  setASCParameter(newParameter);
+  
+
 }
 
 void setASCParameter(float newParameter[16])
@@ -221,6 +239,7 @@ void valvesControl(int valve, int cond)
 int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 {
   digitalWrite(CACvalve, HIGH);
+  
   int secondsNow = rtc.getSeconds() + (rtc.getMinutes()*60) + (rtc.getHours()*3600);
   int valveBag = digitalRead(valve1 + bagcounter - 1);
   if (normalSamplingLogic(meanPressureAmbient, ascParam) && valveBag == 0)
@@ -279,6 +298,7 @@ void reading(void *pvParameters)
 
    while(1)
    {
+      digitalWrite(13, LOW);
       uint8_t currMode = getMode();
      
      dummyParam = getASCParam(bagcounter);
