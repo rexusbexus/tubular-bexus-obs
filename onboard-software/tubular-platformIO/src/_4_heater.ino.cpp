@@ -142,11 +142,10 @@ void readingData(void *pvParameters)
     //Reads the temperature at the two sensors
     tempAtHtr  = readData(0);
  //   tempAtHtr[1]  = *readData(0);//Must make sure to get the correct tempSensors.
-  ;;
     struct heater htrflag = heaterCompare();
     heaterControl(htrflag.htr1_flag,htrflag.htr2_flag);
 
-    wdt.restart();
+    flagPost(1);
     vTaskDelayUntil(&xLastWakeTime, (5000 / portTICK_PERIOD_MS) ); 
   }
     
