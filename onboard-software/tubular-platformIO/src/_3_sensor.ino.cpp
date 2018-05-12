@@ -414,7 +414,7 @@ void sampler(void *pvParameters)
 
       /*Check current sampling rate*/
       currSamplingRate = getSamplingRate();
-      wdt.restart();
+      flagPost(0);
       vTaskDelayUntil(&xLastWakeTime, (currSamplingRate / portTICK_PERIOD_MS) );
    }
 }
