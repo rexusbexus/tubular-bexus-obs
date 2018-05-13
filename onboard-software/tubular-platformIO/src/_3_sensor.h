@@ -28,7 +28,7 @@
 #define pressSensorPin6 42
 #define pressSensorPin7 43
 /*Airflow sensor will be connected to pin 43 */
-#define airFsensorPin   A10
+#define airFsensorPin   A0
 #define sdPin           4
 
 #define safeModeThreshold 900
