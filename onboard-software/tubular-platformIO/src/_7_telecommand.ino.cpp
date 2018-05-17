@@ -5,6 +5,7 @@
 #include "_5_asc.h"
 #include "ethernet.h"
 #include "commandTranslator.h"  
+#include "_8_monitor.h"
 
 #define modeCommand 1
 #define htrCommand 2

@@ -18,6 +18,7 @@
 #include "ethernet.h"
 #include "_1_init.h"
 #include "_6_telemetry.h"
+#include "_8_monitor.h"
 
 extern ethernet ethernet;
 extern RTCDue rtc;
