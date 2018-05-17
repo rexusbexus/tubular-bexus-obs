@@ -151,7 +151,7 @@ void telecommand(void *pvParameters)
           executeSS(ss);
         }
       }
-    wdt.restart();  
+    flagPost(3);  
     }
   }
 }

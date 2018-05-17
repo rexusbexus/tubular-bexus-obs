@@ -396,7 +396,7 @@ void reading(void *pvParameters)
      
      break;
    }
-   wdt.restart();
+   flagPost(2);
    vTaskDelayUntil(&xLastWakeTime, (800 / portTICK_PERIOD_MS) );
    }
 }

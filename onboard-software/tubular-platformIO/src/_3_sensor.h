@@ -28,8 +28,8 @@
 #define pressSensorPin6 42
 #define pressSensorPin7 43 //Temperature
 #define LED 44
-/*Airflow sensor will be connected to pin A10 (analog) */
-#define airFsensorPin   A10
+/*Airflow sensor will be connected to pin A0 (analog) */
+#define airFsensorPin   A0
 #define sdPin           4
 
 #define safeModeThreshold 900
