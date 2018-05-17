@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #define WDT_KEY (0xA5)
 /********************************************************************************
   extern "C" void _watchdogDefaultSetup (void) { WDT_Disable (WDT); }
