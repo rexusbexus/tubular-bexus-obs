@@ -125,15 +125,4 @@ void collectingCommand (byte data_tcp[], int row, int col, byte datasize)
         }
         //k++;
     }
-        // switch (which)
-        // {
-        // case 1:
-        // return mode;
-        // case 2:
-        // return heaters;
-        // case 3:
-        // return asc;
-        // case 4:
-        // return ss;
-        // }
 }

@@ -10,9 +10,15 @@
 #include "_5_asc.h"
 #include "ascLogic.h"
 
-float ascParameter[16];
+
+float ascParameter[totalBagNumber*2];
 extern RTCDue rtc;
 int secondsOpen;
+int flushStartTime;
+int pumpStartTime;
+int valveBagStartTime;
+int bagFillingTime [] = {43, 46, 53, 50, 47, 41};
+
 
 std::vector<float> getASCParam(int bag)
 {
@@ -26,11 +32,11 @@ std::vector<float> getASCParam(int bag)
 
 std::vector<float> processInitialAscParameters(char scParameters[])
 {
-  std::vector<float> newParameter(16);
+  std::vector<float> newParameter(totalBagNumber*2);
   char buf[6];
   int i = 0; int z = 0;
   int sizeParam = sizeof(scParameters)/sizeof(byte);
-  while(z<16)
+  while(z<totalBagNumber*2)
   {
     int k = 0;
     while(1)
@@ -63,9 +69,9 @@ void initAscParameters()
         scParameters[i] = dataParam.read();
         i++;
     }
-    float newParameter[16];
+    float newParameter[totalBagNumber*2];
     std::vector<float> newParameterV = processInitialAscParameters(scParameters);
-    for (int scP = 0; scP < 16; scP++)
+    for (int scP = 0; scP < totalBagNumber*2; scP++)
     {
         newParameter[scP] = newParameterV[scP];
     }
@@ -76,10 +82,10 @@ void initAscParameters()
 
 }
 
-void setASCParameter(float newParameter[16])
+void setASCParameter(float newParameter[totalBagNumber*2])
 {
   xSemaphoreTake(sem, portMAX_DELAY);
-  for (int i = 0; i < 16; i++)
+  for (int i = 0; i < totalBagNumber*2; i++)
   {
     ascParameter[i]=newParameter[i];
   }
@@ -100,20 +106,6 @@ void initValvesControl()
   pinMode(valve10, OUTPUT);
   pinMode(flushValve, OUTPUT);
   pinMode(CACvalve, OUTPUT);
-}
-
-void samplingLogic(int bagcounter)
-{
-  valvesControl(11, 1); //delay(10);
-  pumpControl(1);
-  valvesControl(11, 0); //delay(10);
-  valvesControl(bagcounter, 1); //delay(10);  
-}
-
-void closeValve(int bagcounter)
-{
-  pumpControl(0); //delay(100);
-  valvesControl(bagcounter, 0); //delay(10);
 }
 
 void pumpControl(int cond)
@@ -236,51 +228,111 @@ void valvesControl(int valve, int cond)
   }
 }
 
+int getCurrentTime()
+{
+  int secondsNow = rtc.getSeconds() + (rtc.getMinutes()*60) + (rtc.getHours()*3600);
+  return secondsNow;
+}
+
 int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 {
   digitalWrite(CACvalve, HIGH);
   
-  int secondsNow = rtc.getSeconds() + (rtc.getMinutes()*60) + (rtc.getHours()*3600);
+  // int secondsNow = getCurrentTime();
   int valveBag = digitalRead(valve1 + bagcounter - 1);
-  if (normalSamplingLogic(meanPressureAmbient, ascParam) && valveBag == 0)
+  int valveFlush = digitalRead(flushValve);
+  int pumpState = digitalRead(pumpPin);
+  
+  if (ascentSamplingLogic(meanPressureAmbient, ascParam))
   {
-    secondsOpen = secondsNow;
-    samplingLogic(bagcounter);
-    
-  }
-  else if (secondsNow > (secondsOpen+30) && valveBag == 1)
-  {
-    closeValve(bagcounter);
-  }
-  else
-  {
-    if (bagcounter<8 && meanPressureAmbient>=(ascParam[1])){
-      bagcounter++; 
+    if (valveBag == closeState)
+    {
+      if (pumpState == closeState)
+      {
+        pumpControl(openState);
+        pumpStartTime = getCurrentTime();
+      }
+      else
+      {
+        if (getCurrentTime() > pumpStartTime+1)
+        {
+          if (valveFlush == closeState)
+          {
+            valvesControl(11, openState);
+            flushStartTime = getCurrentTime();
+          }
+          else
+          {
+            if (getCurrentTime() > (flushStartTime+60))
+            {
+              valvesControl(11, closeState);
+              valvesControl(bagcounter, openState);
+              valveBagStartTime = getCurrentTime();
+            }
+          }
+        }
+      }
+    }
+    else
+    {
+      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter]))
+      {
+        valvesControl(bagcounter, closeState);
+        bagcounter++;
+      }
     }
   }
+  
   return bagcounter;
   
 }
 
 int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 {
-  int secondsNow = rtc.getSeconds() + (rtc.getMinutes()*60) + (rtc.getHours()*3600);
   int valveBag = digitalRead(valve1 + bagcounter - 1);
-  if (normalSamplingLogic(meanPressureAmbient, ascParam) && valveBag == 0)
+  int valveFlush = digitalRead(flushValve);
+  int pumpState = digitalRead(pumpPin);
+  
+  if (descentSamplingLogic(meanPressureAmbient, ascParam))
   {
-    secondsOpen = secondsNow;
-    samplingLogic(bagcounter);  
-  }
-  else if (secondsNow > (secondsOpen+30) && valveBag == 1)
-  {
-    closeValve(bagcounter);
-  }
-  else
-  {
-    if (bagcounter<8 && meanPressureAmbient<= ascParam[0]){
-      bagcounter++;
+    if (valveBag == closeState)
+    {
+      if (pumpState == closeState)
+      {
+        pumpControl(openState);
+        pumpStartTime = getCurrentTime();
+      }
+      else
+      {
+        if (getCurrentTime() > pumpStartTime+1)
+        {
+          if (valveFlush == closeState)
+          {
+            valvesControl(11, openState);
+            flushStartTime = getCurrentTime();
+          }
+          else
+          {
+            if (getCurrentTime() > (flushStartTime+60))
+            {
+              valvesControl(11, closeState);
+              valvesControl(bagcounter, openState);
+              valveBagStartTime = getCurrentTime();
+            }
+          }
+        }
+      }
+    }
+    else
+    {
+      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter]))
+      {
+        valvesControl(bagcounter, closeState);
+        bagcounter++;
+      }
     }
   }
+  
   return bagcounter;
 }
 
@@ -316,20 +368,26 @@ void reading(void *pvParameters)
      
      /*Normal - Ascent*/
      case normalAscent:
-     bagcounter = ascentSequence(meanPressureAmbient, ascParam, bagcounter);
+     if (ascentOrDescent(ascParam))
+     {
+       bagcounter = ascentSequence(meanPressureAmbient, ascParam, bagcounter);
+     }
      break;
      
      /*Normal - Descent*/
      case normalDescent:
-     bagcounter = descentSequence(meanPressureAmbient, ascParam, bagcounter);
+     if (!ascentOrDescent(ascParam))
+     {
+       bagcounter = descentSequence(meanPressureAmbient, ascParam, bagcounter);
+     }
      break;
      
      /*SAFE*/
      case safeMode:
      digitalWrite(CACvalve, LOW);
-     for (int sd = 1;sd <= 8; sd++)
+     pumpControl(0);
+     for (int sd = 1;sd <= 6; sd++)
      {
-       pumpControl(0);
        valvesControl(sd, 0);
      }
      break;
@@ -348,7 +406,7 @@ void initReading()
   xTaskCreate(
     reading
     ,  (const portCHAR *) "reading"   // Name
-    ,  128  // This stack size 
+    ,  2048  // This stack size 
     ,  NULL
     ,  1  // Priority
     ,  NULL );

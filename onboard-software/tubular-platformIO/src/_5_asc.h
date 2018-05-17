@@ -25,6 +25,10 @@
 #define flushValve 33
 #define CACvalve 34
 
+#define closeState 0
+#define openState 1
+#define totalBagNumber 6
+
 //extern float ascParameter[16];
 void initASC();
 void setASCParameter(float newParameter[16]);
