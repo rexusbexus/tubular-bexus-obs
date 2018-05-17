@@ -111,10 +111,10 @@ axes(handles.ind_valve5);
 imshow(red_light);
 axes(handles.ind_valve6);
 imshow(red_light);
-axes(handles.ind_valve7);
-imshow(red_light);
-axes(handles.ind_valve8);
-imshow(red_light);
+% axes(handles.ind_valve7);
+% imshow(red_light);
+% axes(handles.ind_valve8);
+% imshow(red_light);
 axes(handles.ind_flush);
 imshow(red_light);
 axes(handles.ind_cac);
@@ -406,8 +406,8 @@ set(handles.status_mode, 'mode', modeDisp);
  light_handles_vector(7)    = handles.ind_valve4;
  light_handles_vector(8)    = handles.ind_valve5;
  light_handles_vector(9)    = handles.ind_valve6;
- light_handles_vector(10)   = handles.ind_valve7;
- light_handles_vector(11)   = handles.ind_valve8;
+%  light_handles_vector(10)   = handles.ind_valve7;
+%  light_handles_vector(11)   = handles.ind_valve8;
  
  
 function edit2_Callback(hObject, eventdata, handles)
@@ -549,29 +549,29 @@ switch get(get(handles.button_valve_6, 'SelectedObject'), 'Tag')
     case 'valve_6_off'
         commandToBuild(18:19) = '0,';
 end
-switch get(get(handles.button_valve_7, 'SelectedObject'), 'Tag')
-    case 'valve_7_on'
-        commandToBuild(20:21) = '1,';
-    case 'valve_7_off'
-        commandToBuild(20:21) = '0,';
-end
-switch get(get(handles.button_valve_8, 'SelectedObject'), 'Tag')
-    case 'valve_8_on'
-        commandToBuild(22:23) = '1,';
-    case 'valve_8_off'
-        commandToBuild(22:23) = '0,';
-end
+% switch get(get(handles.button_valve_7, 'SelectedObject'), 'Tag')
+%     case 'valve_7_on'
+%         commandToBuild(20:21) = '1,';
+%     case 'valve_7_off'
+%         commandToBuild(20:21) = '0,';
+% end
+% switch get(get(handles.button_valve_8, 'SelectedObject'), 'Tag')
+%     case 'valve_8_on'
+%         commandToBuild(22:23) = '1,';
+%     case 'valve_8_off'
+%         commandToBuild(22:23) = '0,';
+% end
 switch get(get(handles.button_valve_flush, 'SelectedObject'), 'Tag')
     case 'valve_flush_on'
-        commandToBuild(24:25) = '1,';
+        commandToBuild(20:21) = '1,';
     case 'valve_flush_off'
-        commandToBuild(24:25) = '0,';
+        commandToBuild(20:21) = '0,';
 end
 switch get(get(handles.button_valve_cac, 'SelectedObject'), 'Tag')
     case 'valve_cac_on'
-        commandToBuild(26:27) = '1,';
+        commandToBuild(22:23) = '1,';
     case 'valve_cac_off'
-        commandToBuild(26:27) = '0,';
+        commandToBuild(22:23) = '0,';
 end
 
 % function commandToBuild = buildSensorCommand(handles)

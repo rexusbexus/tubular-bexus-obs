@@ -2,6 +2,8 @@
 #define ASCLOGIC_H
 
 
-bool normalSamplingLogic(float meanPressureAmbient, float ascParam[]);
+bool ascentSamplingLogic(float meanPressureAmbient, float ascParam[]);
+bool descentSamplingLogic(float meanPressureAmbient, float ascParam[]);
+bool ascentOrDescent(float ascParam[]);
 
 #endif

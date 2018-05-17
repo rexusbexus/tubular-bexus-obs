@@ -68,23 +68,24 @@ void openCloseValveManual(byte pumpvalve[])
 
 void executeASC(std::vector<std::vector<byte>> &scC)
 {
-  float dummyParam [4];
+  char buf [6];
   byte pumpvalve[11];
-  floatval param;
+  float dummyParam [totalBagNumber*2];
+  // floatval param;
 
   for(int i = 0; i < 11; i++)
   {
     pumpvalve[i] = scC[i][0];
   }
  
-  for (int i = 11; i<27; i++)
+  for (int i = 11; i<23; i++)
   {
     for (int k = 0; k < 3; k++) 
     {
-      param.bytes[k] = scC[i][k];
+      buf[k] = scC[i][k];
     }
-    param.bytes[3] = byte(0);
-    dummyParam[i-2] = param.val;
+    // param.bytes[3] = byte(0);
+    dummyParam[i-11] = atof(buf);
   }
   setASCParameter(dummyParam);
   openCloseValveManual(pumpvalve);
@@ -160,7 +161,7 @@ void initTelecommand()
   xTaskCreate(
     telecommand
     ,  (const portCHAR *) "telecommand"   // Name
-    ,  128  // This stack size 
+    ,  2048  // This stack size 
     ,  NULL
     ,  3  // Priority
     ,  NULL );

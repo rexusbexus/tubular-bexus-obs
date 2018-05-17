@@ -3,7 +3,7 @@
 
 #define htr1_pin 35
 #define htr2_pin 36
-#define htr3_pin 44
+// #define htr3_pin 44
 
 #include <Arduino.h>
 #include "advancedFunctions.h"
