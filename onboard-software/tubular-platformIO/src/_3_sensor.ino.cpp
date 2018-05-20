@@ -17,8 +17,10 @@
 
 #include "ethernet.h"
 #include "_1_init.h"
+#include "_5_asc.h"
 #include "_6_telemetry.h"
 #include "_8_monitor.h"
+#include "simulation.h"
 
 extern ethernet ethernet;
 extern RTCDue rtc;
@@ -159,125 +161,6 @@ void initTempSensors()
   tempSensor9.begin();
 }
 
-bool checkSimulationOrNot()
-{
-  File sim = SD.open("trig.txt");
-  if (sim)
-  {
-    sim.close();
-    return false;
-  }
-  else
-  {
-    sim.close();
-    return true;
-  }
-}
-
-struct pressureSimulation{
-  int simulationTime[8];
-  int pressureSim[8];
-};
-
-std::vector<int> getPressure(char all_data[])
-{
-  char buf[8];
-  std::vector<int> pressure(8);
-  int i = 0;  int b = 0;
-  while(b<8)
-  {
-    int k = 0;
-    while(1)
-    {
-      if (all_data[i] == ',')
-      {
-        i++;
-        break;
-      }
-      buf[k] = all_data[i];
-      
-      i++; k++;
-    }
-    pressure[b] = atoi(buf);
-    
-    b++;
-  }
-  return pressure;
-}
-
-std::vector<int> getSeconds(char all_data[])
-{
-  char buf[8];
-  std::vector<int> seconds(8);
-  int i = 0;  int b = 0;
-  while(b<8)
-  {
-    int k = 0;
-    while(1)
-    {
-      if (all_data[i] == ',')
-      {
-        i++;
-        break;
-      }
-      buf[k] = all_data[i];
-      
-      i++; k++;
-    }
-    seconds[b] = atoi(buf);
-    
-    b++;
-  }
-  return seconds;
-}
-
-pressureSimulation getPressureSimulationData ()
-{
-  File sim = SD.open("siP.txt", FILE_READ);
-  pressureSimulation pressSim_struct;
-  if (sim)
-  {
-    char all_data[sim.size()];
-    int i = 0;
-    
-    while (sim.available())
-    {
-      all_data[i] = sim.read();
-      i++;
-    }
-    
-    std::vector<int> pressure = getPressure(all_data);
-    for (int g = 0; g < 8; g++)
-    {
-      pressSim_struct.pressureSim[g] = pressure[g];
-    }
-    sim.close();
-  }
-
-  File simT = SD.open("siPT.txt", FILE_READ);
-  
-  if(simT)
-  {
-    char all_data[simT.size()];
-    int i = 0;
-    
-    while (simT.available())
-    {
-      all_data[i] = simT.read();
-      i++;
-    }
-    
-    std::vector<int> seconds = getSeconds(all_data);
-    for (int g = 0; g < 8; g++)
-    {
-      pressSim_struct.simulationTime[g] = seconds[g];
-    }
-    simT.close();
-  }
-  return pressSim_struct;
-}
-
-
 
 void sampler(void *pvParameters)
 {
@@ -318,13 +201,13 @@ void sampler(void *pvParameters)
         curTemperatureMeasurement[5] = tempSensor6.getTemperature();
         curTemperatureMeasurement[6] = tempSensor7.getTemperature();
         curTemperatureMeasurement[7] = tempSensor8.getTemperature();
-        curTemperatureMeasurement[8] = tempSensor9.getTemperature();
+        curTemperatureMeasurement[8] = tempSensor9.getTemperature(); //pressure sensor
         
       
         /*Read airflow from sensor*/
         curAFMeasurement[0] = afSensor.getAF();
 
-      if (simulationOrNot == false)
+      if (!simulationOrNot)
       {
         pressSensorread();
 
@@ -341,30 +224,50 @@ void sampler(void *pvParameters)
       {
         
         /*Simulation*/
-        pressureSimulation press_sim_data = getPressureSimulationData();
-        int secondsNow = rtc.getSeconds() + (rtc.getMinutes()*60) + (rtc.getHours()*3600);
+        pressureSimulation sim_data = getSimulationData();
+        int secondsNow = getCurrentTime();
         for (int seq = 0; seq < 7; seq++)
         {
-          if (secondsNow > press_sim_data.simulationTime[seq] && secondsNow < press_sim_data.simulationTime[seq+1])
+          if (secondsNow > sim_data.simulationTime[seq] && secondsNow < sim_data.simulationTime[seq+1])
           {
             /*Read pressure from sensors*/
-            curPressureMeasurement[0] = press_sim_data.pressureSim[seq];
-            curPressureMeasurement[1] = press_sim_data.pressureSim[seq];
-            curPressureMeasurement[2] = press_sim_data.pressureSim[seq];
-            curPressureMeasurement[3] = press_sim_data.pressureSim[seq];
-            curPressureMeasurement[4] = press_sim_data.pressureSim[seq]; 
-            curPressureMeasurement[5] = press_sim_data.pressureSim[seq];
+            for (int l = 0; l < nrPressSensors; l++)
+            {
+              curPressureMeasurement[l] = sim_data.pressureSim[l][seq];
+            }
+            for (int l = 0; l < nrTempSensors; l++)
+            {
+              curTemperatureMeasurement[l] = sim_data.temperatureSim[l][seq];
+            }
+            for (int l = 0; l < nrHumidSensors; l++)
+            {
+              curHumMeasurement[l] = sim_data.humSim[l][seq];
+            }
+            for (int l = 0; l < nrAirFSensors; l++)
+            {
+              curAFMeasurement[l] = sim_data.airflowSim[l][seq];
+            }
           }
         }
-        if (secondsNow > press_sim_data.simulationTime[7])
+        if (secondsNow > sim_data.simulationTime[7])
           {
             /*Read pressure from sensors*/
-            curPressureMeasurement[0] = press_sim_data.pressureSim[7];
-            curPressureMeasurement[1] = press_sim_data.pressureSim[7];
-            curPressureMeasurement[2] = press_sim_data.pressureSim[7];
-            curPressureMeasurement[3] = press_sim_data.pressureSim[7];
-            curPressureMeasurement[4] = press_sim_data.pressureSim[7]; 
-            curPressureMeasurement[5] = press_sim_data.pressureSim[7];
+            for (int l = 0; l < nrPressSensors; l++)
+            {
+              curPressureMeasurement[l] = sim_data.pressureSim[l][7];
+            }
+            for (int l = 0; l < nrTempSensors; l++)
+            {
+              curTemperatureMeasurement[l] = sim_data.temperatureSim[l][7];
+            }
+            for (int l = 0; l < nrHumidSensors; l++)
+            {
+              curHumMeasurement[l] = sim_data.humSim[l][7];
+            }
+            for (int l = 0; l < nrAirFSensors; l++)
+            {
+              curAFMeasurement[l] = sim_data.airflowSim[l][7];
+            }
           }
         
       }
@@ -387,7 +290,7 @@ void sampler(void *pvParameters)
       meanPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       
       /*Calculating Pressure Difference*/
-      calculatingPressureDifference(meanPressureAmbient);
+      pressDifference = calculatingPressureDifference(meanPressureAmbient);
 
       /*Change mode if the condition is satisfied*/
       if (pressDifference<pressDifferentThresholdneg)

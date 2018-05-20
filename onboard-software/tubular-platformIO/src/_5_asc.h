@@ -34,5 +34,6 @@ void initASC();
 void setASCParameter(float newParameter[16]);
 void valvesControl(int valve, int cond);
 void pumpControl(int cond);
+int getCurrentTime();
 
 #endif
