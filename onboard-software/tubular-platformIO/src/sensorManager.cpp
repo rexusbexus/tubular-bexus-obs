@@ -5,7 +5,7 @@ float humReading [nrHumidSensors];
 float pressReading [nrPressSensors];
 float afReading[nrAirFSensors];
 
-static float tempPressure[2];
+static float tempPressure[2] = {0};
 
 void writeDataToSensorBuffers(float curMeasurements [], int type)
 {
