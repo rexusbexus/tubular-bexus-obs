@@ -28,6 +28,7 @@ std::vector<std::vector<int>> getTemperature(char all_data[])
     while(1)
     {
         int k = 0;
+        char buf[8] = {0};
         if (all_data[i] == '|')
         {
             i++; 
@@ -37,7 +38,7 @@ std::vector<std::vector<int>> getTemperature(char all_data[])
         {
             if (all_data[i] == ',')
             {
-                i++; c++;
+                i++; 
                 break;
             }
             buf[k] = all_data[i];
@@ -45,6 +46,7 @@ std::vector<std::vector<int>> getTemperature(char all_data[])
             i++; k++;
         }
         temperature[b][c] = atoi(buf);
+        c++;
     }
     b++; c = 0;
   }
@@ -61,6 +63,7 @@ std::vector<std::vector<int>> getHumidity(char all_data[])
     while(1)
     {
         int k = 0;
+        char buf[8] = {0};
         if (all_data[i] == '|')
         {
             i++; 
@@ -70,7 +73,7 @@ std::vector<std::vector<int>> getHumidity(char all_data[])
         {
             if (all_data[i] == ',')
             {
-                i++; c++;
+                i++; 
                 break;
             }
             buf[k] = all_data[i];
@@ -78,6 +81,7 @@ std::vector<std::vector<int>> getHumidity(char all_data[])
             i++; k++;
         }
         humidity[b][c] = atoi(buf);
+        c++;
     }
     b++; c = 0;
   }
@@ -94,6 +98,7 @@ std::vector<std::vector<int>> getAirflow(char all_data[])
     while(1)
     {
         int k = 0;
+        char buf[8] = {0};
         if (all_data[i] == '|')
         {
             i++; 
@@ -103,7 +108,7 @@ std::vector<std::vector<int>> getAirflow(char all_data[])
         {
             if (all_data[i] == ',')
             {
-                i++; c++;
+                i++; 
                 break;
             }
             buf[k] = all_data[i];
@@ -111,6 +116,7 @@ std::vector<std::vector<int>> getAirflow(char all_data[])
             i++; k++;
         }
         Airflow[b][c] = atoi(buf);
+        c++;
     }
     b++; c = 0;
   }
@@ -119,7 +125,7 @@ std::vector<std::vector<int>> getAirflow(char all_data[])
 
 std::vector<std::vector<int>> getPressure(char all_data[])
 {
-  char buf[8];
+  
   std::vector<std::vector<int>> pressure(nrPressSensors, std::vector<int> (8,0));
   int i = 0;  int c = 0; int b = 0;
   while(b<6)
@@ -127,6 +133,7 @@ std::vector<std::vector<int>> getPressure(char all_data[])
     while(1)
     {
         int k = 0;
+        char buf[8] = {0};
         if (all_data[i] == '|')
         {
             i++; 
@@ -136,7 +143,7 @@ std::vector<std::vector<int>> getPressure(char all_data[])
         {
             if (all_data[i] == ',')
             {
-                i++; c++;
+                i++; 
                 break;
             }
             buf[k] = all_data[i];
@@ -144,6 +151,7 @@ std::vector<std::vector<int>> getPressure(char all_data[])
             i++; k++;
         }
         pressure[b][c] = atoi(buf);
+        c++;
     }
     b++; c = 0;
   }
@@ -158,6 +166,7 @@ std::vector<int> getSeconds(char all_data[])
   while(b<8)
   {
     int k = 0;
+    char buf[8] = {0};
     while(1)
     {
       if (all_data[i] == ',')
