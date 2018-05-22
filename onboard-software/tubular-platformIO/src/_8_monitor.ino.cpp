@@ -14,8 +14,9 @@ void watchdogSetup(void) {
   /*** watchdogDisable (); ***/
 }
 
-void initWatchdog()
+void initMonitor()
 {
+  Serial.println("I'm at initMonitor");
   // Enable watchdog.
   WDT->WDT_MR = WDT_MR_WDD(0xFFF)
                 | WDT_MR_WDRPROC

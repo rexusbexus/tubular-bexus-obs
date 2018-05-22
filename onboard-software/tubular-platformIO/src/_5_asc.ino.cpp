@@ -33,13 +33,16 @@ std::vector<float> getASCParam(int bag)
 
 std::vector<float> processInitialAscParameters(char scParameters[])
 {
-  std::vector<float> newParameter(totalBagNumber*2);
-  char buf[6];
+  //Serial.println("I'm at processInitialAscParameters");
+  //Serial.println(String(scParameters));
+  std::vector<float> newASCParameter(totalBagNumber*2);
+  
   int i = 0; int z = 0;
-  int sizeParam = sizeof(scParameters)/sizeof(byte);
+  //int sizeParam = sizeof(scParameters)/sizeof(byte);
   while(z<totalBagNumber*2)
   {
     int k = 0;
+    char buf[6] = {0};
     while(1)
     {
       if (scParameters[i] == ',')
@@ -51,10 +54,11 @@ std::vector<float> processInitialAscParameters(char scParameters[])
       
       i++; k++;
     }
-    newParameter[z] = atof(buf);
+    newASCParameter[z] = atof(buf);
+    //Serial.println(newASCParameter[z]);
     z++;
   }
-  return newParameter;
+  return newASCParameter;
 }
 
 void initAscParameters()
@@ -78,6 +82,10 @@ void initAscParameters()
     }
     dataParam.close();
     setASCParameter(newParameter);
+  }
+  else
+  {
+    Serial.println("Failed to open asc.txt");
   }
   
 
@@ -351,7 +359,6 @@ void reading(void *pvParameters)
 
    while(1)
    {
-      digitalWrite(13, LOW);
       uint8_t currMode = getMode();
      
      dummyParam = getASCParam(bagcounter);
@@ -404,6 +411,7 @@ void reading(void *pvParameters)
 
 void initReading()
 {
+  //Serial.println("Im at initReading");
   xTaskCreate(
     reading
     ,  (const portCHAR *) "reading"   // Name
@@ -420,8 +428,11 @@ void initPumpControl()
 
 void initASC()
 {
-  initReading();
+  Serial.println("Im at initAsc");
+  initAscParameters();
   initPumpControl();
   initValvesControl();
+  initReading();
+  
 }
 #endif

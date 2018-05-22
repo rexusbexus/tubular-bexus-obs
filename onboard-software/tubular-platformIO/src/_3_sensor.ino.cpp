@@ -66,12 +66,12 @@ void pressSensorread()
 
 void initHumSensor()
 {
-    
+  //Serial.println("I'm at initHumSensor");  
    // Initialize I2C communication
    humSensor.begin();
     
    // Begin with a device reset
-   humSensor.reset();
+   //humSensor.reset();
 
    // Configure Measurements
    humSensor.setMeasurementMode(TEMP_AND_HUMID);  // Set measurements to temperature and humidity
@@ -83,10 +83,13 @@ void initHumSensor()
    humSensor.triggerMeasurement();
 }
 
-void savingDataToSD(float temperatureData[], float humData[], float pressData[])
+void savingDataToSD(float temperatureData[], float humData[], float pressData[], float afData[])
 {
+  Serial.println("I'm at savingDataToSD");
   String dataString = "";
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  if (dataFile)
+  {
   for (int i = 0; i < nrTempSensors; i++)
   {
     dataString += String(temperatureData[i]);
@@ -111,8 +114,18 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[])
       dataString += "||";
     }
   }
-  dataFile.println(dataString);
-  dataFile.close();
+  for (int i = 0; i < nrAirFSensors; i++)
+  {
+    dataString += String(afData[i]);
+    if (i == (nrAirFSensors - 1))
+    {
+      dataString += "||";
+    }
+  }
+  
+    dataFile.println(dataString);
+    dataFile.close();
+  }
 }
 
 void setSamplingRate(int curSamplingRate)
@@ -150,6 +163,7 @@ std::vector<float> readData(int type)
 
 void initTempSensors()
 {
+  //Serial.println("I'm at initTempSensors");
   tempSensor.begin();
   tempSensor2.begin();
   tempSensor3.begin();
@@ -188,11 +202,23 @@ void sampler(void *pvParameters)
       xHigherPriorityTaskWoken = pdFALSE;
       uint8_t currMode = getMode();
 
-      /*read humidity from HDC*/
+      if (!simulationOrNot)
+      {
+        pressSensorread();
+
+        /*Read pressure from sensors*/
+        curPressureMeasurement[0] = pressSensor.getPressure();
+        curPressureMeasurement[1] = pressSensor2.getPressure();   
+        curPressureMeasurement[2] = pressSensor3.getPressure();
+        curPressureMeasurement[3] = pressSensor4.getPressure();
+        curPressureMeasurement[4] = pressSensor5.getPressure();   
+        curPressureMeasurement[5] = pressSensor6.getPressure();
+
+        /*read humidity from HDC*/
         //float temperatureHDC = humSensor.readTemp();
         curHumMeasurement[0] = humSensor.readHumidity();
 
-      /*Read temperature from sensors*/
+        /*Read temperature from sensors*/
         curTemperatureMeasurement[0] = tempSensor.getTemperature();
         curTemperatureMeasurement[1] = tempSensor2.getTemperature();
         curTemperatureMeasurement[2] = tempSensor3.getTemperature();
@@ -206,18 +232,6 @@ void sampler(void *pvParameters)
       
         /*Read airflow from sensor*/
         curAFMeasurement[0] = afSensor.getAF();
-
-      if (!simulationOrNot)
-      {
-        pressSensorread();
-
-        /*Read pressure from sensors*/
-        curPressureMeasurement[0] = pressSensor.getPressure();
-        curPressureMeasurement[1] = pressSensor2.getPressure();   
-        curPressureMeasurement[2] = pressSensor3.getPressure();
-        curPressureMeasurement[3] = pressSensor4.getPressure();
-        curPressureMeasurement[4] = pressSensor5.getPressure();   
-        curPressureMeasurement[5] = pressSensor6.getPressure();
 
       }
       else
@@ -285,7 +299,7 @@ void sampler(void *pvParameters)
         writeData(curAFMeasurement, 3);
       
         /*Save all data to SD*/
-        savingDataToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement);
+        savingDataToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement, curAFMeasurement);
 
       meanPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       
@@ -325,10 +339,11 @@ void sampler(void *pvParameters)
 
 void initSampler()
 {
+    //Serial.println("I'm at initSampler");
     xTaskCreate(
       sampler
       ,  (const portCHAR *)"Sampler"   // A name just for humans
-      ,  128  // This stack size can be checked & adjusted by reading the Stack Highwater
+      ,  2048  // This stack size can be checked & adjusted by reading the Stack Highwater
       ,  NULL
       ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
       ,  NULL );
@@ -336,8 +351,9 @@ void initSampler()
 
 void initSensor()
 {
-   SD.begin(sdCS);
-   initSampler();
+   //Serial.println("I'm at initSensor");
    initHumSensor();
+   initTempSensors();
+   initSampler();
 }
 #endif

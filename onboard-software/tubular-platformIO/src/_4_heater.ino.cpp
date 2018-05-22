@@ -21,13 +21,15 @@ float htrParameter[4];
 
 std::vector<float> processInitialHtrParameters(char htrParameters[])
 {
-  std::vector<float> newParameter(4);
-  char buf[6];
+  Serial.println("I'm at processInitialHtrParameters");
+  std::vector<float> newHtrParameter(4);
+  
   int i = 0; int z = 0;
-  int sizeParam = sizeof(htrParameters)/sizeof(byte);
+  //int sizeParam = sizeof(htrParameters)/sizeof(byte);
   while(z<4)
   {
     int k = 0;
+    char buf[6] = {0};
     while(1)
     {
       if (htrParameters[i] == ',')
@@ -39,14 +41,16 @@ std::vector<float> processInitialHtrParameters(char htrParameters[])
       
       i++; k++;
     }
-    newParameter[z] = atof(buf);
+    newHtrParameter[z] = atof(buf);
+    Serial.println(newHtrParameter[z]);
     z++;
   }
-  return newParameter;
+  return newHtrParameter;
 }
 
 void initHtrParameters()
 {
+  Serial.println("I'm at initHtrParameters");
   File dataParam = SD.open("htr.txt");
   if (dataParam)
   {
@@ -57,6 +61,7 @@ void initHtrParameters()
         htrParameters[i] = dataParam.read();
         i++;
     }
+    Serial.println(String(htrParameters));
     float newParameter[4];
     std::vector<float> newParameterV = processInitialHtrParameters(htrParameters);
     for (int scP = 0; scP < 4; scP++)
@@ -65,6 +70,10 @@ void initHtrParameters()
     }
     dataParam.close();
     setHeaterParameter(newParameter);
+  }
+  else
+  {
+    Serial.println("Failed to open htr.txt");
   }
   
 }
@@ -95,7 +104,7 @@ void readHeaterParameter()
  *  elemnets and will replace the htrParameter array
  *  with new values
  */
-void setHeaterParameter(float newParameter[4])
+void setHeaterParameter(float newParameter[])
 {
   xSemaphoreTake(sem, portMAX_DELAY);
   htrParameter[0]=(newParameter[0]);//,*newParameter+1,*newParameter+2,*newParameter+3);
@@ -155,10 +164,11 @@ void readingData(void *pvParameters)
 
 
 void initReadingData() {
+    Serial.println("I'm at initReadingData");
     xTaskCreate(
     readingData
     ,  (const portCHAR *) "readingData"   // Name
-    ,  128  // This stack size 
+    ,  2048  // This stack size 
     ,  NULL
     ,  2  // Priority
     ,  NULL );
@@ -166,7 +176,10 @@ void initReadingData() {
 }
 
 void initHeater() {
-  initHtrParameters();
+  Serial.println("Im at initHeater");
+  //initHtrParameters();
+  float initHeaterParam[] = {15,20,-5,0};
+  setHeaterParameter(initHeaterParam);
   pinMode(htr1_pin, OUTPUT);
   pinMode(htr2_pin, OUTPUT);
   initReadingData();

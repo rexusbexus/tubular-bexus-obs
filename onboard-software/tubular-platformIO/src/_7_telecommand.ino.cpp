@@ -159,6 +159,7 @@ void telecommand(void *pvParameters)
 
 void initTelecommand()
 {
+  Serial.println("Im at initTelecommand");
   xTaskCreate(
     telecommand
     ,  (const portCHAR *) "telecommand"   // Name
