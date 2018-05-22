@@ -13,6 +13,7 @@
 #include <HDC2010.h> //humidity sensor lib
 #include <Ethernet2.h>
 #include <MS5607.h>
+#include <FreeRTOS_ARM.h>
 
 
 #include "ethernet.h"
@@ -43,6 +44,10 @@ M2M_LM75A tempSensor8;
 M2M_LM75A tempSensor9;
 AWM43300V afSensor(airFsensorPin);
 
+pressureSimulation sim_data;
+ 
+bool simulationOrNot;
+extern SemaphoreHandle_t sem;
 int samplingRate = 500;
 
 void pressSensorread()
@@ -90,41 +95,45 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if (dataFile)
   {
-  for (int i = 0; i < nrTempSensors; i++)
-  {
-    dataString += String(temperatureData[i]);
-    if (i == (nrTempSensors - 1))
+    for (int i = 0; i < nrTempSensors; i++)
     {
-      dataString += "||";
+      dataString += String(temperatureData[i]);
+      if (i == (nrTempSensors - 1))
+      {
+        dataString += "||";
+      }
     }
-  }
-  for (int i = 0; i < nrHumidSensors; i++)
-  {
-    dataString += String(humData[i]);
-    if (i == (nrHumidSensors - 1))
+    for (int i = 0; i < nrHumidSensors; i++)
     {
-      dataString += "||";
+      dataString += String(humData[i]);
+      if (i == (nrHumidSensors - 1))
+      {
+        dataString += "||";
+      }
     }
-  }
-  for (int i = 0; i < nrPressSensors; i++)
-  {
-    dataString += String(pressData[i]);
-    if (i == (nrPressSensors - 1))
+    for (int i = 0; i < nrPressSensors; i++)
     {
-      dataString += "||";
+      dataString += String(pressData[i]);
+      if (i == (nrPressSensors - 1))
+      {
+        dataString += "||";
+      }
     }
-  }
-  for (int i = 0; i < nrAirFSensors; i++)
-  {
-    dataString += String(afData[i]);
-    if (i == (nrAirFSensors - 1))
+    for (int i = 0; i < nrAirFSensors; i++)
     {
-      dataString += "||";
+      dataString += String(afData[i]);
+      if (i == (nrAirFSensors - 1))
+      {
+        dataString += "||";
+      }
     }
-  }
-  
+    
     dataFile.println(dataString);
     dataFile.close();
+  }
+  else
+  {
+    Serial.println("Failed to open datalog.txt");
   }
 }
 
@@ -145,7 +154,7 @@ int getSamplingRate(void)
    
 }
 
-static void writeData(float curMeasurements [], int type)
+void writeData(float curMeasurements [], int type)
 {
    xSemaphoreTake(sem, portMAX_DELAY);
    writeDataToSensorBuffers(curMeasurements, type);
@@ -193,12 +202,11 @@ void sampler(void *pvParameters)
    static BaseType_t xHigherPriorityTaskWoken;
    TickType_t xLastWakeTime;
    xLastWakeTime = xTaskGetTickCount ();
-   bool simulationOrNot = checkSimulationOrNot();
+   
 
    while(1)
    {
-      /*Test*/
-        digitalWrite(13, HIGH);
+      Serial.println("I'm at sensor periodic");
       xHigherPriorityTaskWoken = pdFALSE;
       uint8_t currMode = getMode();
 
@@ -232,13 +240,13 @@ void sampler(void *pvParameters)
       
         /*Read airflow from sensor*/
         curAFMeasurement[0] = afSensor.getAF();
+        Serial.println("I'm at normal");
 
       }
       else
       {
-        
+        Serial.println("I'm at simulation");
         /*Simulation*/
-        pressureSimulation sim_data = getSimulationData();
         int secondsNow = getCurrentTime();
         for (int seq = 0; seq < 7; seq++)
         {
@@ -333,6 +341,7 @@ void sampler(void *pvParameters)
       /*Check current sampling rate*/
       currSamplingRate = getSamplingRate();
       flagPost(0);
+      Serial.println("I'm leaving sensor periodic");
       vTaskDelayUntil(&xLastWakeTime, (currSamplingRate / portTICK_PERIOD_MS) );
    }
 }
@@ -345,13 +354,19 @@ void initSampler()
       ,  (const portCHAR *)"Sampler"   // A name just for humans
       ,  2048  // This stack size can be checked & adjusted by reading the Stack Highwater
       ,  NULL
-      ,  2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+      ,  3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
       ,  NULL );
 }
 
 void initSensor()
 {
    //Serial.println("I'm at initSensor");
+   simulationOrNot = checkSimulationOrNot(); 
+   if (simulationOrNot)
+   {
+        sim_data = getSimulationData();
+        Serial.println("Succes getting simulation data");
+   }
    initHumSensor();
    initTempSensors();
    initSampler();

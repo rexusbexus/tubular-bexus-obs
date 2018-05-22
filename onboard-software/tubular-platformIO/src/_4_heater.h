@@ -6,7 +6,7 @@
 // #define htr3_pin 44
 
 #include <Arduino.h>
-#include "advancedFunctions.h"
+//#include "advancedFunctions.h"
 
 #include "_1_init.h"
 #include "_2_mode.h"

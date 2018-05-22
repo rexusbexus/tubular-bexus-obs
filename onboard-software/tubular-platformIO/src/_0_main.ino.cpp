@@ -26,7 +26,8 @@
 void setup()
 {
     
-    Serial.begin(9600);
+    Serial.begin(115200);
+    SD.end();
     SD.begin(sdPin);
     //server.begin();
     initAll();

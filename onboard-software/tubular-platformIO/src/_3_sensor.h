@@ -3,7 +3,7 @@
 
 #include <ArduinoSTL.h>
 #include <vector>
-#include "advancedFunctions.h"
+// #include "advancedFunctions.h"
 #include "_1_init.h"
 #include "_2_mode.h"
 #include "sensorManager.h"
@@ -39,6 +39,8 @@
 
 void initSensor();
 void setSamplingRate(int curSamplingRate);
+void writeData(float curMeasurements [], int type);
+void savingDataToSD(float temperatureData[], float humData[], float pressData[], float afData[]);
 std::vector<float> readData(int type);
 
 #endif
