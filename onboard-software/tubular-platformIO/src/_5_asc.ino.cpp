@@ -85,13 +85,15 @@ void initAscParameters()
   }
   else
   {
+    float backupAscParam[] = {80,70,51.8,41.8,76.2,86.2,98,108,136,146,188.3,198.3};
+    setASCParameter(backupAscParam);
     Serial.println("Failed to open asc.txt");
   }
   
 
 }
 
-void setASCParameter(float newParameter[totalBagNumber*2])
+void setASCParameter(float newParameter[])
 {
   xSemaphoreTake(sem, portMAX_DELAY);
   for (int i = 0; i < totalBagNumber*2; i++)
@@ -359,6 +361,7 @@ void reading(void *pvParameters)
 
    while(1)
    {
+      Serial.println("I'm at asc periodic");
       uint8_t currMode = getMode();
      
      dummyParam = getASCParam(bagcounter);
@@ -405,6 +408,7 @@ void reading(void *pvParameters)
      break;
    }
    flagPost(2);
+   Serial.println("I'm leaving asc periodic");
    vTaskDelayUntil(&xLastWakeTime, (800 / portTICK_PERIOD_MS) );
    }
 }
@@ -428,7 +432,7 @@ void initPumpControl()
 
 void initASC()
 {
-  Serial.println("Im at initAsc");
+  // Serial.println("Im at initAsc");
   initAscParameters();
   initPumpControl();
   initValvesControl();

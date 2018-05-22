@@ -7,7 +7,7 @@ void test_normalSamplingLogic_pressure_in_range()
 {
     float pressure = 400.351;
     float param [] = {300, 450};
-    bool result = normalSamplingLogic(pressure, param);
+    bool result = ascentSamplingLogic(pressure, param);
     TEST_ASSERT_TRUE(result == true);
     
 }
@@ -16,7 +16,7 @@ void test_normalSamplingLogic_pressure_not_in_range()
 {
     float pressure = 600;
     float param [] = {300, 450};
-    bool result = normalSamplingLogic(pressure, param);
+    bool result = ascentSamplingLogic(pressure, param);
     TEST_ASSERT_TRUE(result == false);
 }
 

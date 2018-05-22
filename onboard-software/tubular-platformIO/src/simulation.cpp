@@ -13,7 +13,7 @@ bool checkSimulationOrNot()
   }
   else
   {
-    sim.close();
+    Serial.println("Simulation file not found");
     return false;
   }
 }
@@ -151,6 +151,7 @@ std::vector<std::vector<int>> getPressure(char all_data[])
             i++; k++;
         }
         pressure[b][c] = atoi(buf);
+        // Serial.println(pressure[b][c]);
         c++;
     }
     b++; c = 0;
@@ -192,6 +193,7 @@ pressureSimulation getSimulationData ()
   
   if (sim)
   {
+    Serial.println("siP");
     char press_data[sim.size()];
     int i = 0;
     
@@ -200,6 +202,7 @@ pressureSimulation getSimulationData ()
       press_data[i] = sim.read();
       i++;
     }
+    // Serial.println(String(press_data));
     
     std::vector<std::vector<int>> pressure = getPressure(press_data);
     for (int g = 0; g < nrPressSensors; g++)
@@ -215,6 +218,7 @@ pressureSimulation getSimulationData ()
   File simTe = SD.open("siT.txt", FILE_READ);
   if (simTe)
   {
+    Serial.println("siT");
     char temp_data[simTe.size()];
     int i = 0;
     
@@ -238,6 +242,7 @@ pressureSimulation getSimulationData ()
   File simH = SD.open("siH.txt", FILE_READ);
   if (simH)
   {
+    Serial.println("siH");
     char hum_data[simH.size()];
     int i = 0;
     
@@ -261,6 +266,7 @@ pressureSimulation getSimulationData ()
   File simAF = SD.open("siA.txt", FILE_READ);
   if (simAF)
   {
+    Serial.println("siA");
     char AF_data[simAF.size()];
     int i = 0;
     
@@ -284,6 +290,7 @@ pressureSimulation getSimulationData ()
   File simT = SD.open("siTi.txt", FILE_READ);
   if(simT)
   {
+    Serial.println("siTi");
     char time_data[simT.size()];
     int i = 0;
     

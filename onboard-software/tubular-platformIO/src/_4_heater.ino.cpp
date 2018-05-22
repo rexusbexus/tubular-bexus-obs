@@ -21,7 +21,7 @@ float htrParameter[4];
 
 std::vector<float> processInitialHtrParameters(char htrParameters[])
 {
-  Serial.println("I'm at processInitialHtrParameters");
+  // Serial.println("I'm at processInitialHtrParameters");
   std::vector<float> newHtrParameter(4);
   
   int i = 0; int z = 0;
@@ -42,7 +42,7 @@ std::vector<float> processInitialHtrParameters(char htrParameters[])
       i++; k++;
     }
     newHtrParameter[z] = atof(buf);
-    Serial.println(newHtrParameter[z]);
+    // Serial.println(newHtrParameter[z]);
     z++;
   }
   return newHtrParameter;
@@ -50,7 +50,7 @@ std::vector<float> processInitialHtrParameters(char htrParameters[])
 
 void initHtrParameters()
 {
-  Serial.println("I'm at initHtrParameters");
+  // Serial.println("I'm at initHtrParameters");
   File dataParam = SD.open("htr.txt");
   if (dataParam)
   {
@@ -61,18 +61,21 @@ void initHtrParameters()
         htrParameters[i] = dataParam.read();
         i++;
     }
-    Serial.println(String(htrParameters));
+    // Serial.println(String(htrParameters));
     float newParameter[4];
-    std::vector<float> newParameterV = processInitialHtrParameters(htrParameters);
+    std::vector<float> newhtrParameterV = processInitialHtrParameters(htrParameters);
     for (int scP = 0; scP < 4; scP++)
     {
-        newParameter[scP] = newParameterV[scP];
+        newParameter[scP] = newhtrParameterV[scP];
     }
     dataParam.close();
     setHeaterParameter(newParameter);
+    // Serial.println("I'm leaving initialHtrParameters");
   }
   else
   {
+    float backupHtrParam[] = {15,20,-5,0};
+    setHeaterParameter(backupHtrParam);
     Serial.println("Failed to open htr.txt");
   }
   
@@ -147,6 +150,7 @@ void readingData(void *pvParameters)
   
   while(1)
   {
+    // Serial.println("I'm at heater periodic");
     //Reads the current mode
     static uint8_t currMode = getMode();
     //Reads the temperature at the two sensors
@@ -156,6 +160,7 @@ void readingData(void *pvParameters)
     heaterControl(htrflag.htr1_flag,htrflag.htr2_flag);
 
     flagPost(1);
+    // Serial.println("I'm leaving heater periodic");
     vTaskDelayUntil(&xLastWakeTime, (5000 / portTICK_PERIOD_MS) ); 
   }
     
@@ -164,7 +169,7 @@ void readingData(void *pvParameters)
 
 
 void initReadingData() {
-    Serial.println("I'm at initReadingData");
+    // Serial.println("I'm at initReadingData");
     xTaskCreate(
     readingData
     ,  (const portCHAR *) "readingData"   // Name
@@ -176,10 +181,10 @@ void initReadingData() {
 }
 
 void initHeater() {
-  Serial.println("Im at initHeater");
-  //initHtrParameters();
-  float initHeaterParam[] = {15,20,-5,0};
-  setHeaterParameter(initHeaterParam);
+  // Serial.println("Im at initHeater");
+  initHtrParameters();
+  // float initHeaterParam[] = {15,20,-5,0};
+  // setHeaterParameter(initHeaterParam);
   pinMode(htr1_pin, OUTPUT);
   pinMode(htr2_pin, OUTPUT);
   initReadingData();

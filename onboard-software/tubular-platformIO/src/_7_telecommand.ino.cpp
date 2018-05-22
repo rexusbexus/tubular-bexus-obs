@@ -152,14 +152,14 @@ void telecommand(void *pvParameters)
           executeSS(ss);
         }
       }
-    flagPost(3);  
+    // flagPost(3);  
     }
   }
 }
 
 void initTelecommand()
 {
-  Serial.println("Im at initTelecommand");
+  // Serial.println("Im at initTelecommand");
   xTaskCreate(
     telecommand
     ,  (const portCHAR *) "telecommand"   // Name

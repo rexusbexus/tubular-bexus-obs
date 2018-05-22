@@ -16,7 +16,7 @@ void watchdogSetup(void) {
 
 void initMonitor()
 {
-  Serial.println("I'm at initMonitor");
+  // Serial.println("I'm at initMonitor");
   // Enable watchdog.
   WDT->WDT_MR = WDT_MR_WDD(0xFFF)
                 | WDT_MR_WDRPROC
@@ -32,7 +32,7 @@ void initMonitor()
   //Serial.print("RSTTYP = 0b"); Serial.println(status, BIN);  // Should be 0b010 after first watchdog reset
 }
 
-int flag[4] = {0};
+int flag[3] = {0};
 /* It exists a number places where the flags are set
  * Flag 0: _3_Sensor.ino.cpp
  * Flag 1: _4_heater.ino.cpp
@@ -41,11 +41,11 @@ int flag[4] = {0};
 */
 void flagPost(int flagNr) {
   flag[flagNr] = 1;
-  if (flag[0] == 1 && flag[1] == 1 && flag[2] == 1 && flag[3] == 1) {
+  if (flag[0] == 1 && flag[1] == 1 && flag[2] == 1) {
     flag[0] = 0;
     flag[1] = 0;
     flag[2] = 0;
-    flag[3] = 0;
+    // flag[3] = 0;
     WDT->WDT_CR = WDT_CR_KEY(WDT_KEY)
                   | WDT_CR_WDRSTT;
   }
