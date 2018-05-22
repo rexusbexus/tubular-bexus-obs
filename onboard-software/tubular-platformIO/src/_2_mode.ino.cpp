@@ -9,11 +9,6 @@
 
 uint8_t state;
 
-void initMode()
-{
-   setMode(standbyMode);
-}
-
 uint8_t getMode()
 {
    uint8_t tempt;
@@ -28,6 +23,12 @@ void setMode(uint8_t curMode)
    xSemaphoreTake(sem, portMAX_DELAY);
    state = curMode;
    xSemaphoreGive(sem);
+}
+
+void initMode()
+{
+   //Serial.println("I'm at initMode");
+   setMode(standbyMode);
 }
 
 #endif

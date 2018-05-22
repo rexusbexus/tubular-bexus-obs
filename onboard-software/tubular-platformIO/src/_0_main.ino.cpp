@@ -1,4 +1,5 @@
 #ifndef UNIT_TEST
+#include <Arduino.h>
 #include <ArduinoSTL.h>
 #include <vector>
 
@@ -19,13 +20,15 @@
 #include "_1_init.h"
 #include "ethernet.h"
 
+#define sdPin           4
 
 /*init*/
 void setup()
 {
-    Serial.begin(9600);
-    //server.begin();
     
+    Serial.begin(9600);
+    SD.begin(sdPin);
+    //server.begin();
     initAll();
     vTaskStartScheduler();
 

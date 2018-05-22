@@ -2,7 +2,7 @@
 
 bool ascentOrDescent(float ascParam[])
 {
-    if (ascParam[0] < ascParam[1])
+    if (ascParam[0] > ascParam[1])
     {
         return true;
     }
@@ -12,8 +12,7 @@ bool ascentOrDescent(float ascParam[])
     }
 }
 
-
-bool descentSamplingLogic(float meanPressureAmbient, float ascParam[])
+bool ascentSamplingLogic(float meanPressureAmbient, float ascParam[])
 {
     if (meanPressureAmbient <= ascParam[0] && meanPressureAmbient >= (ascParam[1]))
     {
@@ -26,9 +25,9 @@ bool descentSamplingLogic(float meanPressureAmbient, float ascParam[])
     }
 }
 
-bool ascentSamplingLogic(float meanPressureAmbient, float ascParam[])
+bool descentSamplingLogic(float meanPressureAmbient, float ascParam[])
 {
-    if (meanPressureAmbient >= ascParam[0] && meanPressureAmbient<= (ascParam[1]))
+    if (meanPressureAmbient >= ascParam[0] && meanPressureAmbient <= (ascParam[1]))
     {
         
         return true;
@@ -38,3 +37,4 @@ bool ascentSamplingLogic(float meanPressureAmbient, float ascParam[])
         return false;
     }
 }
+

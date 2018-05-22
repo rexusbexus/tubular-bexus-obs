@@ -20,12 +20,14 @@ RTCDue rtc(XTAL);
 
 void initSemaphore()
 {
+    //Serial.println("I'm at initSemaphore");
     sem = xSemaphoreCreateMutex();
     semPeriodic = xSemaphoreCreateBinary();
 }
 
 void initRTC()
 {
+    //Serial.println("I'm at initRTC");
     /* Change these values to set the current initial time */
     const uint8_t seconds = 0;
     const uint8_t minutes = 0;
@@ -44,14 +46,17 @@ void initRTC()
 void initAll()
 {
     pinMode(13, OUTPUT);
+    
     ethernet.initEthernet();
     initSemaphore();
     initRTC();
     initMode();
     initSensor();
-    initHeater();
     initASC();
+    initHeater();
+    
     initTelecommand();
+    initMonitor();
     
 }
 

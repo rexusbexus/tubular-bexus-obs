@@ -30,7 +30,7 @@
 #define LED 44
 /*Airflow sensor will be connected to pin A0 (analog) */
 #define airFsensorPin   A0
-#define sdPin           4
+
 
 #define safeModeThreshold 900
 #define pressDifferentThresholdneg -20
