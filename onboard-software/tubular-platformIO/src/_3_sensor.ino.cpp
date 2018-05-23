@@ -90,46 +90,58 @@ void initHumSensor()
 
 void savingDataToSD(float temperatureData[], float humData[], float pressData[], float afData[])
 {
-  Serial.println("I'm at savingDataToSD");
+  // Serial.println("I'm at savingDataToSD");
   String dataString = "";
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if (dataFile)
   {
+    // Serial.println("I'm at dataFile");
     for (int i = 0; i < nrTempSensors; i++)
     {
       dataString += String(temperatureData[i]);
+      dataString += ",";
       if (i == (nrTempSensors - 1))
       {
         dataString += "||";
       }
     }
+    dataFile.print(dataString);
+    dataString = "";
     for (int i = 0; i < nrHumidSensors; i++)
     {
       dataString += String(humData[i]);
+      dataString += ",";
       if (i == (nrHumidSensors - 1))
       {
         dataString += "||";
       }
     }
+    dataFile.print(dataString);
+    dataString = "";
     for (int i = 0; i < nrPressSensors; i++)
     {
       dataString += String(pressData[i]);
+      dataString += ",";
       if (i == (nrPressSensors - 1))
       {
         dataString += "||";
       }
     }
+    dataFile.print(dataString);
+    dataString = "";
     for (int i = 0; i < nrAirFSensors; i++)
     {
       dataString += String(afData[i]);
+      dataString += ",";
       if (i == (nrAirFSensors - 1))
       {
         dataString += "||";
       }
     }
-    
-    dataFile.println(dataString);
+    dataFile.print(dataString);
+    dataFile.println();
     dataFile.close();
+    Serial.println("Exiting dataFile");
   }
   else
   {
@@ -192,10 +204,10 @@ void sampler(void *pvParameters)
    //float tempPressure[nrPressSensors];
    //int count=0;
    float pressDifference = 0;
-   float curPressureMeasurement[nrPressSensors];
-   float curTemperatureMeasurement[nrTempSensors];
-   float curHumMeasurement[nrHumidSensors];
-   float curAFMeasurement[nrAirFSensors];
+   float curPressureMeasurement[nrPressSensors] = {0};
+   float curTemperatureMeasurement[nrTempSensors] = {0};
+   float curHumMeasurement[nrHumidSensors] = {0};
+   float curAFMeasurement[nrAirFSensors] = {0};
    float meanPressureAmbient;
    int currSamplingRate;
 
@@ -255,11 +267,25 @@ void sampler(void *pvParameters)
             /*Read pressure from sensors*/
             for (int l = 0; l < nrPressSensors; l++)
             {
-              curPressureMeasurement[l] = sim_data.pressureSim[l][seq];
+              if (l<2)
+              {
+                curPressureMeasurement[l] = sim_data.pressureSim[l][seq];
+              }
+              else
+              {
+                curPressureMeasurement[l] = 0;
+              }
             }
             for (int l = 0; l < nrTempSensors; l++)
             {
-              curTemperatureMeasurement[l] = sim_data.temperatureSim[l][seq];
+              if (l<2)
+              {
+                curTemperatureMeasurement[l] = sim_data.temperatureSim[l][seq];
+              }
+              else
+              {
+                curTemperatureMeasurement[l] = 0;
+              }
             }
             for (int l = 0; l < nrHumidSensors; l++)
             {
@@ -276,11 +302,25 @@ void sampler(void *pvParameters)
             /*Read pressure from sensors*/
             for (int l = 0; l < nrPressSensors; l++)
             {
-              curPressureMeasurement[l] = sim_data.pressureSim[l][7];
+              if (l<2)
+              {
+                curPressureMeasurement[l] = sim_data.pressureSim[l][7];
+              }
+              else
+              {
+                curPressureMeasurement[l] = 0;
+              }
             }
             for (int l = 0; l < nrTempSensors; l++)
             {
-              curTemperatureMeasurement[l] = sim_data.temperatureSim[l][7];
+              if (l<2)
+              {
+                curTemperatureMeasurement[l] = sim_data.temperatureSim[l][7];
+              }
+              else
+              {
+                curTemperatureMeasurement[l] = 0;
+              }
             }
             for (int l = 0; l < nrHumidSensors; l++)
             {

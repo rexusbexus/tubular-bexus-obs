@@ -21,6 +21,7 @@ EthernetUDP Udp;
 extern RTCDue rtc;
 
 void transmit() {
+  Serial.println("I'm at transmit");
   std::vector<float>  tempData = readData(0);
   std::vector<float>  humidData = readData(1);
   std::vector<float>  pressData = readData(2);
@@ -74,5 +75,6 @@ void transmit() {
   Udp.write(",md,");
   Udp.write(getMode());
   Udp.endPacket();
+  Serial.println("Exiting Transmit");
 }
 #endif
