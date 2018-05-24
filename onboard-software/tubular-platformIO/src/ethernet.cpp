@@ -3,6 +3,8 @@
 #include <EthernetUdp2.h>
 #include "ethernet.h"
 
+unsigned int localPort = 8888;
+EthernetUDP Udp;
 
 void ethernet::initEthernet()
 {
@@ -14,7 +16,7 @@ void ethernet::initEthernet()
     IPAddress subnet(255, 0, 0, 0);
     Ethernet.begin(mac, ip, subnet);
     initServer();
-    
+    initUDP();
 }
 
 EthernetClient ethernet::checkClientAvailibility()
@@ -26,5 +28,10 @@ void ethernet::initServer()
 {
     server = new EthernetServer(4000);
     server->begin();
+}
+
+void ethernet::initUDP()
+{
+    Udp.begin(localPort);
 }
 #endif

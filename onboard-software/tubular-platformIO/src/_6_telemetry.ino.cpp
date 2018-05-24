@@ -15,9 +15,9 @@
 #include "_5_asc.h"
 
 int16_t status=0;
-unsigned int localPort = 8888;
+extern unsigned int localPort;
 IPAddress remote(1, 1, 1, 2);
-EthernetUDP Udp;
+extern EthernetUDP Udp;
 extern RTCDue rtc;
 
 void transmit() {
@@ -26,7 +26,7 @@ void transmit() {
   std::vector<float>  humidData = readData(1);
   std::vector<float>  pressData = readData(2);
   std::vector<float>  airFData = readData(3);
-
+  // Serial.println("Finished gathering data");
   Udp.beginPacket(remote, localPort);
   Udp.write("gs,");
   Udp.write(rtc.unixtime());
@@ -37,7 +37,7 @@ void transmit() {
     Udp.write(pressData[i]);
     Udp.write(",");
   }
-
+  
 
   Udp.write("ts,");
   Udp.write(nrTempSensors);
@@ -71,9 +71,11 @@ void transmit() {
     status = status + status + digitalRead(pumpPin + i);
              
   }
+  // Serial.println(status);
   Udp.write(status);
   Udp.write(",md,");
   Udp.write(getMode());
+  // Serial.println("Wrote mode");
   Udp.endPacket();
   Serial.println("Exiting Transmit");
 }

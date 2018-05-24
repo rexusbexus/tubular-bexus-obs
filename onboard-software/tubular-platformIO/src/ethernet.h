@@ -8,6 +8,7 @@ class ethernet
     public: 
     void initEthernet();
     void initServer();
+    void initUDP();
     EthernetClient checkClientAvailibility();
 
     private:
