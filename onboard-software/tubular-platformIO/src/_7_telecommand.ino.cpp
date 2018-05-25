@@ -26,19 +26,19 @@ void executeMode(std::vector<std::vector<byte>> &modeC)
 
 void executeHTR(std::vector<std::vector<byte>> &heatersC)
 {
-  float dummyParam [4];
-  floatval param;
+  // float dummyParam [4];
+  // floatval param;
   heaterControl(heatersC[0][0], heatersC [1][0]);
-  for (int i = 2; i<6; i++)
-  {
-    for (int k = 0; k < 3; k++) 
-    {
-      param.bytes[k] = heatersC[i][k];
-    }
-    dummyParam[i-2] = param.val;
-  }
-  param.bytes[3] = byte(0);
-  setHeaterParameter(dummyParam);
+  // for (int i = 2; i<6; i++)
+  // {
+  //   for (int k = 0; k < 3; k++) 
+  //   {
+  //     param.bytes[k] = heatersC[i][k];
+  //   }
+  //   dummyParam[i-2] = param.val;
+  // }
+  // param.bytes[3] = byte(0);
+  // setHeaterParameter(dummyParam);
 }
 
 void openCloseValveManual(byte pumpvalve[])
@@ -74,20 +74,20 @@ void executeASC(std::vector<std::vector<byte>> &scC)
   float dummyParam [totalBagNumber*2];
   // floatval param;
 
-  for(int i = 0; i < 11; i++)
+  for(int i = 0; i < 9; i++)
   {
     pumpvalve[i] = scC[i][0];
   }
  
-  for (int i = 11; i<23; i++)
-  {
-    for (int k = 0; k < 3; k++) 
-    {
-      buf[k] = scC[i][k];
-    }
-    // param.bytes[3] = byte(0);
-    dummyParam[i-11] = atof(buf);
-  }
+  // for (int i = 11; i<23; i++)
+  // {
+  //   for (int k = 0; k < 3; k++) 
+  //   {
+  //     buf[k] = scC[i][k];
+  //   }
+  //   // param.bytes[3] = byte(0);
+  //   dummyParam[i-11] = atof(buf);
+  // }
   setASCParameter(dummyParam);
   openCloseValveManual(pumpvalve);
 }
@@ -149,7 +149,7 @@ void telecommand(void *pvParameters)
         {
           executeHTR(heaters);
           executeASC(asc);
-          executeSS(ss);
+          // executeSS(ss);
         }
       }
     // flagPost(3);  

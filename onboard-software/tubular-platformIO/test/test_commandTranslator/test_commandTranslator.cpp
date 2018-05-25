@@ -56,7 +56,7 @@ void test_scanBuffer_with_correct_command()
 void test_collectCommand_with_valid_command()
 {
     int col = 3;
-    byte telecommand[] = {"tub,2,ht,2,1,1,md,1,1,"};
+    byte telecommand[] = {"tub,3,md,1,1,sc,9,1,1,0,0,0,0,0,0,0,"};
     int row = checkComma(telecommand, 0, sizeof(telecommand));
     TEST_ASSERT_EQUAL_INT(9, row);
     collectingCommand (telecommand, row, col, sizeof(telecommand));
