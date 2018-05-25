@@ -411,16 +411,18 @@ set(handles.status_mode, 'mode', modeDisp);
  % Creates an array of handles of the valve states in the GUI for
  % easier management
  light_handles_vector(1)    = handles.ind_pump;
+ 
+ 
  light_handles_vector(2)    = handles.ind_valve1;
  light_handles_vector(3)    = handles.ind_valve2;
  light_handles_vector(4)    = handles.ind_valve3;
  light_handles_vector(5)    = handles.ind_valve4;
- light_handles_vector(6)    = handles.ind_valve5;
- light_handles_vector(7)    = handles.ind_valve6;
- light_handles_vector(8)    = handles.ind_flush;
- light_handles_vector(9)    = handles.ind_cac;
- light_handles_vector(10)   = handles.ind_htr1;
- light_handles_vector(11)   = handles.ind_htr2;
+ light_handles_vector()    = handles.ind_valve5;
+ light_handles_vector(9)    = handles.ind_valve6;
+ light_handles_vector(1)    = handles.ind_flush;
+ light_handles_vector(2)    = handles.ind_cac;
+%  light_handles_vector(10)   = handles.ind_valve7;
+%  light_handles_vector(11)   = handles.ind_valve8;
  
  
 function edit2_Callback(hObject, eventdata, handles)
