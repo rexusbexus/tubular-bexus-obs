@@ -127,7 +127,10 @@ axes(handles.ind_cac);
 imshow(red_light);
 axes(handles.ind_pump);
 imshow(red_light);
-
+axes(handles.ind_htr1);
+imshow(red_light);
+axes(handles.ind_htr2);
+imshow(red_light);
 % UIWAIT makes groundStation_GUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -212,11 +215,11 @@ remPort=8888;
 host='1.1.1.1';  
 locPort=8888;
 u = udp(host,'RemotePort',remPort,'LocalPort',locPort); 
-u.InputBufferSize = 10000;
+u.InputBufferSize = 120;
 u.OutputBufferSize = 10000;
 u.ReadAsyncMode = 'continuous';
 u.BytesAvailableFcnMode = 'byte';
-u.BytesAvailableFcnCount =64;
+u.BytesAvailableFcnCount =120;
 u.BytesAvailableFcn = {@update_udpoutput, handles};
 handles.u=u;
 
@@ -240,6 +243,7 @@ function udp_stop_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 u=handles.u;
+stopasync(u);
 fclose(u);
 delete(u);
 clear u;
@@ -272,7 +276,7 @@ if gsString(1)==1
                     temp = typecast(temp, 'single');
                     tempSensorVal(j) = (temp);
                     i=i+3;
-                    disp(textq);
+%                     disp(textq);
                 end
             case 'ps'
                 i=i+3;
@@ -283,7 +287,7 @@ if gsString(1)==1
                     temp = typecast(temp, 'single');
                     pressSensorVal(j) = (temp);
                     i=i+3;
-                    disp(textq);
+%                     disp(textq);
                 end
             case 'hs'
                 i=i+3;
@@ -294,7 +298,7 @@ if gsString(1)==1
                     temp = typecast(temp, 'single');
                     humidSensorVal(j) = (temp);
                     i=i+3;
-                    disp(textq);
+%                     disp(textq);
                 end
             case 'as'
                 i=i+3;
@@ -305,20 +309,20 @@ if gsString(1)==1
                     temp = typecast(temp, 'single');
                     airFSensorVal(j) = (temp);
                     i=i+3;
-                    disp(textq);
+%                     disp(textq);
                 end
             case 'st'
                 i=i+3;
                 statusVal = typecast(uint8(data(i:(i+1))),'uint16');
                 %disp([text(i:(i+1))]);
                 i=i+1;
-                disp(textq);
+%                 disp(textq);
                 
             case 'md'
                 i=i+3;
                 modeVal = [data(i)];
                 %disp(text(i));
-                disp(textq);
+%                 disp(textq);
                 break
         end
         
@@ -340,31 +344,38 @@ end
 pressSensorMean = sum(pressSensorVal)/length(pressSensorVal);
 tabledataPressure = [ time_stamp, pressSensorVal, pressSensorMean ; tabledataPressure(1:end-1,:)];
 set(handles.table_pressure, 'Data', tabledataPressure);
+% drawnow;
 
 %%   Write temperature
 tempSensorMean =sum(tempSensorVal)/length(tempSensorVal);
 tabledataTemperature = [ time_stamp, tempSensorVal, tempSensorMean; tabledataTemperature(1:end-1,:)];
 set(handles.table_temperature, 'Data', tabledataTemperature);
+% drawnow;
 
 %%   Write Humidity
 humidSensorMean = sum(humidSensorVal)/length(humidSensorVal);
 tabledataHumidity = [ time_stamp, humidSensorVal; tabledataHumidity(1:end-1,:)];
 set(handles.table_humidity, 'Data', tabledataHumidity);
+% drawnow;
 
 %%   Write airflow
 airFSensorMean = sum(airFSensorVal)/length(airFSensorVal);
 tabledataAirflow = [ time_stamp, airFSensorVal; tabledataAirflow(1:end-1,:)];
 set(handles.table_airflow, 'Data', tabledataAirflow);
+% drawnow;
 
 %%   Write status of valves
 light_hanles = light_handles(handles);
-for i=0:15
+for i=0:14
     if(bitget(statusVal,16-i)==1)
         axes(light_hanles(i+1));
         imshow(green_light);
-    else
-        axes(light_hanles(i+1));
-        imshow(red_light);
+    elseif(bitget(statusVal,16-i)==0)
+        if (i==7||i==8||i==9||i==10) 
+        else
+            axes(light_hanles(i+1));
+            imshow(red_light);
+        end
     end
 end
      
@@ -384,7 +395,7 @@ switch(modeVal)
     otherwise
         modeDisp = 'Unknown mode';     
 end
-set(handles.status_mode, 'mode', modeDisp);
+set(handles.status_mode, 'String', modeDisp);
      
 %% Calculate height and plot it as a function of time
  % Sources: Vertical pressure variation, read 2018-05-05
@@ -402,7 +413,7 @@ set(handles.status_mode, 'mode', modeDisp);
 %  calcHeightVector = [calcHeightVector calcHeight];
 %  set(handles.axes4, 'altitude', calcHeightVector);
 %  
-%  drawnow;
+ drawnow;
 
 %% Write data to file
  %save('TUBULAR.mat','data','-append')
@@ -417,10 +428,10 @@ set(handles.status_mode, 'mode', modeDisp);
  light_handles_vector(5)    = handles.ind_valve4;
  light_handles_vector(6)    = handles.ind_valve5;
  light_handles_vector(7)    = handles.ind_valve6;
- light_handles_vector(8)    = handles.ind_flush;
- light_handles_vector(9)    = handles.ind_cac;
- light_handles_vector(10)   = handles.ind_htr1;
- light_handles_vector(11)   = handles.ind_htr2;
+ light_handles_vector(12)    = handles.ind_flush;
+ light_handles_vector(13)    = handles.ind_cac;
+ light_handles_vector(14)   = handles.ind_htr1;
+ light_handles_vector(15)   = handles.ind_htr2;
  
  
 function edit2_Callback(hObject, eventdata, handles)
