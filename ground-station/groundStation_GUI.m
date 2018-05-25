@@ -365,19 +365,19 @@ set(handles.table_airflow, 'Data', tabledataAirflow);
 % drawnow;
 
 %%   Write status of valves
-light_hanles = light_handles(handles);
-for i=0:14
-    if(bitget(statusVal,16-i)==1)
-        axes(light_hanles(i+1));
-        imshow(green_light);
-    elseif(bitget(statusVal,16-i)==0)
-        if (i==7||i==8||i==9||i==10) 
-        else
-            axes(light_hanles(i+1));
-            imshow(red_light);
-        end
-    end
-end
+% light_hanles = light_handles(handles);
+% for i=0:14
+%     if(bitget(statusVal,16-i)==1)
+%         axes(light_hanles(i+1));
+%         imshow(green_light);
+%     elseif(bitget(statusVal,16-i)==0)
+%         if (i==7||i==8||i==9||i==10) 
+%         else
+%             axes(light_hanles(i+1));
+%             imshow(red_light);
+%         end
+%     end
+% end
      
      
 %%   Write mode state

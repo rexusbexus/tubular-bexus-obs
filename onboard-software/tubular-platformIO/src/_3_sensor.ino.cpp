@@ -48,7 +48,7 @@ pressureSimulation sim_data;
  
 bool simulationOrNot;
 extern SemaphoreHandle_t sem;
-int samplingRate = 500;
+int samplingRate = 1000;
 
 void pressSensorread()
 {
