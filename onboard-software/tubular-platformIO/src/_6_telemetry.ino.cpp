@@ -34,7 +34,7 @@ void transmit() {
   Udp.write(",ps,");
   Udp.write(nrPressSensors); Udp.write(",");
   floatval dummy;
-  status_bytes dummyStatus;
+  status_bytes dummyStatus; dummyStatus.val = 0;
   for (int i = 0; i < nrPressSensors; i++) //Loop number of time there are press sensors
   {
     dummy.val = pressData[i];
@@ -87,7 +87,7 @@ void transmit() {
   Udp.write("st,");
   for (int i = 0; i <= (htr2_pin - pumpPin) ; i++) //Loop number of time there are humidity sensors
   {
-    dummyStatus.val = status + status + digitalRead(pumpPin + i);
+    dummyStatus.val = dummyStatus.val + dummyStatus.val + digitalRead(pumpPin + i);
              
   }
   // Serial.println(status);
