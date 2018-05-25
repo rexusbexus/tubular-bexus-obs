@@ -12,6 +12,11 @@ typedef union {
     uint8_t bytes[4];
 } floatval;
 
+typedef union {
+    uint16_t val;
+    uint8_t bytes[2];
+} status_bytes;
+
 
 
 void initAll();

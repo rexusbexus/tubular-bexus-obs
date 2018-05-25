@@ -121,6 +121,10 @@ axes(handles.ind_cac);
 imshow(red_light);
 axes(handles.ind_pump);
 imshow(red_light);
+axes(handles.ind_htr1);
+imshow(red_light);
+axes(handles.ind_htr2);
+imshow(red_light);
 
 % UIWAIT makes groundStation_GUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -218,7 +222,7 @@ if (~strcmp(u.Status,'open'))
 else
     set(handles.constat_udp, 'String', 'Connection Opened');
 end
-disp('Hello');
+% disp('Hello');
 guidata(gcbf, handles);
 
 
@@ -237,7 +241,7 @@ set(handles.constat_udp, 'String', 'Connection Closed');
 
 function update_udpoutput(u, evt, handles)
 global tabledata calcHeightVector;
-data=fread(u)';
+data=fread(u)'; disp(data);
 
 gsString = strfind(data,'gs');
 if gsString(1)==1
@@ -488,7 +492,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%
 function commandToBuild = buildHeaterCommand(handles)
-commandToBuild(1:5) = 'ht,6,';
+commandToBuild(1:5) = 'ht,2,';
 switch get(get(handles.heater1_control, 'SelectedObject'), 'Tag')
     case 'control_heater1_on'
         commandToBuild(6:7) = '1,';
@@ -504,7 +508,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%
 function commandToBuild = buildAscCommand(handles)
-commandToBuild(1:5) = 'sc,2,';
+commandToBuild(1:5) = 'sc,9,';
 
 switch get(get(handles.pump_control, 'SelectedObject'), 'Tag')
     case 'control_pump_on'

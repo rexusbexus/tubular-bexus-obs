@@ -14,6 +14,7 @@
 #include "_4_heater.h"
 #include "_5_asc.h"
 
+
 int16_t status=0;
 extern unsigned int localPort;
 IPAddress remote(1, 1, 1, 2);
@@ -31,36 +32,54 @@ void transmit() {
   Udp.write("gs,");
   Udp.write(rtc.unixtime());
   Udp.write(",ps,");
-  Udp.write(nrPressSensors);
+  Udp.write(nrPressSensors); Udp.write(",");
+  floatval dummy;
+  status_bytes dummyStatus;
   for (int i = 0; i < nrPressSensors; i++) //Loop number of time there are press sensors
   {
-    Udp.write(pressData[i]);
+    dummy.val = pressData[i];
+    for (int k = 0; k < 4; k++)
+    {
+      Udp.write(dummy.bytes[k]);
+    }
     Udp.write(",");
   }
   
 
   Udp.write("ts,");
-  Udp.write(nrTempSensors);
+  Udp.write(nrTempSensors); Udp.write(",");
   for (int i = 0; i < nrTempSensors; i++) //Loop number of time there are temp sensors
   {
     
-    Udp.write(tempData[i]);
+    dummy.val = tempData[i];
+    for (int k = 0; k < 4; k++)
+    {
+      Udp.write(dummy.bytes[k]);
+    }
     Udp.write(",");
   }
 
   Udp.write("hs,");
-  Udp.write(nrHumidSensors);
+  Udp.write(nrHumidSensors); Udp.write(",");
   for (int i = 0; i < nrHumidSensors; i++) //Loop number of time there are humidity sensors
   {
-    Udp.write((humidData[i]));
+    dummy.val = humidData[i];
+    for (int k = 0; k < 4; k++)
+    {
+      Udp.write(dummy.bytes[k]);
+    }
     Udp.write(",");
   }
 
   Udp.write("as,");
-  Udp.write(nrAirFSensors);
+  Udp.write(nrAirFSensors); Udp.write(",");
   for (int i = 0; i < nrAirFSensors; i++) //Loop number of time there are air flow sensors
   {
-    Udp.write(airFData[i]);
+    dummy.val = airFData[i];
+    for (int k = 0; k < 4; k++)
+    {
+      Udp.write(dummy.bytes[k]);
+    }
     Udp.write(",");
   }
 
@@ -68,11 +87,11 @@ void transmit() {
   Udp.write("st,");
   for (int i = 0; i <= (htr2_pin - pumpPin) ; i++) //Loop number of time there are humidity sensors
   {
-    status = status + status + digitalRead(pumpPin + i);
+    dummyStatus.val = status + status + digitalRead(pumpPin + i);
              
   }
   // Serial.println(status);
-  Udp.write(status);
+  Udp.write(dummyStatus.bytes[0]); Udp.write(dummyStatus.bytes[1]);
   Udp.write(",md,");
   Udp.write(getMode());
   // Serial.println("Wrote mode");
