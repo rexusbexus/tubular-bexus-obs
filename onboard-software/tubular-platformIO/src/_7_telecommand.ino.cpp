@@ -29,6 +29,8 @@ void executeHTR(std::vector<std::vector<byte>> &heatersC)
   // float dummyParam [4];
   // floatval param;
   heaterControl(heatersC[0][0], heatersC [1][0]);
+  // Serial.println(heatersC[0][0]);
+  // Serial.println(heatersC[1][0]);
   // for (int i = 2; i<6; i++)
   // {
   //   for (int k = 0; k < 3; k++) 
@@ -43,35 +45,21 @@ void executeHTR(std::vector<std::vector<byte>> &heatersC)
 
 void openCloseValveManual(byte pumpvalve[])
 {
-  for (int i = 1; i < 11; i++)
-    {
-      valvesControl(i, 0);
-    }
-  if (pumpvalve[0] == 0)
+  pumpControl(pumpvalve[0]);
+  for (int i = 1; i < 7; i++)
   {
-    pumpControl(pumpvalve[0]);
-    for (int i = 1; i < 11; i++)
-    {
-      valvesControl(i, pumpvalve[i]);
-    }
+    valvesControl(i, pumpvalve[i]);
   }
-  else if (pumpvalve[0] == 1)
-  {
-    valvesControl(11, 1); //delay(10);
-    pumpControl(pumpvalve[0]);
-    valvesControl(11, 0); //delay(10);
-    for (int i = 1; i < 11; i++)
-    {
-      valvesControl(i, pumpvalve[i]);
-    }
-  }
+  valvesControl(11, pumpvalve[7]);
+  digitalWrite(CACvalve, pumpvalve[8]);
+  
 }
 
 void executeASC(std::vector<std::vector<byte>> &scC)
 {
   char buf [6];
-  byte pumpvalve[11];
-  float dummyParam [totalBagNumber*2];
+  byte pumpvalve[9];
+  // float dummyParam [totalBagNumber*2];
   // floatval param;
 
   for(int i = 0; i < 9; i++)
@@ -88,7 +76,7 @@ void executeASC(std::vector<std::vector<byte>> &scC)
   //   // param.bytes[3] = byte(0);
   //   dummyParam[i-11] = atof(buf);
   // }
-  setASCParameter(dummyParam);
+  // setASCParameter(dummyParam);
   openCloseValveManual(pumpvalve);
 }
 

@@ -15,14 +15,14 @@
 #include "_5_asc.h"
 
 
-int16_t status=0;
+int16_t status=0b0000000000000000;
 extern unsigned int localPort;
 IPAddress remote(1, 1, 1, 2);
 extern EthernetUDP Udp;
 extern RTCDue rtc;
 
 void transmit() {
-  Serial.println("I'm at transmit");
+  // Serial.println("I'm at transmit");
   std::vector<float>  tempData = readData(0);
   std::vector<float>  humidData = readData(1);
   std::vector<float>  pressData = readData(2);
@@ -34,7 +34,7 @@ void transmit() {
   Udp.write(",ps,");
   Udp.write(nrPressSensors); Udp.write(",");
   floatval dummy;
-  status_bytes dummyStatus; dummyStatus.val = 0;
+  status_bytes dummyStatus; dummyStatus.val = status;
   for (int i = 0; i < nrPressSensors; i++) //Loop number of time there are press sensors
   {
     dummy.val = pressData[i];
@@ -87,8 +87,8 @@ void transmit() {
   Udp.write("st,");
   for (int i = 0; i <= (htr2_pin - pumpPin) ; i++) //Loop number of time there are humidity sensors
   {
-    dummyStatus.val = dummyStatus.val + dummyStatus.val + digitalRead(pumpPin + i);
-             
+    dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(pumpPin + i)) << i);
+              
   }
   // Serial.println(status);
   Udp.write(dummyStatus.bytes[0]); Udp.write(dummyStatus.bytes[1]);
@@ -96,6 +96,6 @@ void transmit() {
   Udp.write(getMode());
   // Serial.println("Wrote mode");
   Udp.endPacket();
-  Serial.println("Exiting Transmit");
+  // Serial.println("Exiting Transmit");
 }
 #endif

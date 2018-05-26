@@ -317,10 +317,10 @@ std::vector<int> getSeconds(char all_data[])
 pressureSimulation getSimulationData ()
 {
   pressureSimulation Sim_struct;
-  int pressureSimData [] = {1000,500,300,50,80,130,200,1000};
-  int temperatureSimData [] = {20,15,10,5,-5,-10,-7,-9};
-  int humSimData [] = {100,80,70,30,40,20,10,40};
-  int airflowSimData [] = {400,1000,300,500,692,582,932,412};
+  float pressureSimData [] = {1000,75,46.8,81.2,103,141,193.3,1000};
+  float temperatureSimData [] = {20,15,10,5,-5,-10,-7,-9};
+  float humSimData [] = {100,80,70,30,40,20,10,40};
+  float airflowSimData [] = {400,1000,300,500,692,582,932,412};
   int timeSimData [] = {0,15,30,45,60,75,90,105};
   for (int k = 0; k < 2; k++)
   {

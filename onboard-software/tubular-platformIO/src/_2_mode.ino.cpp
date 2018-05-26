@@ -11,10 +11,12 @@ uint8_t state;
 
 uint8_t getMode()
 {
+//    Serial.println("I'm at getMode");
    uint8_t tempt;
    xSemaphoreTake(sem, portMAX_DELAY);
    tempt = state;
    xSemaphoreGive(sem);
+//    Serial.println("Leaving getMode");
    return(tempt);
 }
 

@@ -9,12 +9,12 @@ extern SemaphoreHandle_t sem;
 extern SemaphoreHandle_t semPeriodic;
 typedef union {
     float val;
-    uint8_t bytes[4];
+    char bytes[4];
 } floatval;
 
 typedef union {
-    uint16_t val;
-    uint8_t bytes[2];
+    int16_t val;
+    byte bytes[2];
 } status_bytes;
 
 
