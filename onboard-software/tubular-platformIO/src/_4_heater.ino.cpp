@@ -17,6 +17,7 @@
 extern std::vector<float> htrParam;
 extern std::vector<float> tempAtHtr;
 float htrParameter[4];
+extern SemaphoreHandle_t sem;
 //std::vector<char> htr_flag[2];
 
 std::vector<float> processInitialHtrParameters(char htrParameters[])
@@ -42,7 +43,7 @@ std::vector<float> processInitialHtrParameters(char htrParameters[])
       i++; k++;
     }
     newHtrParameter[z] = atof(buf);
-    // Serial.println(newHtrParameter[z]);
+    Serial.println(newHtrParameter[z]);
     z++;
   }
   return newHtrParameter;
@@ -144,23 +145,43 @@ void readingData(void *pvParameters)
   
   //bool htr1_flag;// = htr_flag(0);
   //bool htr2_flag;// = htr_flag(1);
+  uint8_t currMode;
   
   TickType_t xLastWakeTime;
   xLastWakeTime = xTaskGetTickCount ();
   
   while(1)
   {
-    // Serial.println("I'm at heater periodic");
+    Serial.println("I'm at heater periodic");
     //Reads the current mode
-    static uint8_t currMode = getMode();
-    //Reads the temperature at the two sensors
-    tempAtHtr  = readData(0);
- //   tempAtHtr[1]  = *readData(0);//Must make sure to get the correct tempSensors.
-    struct heater htrflag = heaterCompare();
-    heaterControl(htrflag.htr1_flag,htrflag.htr2_flag);
+    delay(1000);
+    currMode = getMode();
+    Serial.println(currMode);
+    if (currMode == safeMode)
+    {
+      heaterControl(0,0);
+    }
+    else if (currMode == manual)
+    {
+        // Serial.println(digitalRead(htr1_pin));
+        // Serial.println(digitalRead(htr2_pin));
+    }
+    else
+    {
+      Serial.println("Entering else in Heater");
+      readHeaterParameter();
+      std::vector<float> dummyHtrData = readData(0);
+      tempAtHtr[0]  = dummyHtrData[0];
+      tempAtHtr[1]  = dummyHtrData[1];
 
+ //   tempAtHtr[1]  = *readData(0);//Must make sure to get the correct tempSensors.
+      Serial.println("Entering heaterCompare");
+      heater htrflag = heaterCompare();
+      heaterControl(htrflag.htr1_flag, htrflag.htr2_flag);
+    }
+    //Reads the temperature at the two sensors
     flagPost(1);
-    // Serial.println("I'm leaving heater periodic");
+    Serial.println("I'm leaving heater periodic");
     vTaskDelayUntil(&xLastWakeTime, (5000 / portTICK_PERIOD_MS) ); 
   }
     

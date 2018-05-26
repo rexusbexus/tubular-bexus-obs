@@ -141,7 +141,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     dataFile.print(dataString);
     dataFile.println();
     dataFile.close();
-    Serial.println("Exiting dataFile");
+    // Serial.println("Exiting dataFile");
   }
   else
   {
@@ -355,15 +355,15 @@ void sampler(void *pvParameters)
       pressDifference = calculatingPressureDifference(meanPressureAmbient);
 
       /*Change mode if the condition is satisfied*/
-      if (pressDifference<pressDifferentThresholdneg)
+      if (pressDifference<pressDifferentThresholdneg && getMode() != manual)
       {
         setMode(normalAscent);
       }
-      else if (pressDifference>pressDifferentThresholdpos)
+      else if (pressDifference>pressDifferentThresholdpos && getMode() != manual)
       {
           setMode(normalDescent);
       }
-      else if (currMode==normalDescent && meanPressureAmbient<=safeModeThreshold)
+      else if (currMode==normalDescent && meanPressureAmbient>=safeModeThreshold)
       {
         setMode(safeMode);
       }
@@ -381,7 +381,7 @@ void sampler(void *pvParameters)
       /*Check current sampling rate*/
       currSamplingRate = getSamplingRate();
       flagPost(0);
-      Serial.println("I'm leaving sensor periodic");
+      // Serial.println("I'm leaving sensor periodic");
       vTaskDelayUntil(&xLastWakeTime, (currSamplingRate / portTICK_PERIOD_MS) );
    }
 }

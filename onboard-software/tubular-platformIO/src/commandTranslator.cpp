@@ -67,7 +67,7 @@ void collectingCommand (byte data_tcp[], int row, int col, byte datasize)
         if (command[k][0] == 'm' && command[k][1] == 'd')
         {
             nrParam = command[k+1][0] - '0';
-            mode[0][0] = command[k+2][0];
+            mode[0][0] = command[k+2][0] - '0';
             k=k+2+nrParam;
         }
 
@@ -83,7 +83,7 @@ void collectingCommand (byte data_tcp[], int row, int col, byte datasize)
             {
                 for (int x = 0; x < col; x++)
                 {
-                    heaters[z][x] = command[k+2+z][x];
+                    heaters[z][x] = command[k+2+z][x] - '0';
                 }
             }
             k=k+2+nrParam;
@@ -101,8 +101,8 @@ void collectingCommand (byte data_tcp[], int row, int col, byte datasize)
             {
                 for (int v = 0; v < col; v++)
                 {
-                    asc[b][v] = command[k+2+b][v];
-                }
+                    asc[b][v] = command[k+2+b][v] - '0';
+                } 
             }
             k=k+2+nrParam;
         }

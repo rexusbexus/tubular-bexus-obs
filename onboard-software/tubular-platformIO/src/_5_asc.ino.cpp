@@ -18,7 +18,8 @@ int secondsOpen;
 int flushStartTime;
 int pumpStartTime;
 int valveBagStartTime;
-int bagFillingTime [] = {43, 46, 53, 50, 47, 41};
+// int bagFillingTime [] = {43, 46, 53, 50, 47, 41};
+int bagFillingTime [] = {4, 4, 4, 4, 4, 4};
 
 
 std::vector<float> getASCParam(int bag)
@@ -121,7 +122,9 @@ void initValvesControl()
 
 void pumpControl(int cond)
 {
+  Serial.println("Pump control taking sem");
   xSemaphoreTake(sem, portMAX_DELAY);
+  Serial.println("Entering pump control");
   switch (cond){
     case 0:
     digitalWrite(pumpPin, LOW);
@@ -132,11 +135,14 @@ void pumpControl(int cond)
     break;
   }
   xSemaphoreGive(sem);
+  Serial.println("Leaving pump control");
 }
 
 void valvesControl(int valve, int cond)
 {
+  Serial.println("valves control taking sem");
   xSemaphoreTake(sem, portMAX_DELAY);
+  Serial.println("Entering valves control");
   if (cond==1)
   {
     switch (valve)
@@ -235,8 +241,10 @@ void valvesControl(int valve, int cond)
     default:
     break;
   }
-  xSemaphoreGive(sem);
+  
   }
+  xSemaphoreGive(sem);
+  Serial.println("Leaving valves control");
 }
 
 int getCurrentTime()
@@ -274,7 +282,7 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
           }
           else
           {
-            if (getCurrentTime() > (flushStartTime+60))
+            if (getCurrentTime() > (flushStartTime+flushingTime))
             {
               valvesControl(11, closeState);
               valvesControl(bagcounter, openState);
@@ -289,6 +297,7 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
       if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter]))
       {
         valvesControl(bagcounter, closeState);
+        pumpControl(closeState);
         bagcounter++;
       }
     }
@@ -324,7 +333,7 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
           }
           else
           {
-            if (getCurrentTime() > (flushStartTime+60))
+            if (getCurrentTime() > (flushStartTime+flushingTime))
             {
               valvesControl(11, closeState);
               valvesControl(bagcounter, openState);
@@ -339,6 +348,7 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
       if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter]))
       {
         valvesControl(bagcounter, closeState);
+        pumpControl(closeState);
         bagcounter++;
       }
     }
@@ -355,6 +365,7 @@ void reading(void *pvParameters)
    int bagcounter = 1;
    std::vector<float> currPressure(nrPressSensors);
    float meanPressureAmbient;
+   uint8_t currMode;
    
    TickType_t xLastWakeTime;
    xLastWakeTime = xTaskGetTickCount ();
@@ -362,7 +373,7 @@ void reading(void *pvParameters)
    while(1)
    {
       Serial.println("I'm at asc periodic");
-      uint8_t currMode = getMode();
+      currMode = getMode();
      
      dummyParam = getASCParam(bagcounter);
      ascParam[0] = dummyParam[0]; // lower limit
@@ -408,7 +419,7 @@ void reading(void *pvParameters)
      break;
    }
    flagPost(2);
-   Serial.println("I'm leaving asc periodic");
+  //  Serial.println("I'm leaving asc periodic");
    vTaskDelayUntil(&xLastWakeTime, (800 / portTICK_PERIOD_MS) );
    }
 }

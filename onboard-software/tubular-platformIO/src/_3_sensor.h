@@ -32,7 +32,7 @@
 #define airFsensorPin   A0
 
 
-#define safeModeThreshold 900
+#define safeModeThreshold 954.608
 #define pressDifferentThresholdneg -20
 #define pressDifferentThresholdpos 20
 

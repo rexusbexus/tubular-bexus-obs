@@ -5,10 +5,10 @@
 
 struct pressureSimulation{
   int simulationTime[8];
-  int pressureSim[2][8];
-  int temperatureSim[2][8];
-  int airflowSim[nrAirFSensors][8];
-  int humSim[nrHumidSensors][8];
+  float pressureSim[2][8];
+  float temperatureSim[2][8];
+  float airflowSim[nrAirFSensors][8];
+  float humSim[nrHumidSensors][8];
 };
 
 bool checkSimulationOrNot();
