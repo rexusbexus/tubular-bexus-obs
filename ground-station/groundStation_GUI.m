@@ -63,11 +63,13 @@ tabledata=zeros(10,11);
 tabledata2=zeros(10,2);
 calcHeightVector=0;
 
-global tabledataAirflow tabledataPressure tabledataTemperature tabledataHumidity green_light red_light; 
-tabledataAirflow= zeros(10,2);
-tabledataPressure= zeros(10,8);
+global tabledataAirflow tabledataPressure tabledataTemperature ...
+    tabledataHumidity green_light red_light tabledataHeight; 
+tabledataAirflow     = zeros(10,2);
+tabledataPressure    = zeros(10,8);
 tabledataTemperature = zeros(10,11);
-tabledataHumidity = zeros(10,2);
+tabledataHumidity    = zeros(10,2);
+tabledataHeight      = 0;
 
 % Initialise tabs
 handles.tabManager = TabManager( hObject );
@@ -232,7 +234,7 @@ if (~strcmp(u.Status,'open'))
 else
     set(handles.constat_udp, 'String', 'Connection Opened');
 end
-disp('Hello');
+disp('udp initialized');
 guidata(gcbf, handles);
 
 
@@ -252,7 +254,8 @@ set(handles.constat_udp, 'String', 'Connection Closed');
 
 function update_udpoutput(u, evt, handles)
 %global tabledata calcHeightVector;
-global tabledataAirflow tabledataPressure tabledataTemperature tabledataHumidity green_light red_light; 
+global tabledataAirflow tabledataPressure tabledataTemperature ...
+    tabledataHumidity green_light red_light tabledataHeight; 
 data=fread(u)';
 %disp(data);
 dataSize=length(data);
@@ -365,19 +368,21 @@ set(handles.table_airflow, 'Data', tabledataAirflow);
 % drawnow;
 
 %%   Write status of valves
-% light_hanles = light_handles(handles);
-% for i=0:14
-%     if(bitget(statusVal,16-i)==1)
-%         axes(light_hanles(i+1));
-%         imshow(green_light);
-%     elseif(bitget(statusVal,16-i)==0)
-%         if (i==7||i==8||i==9||i==10) 
-%         else
-%             axes(light_hanles(i+1));
-%             imshow(red_light);
-%         end
-%     end
-% end
+light_hanles = light_handles(handles);
+for i=1:15
+    if(bitget(statusVal,i)==1)
+        %axes(light_hanles(i+1));
+        %imshow(green_light);
+        set(light_hanles(i), 'Cdata', green_light)
+    elseif(bitget(statusVal,i)==0)
+        if (i==8||i==9||i==10||i==11) 
+        else
+            %axes(light_hanles(i+1));
+            %imshow(red_light);
+            set(light_hanles(i), 'Cdata', red_light)
+        end
+    end
+end
      
      
 %%   Write mode state
@@ -401,18 +406,20 @@ set(handles.status_mode, 'String', modeDisp);
  % Sources: Vertical pressure variation, read 2018-05-05
  %          https://en.wikipedia.org/wiki/Vertical_pressure_variation
  
-%  T_0_refernce   = 288.5;        % K
-%  L_lapse_rate   = -6.5*10^(-3); % K/m
-%  press_refernce = 1013;         % mbar
-%  R_gas_constant = 287.053;      % J/(kg K)
-%  gravity        = 9.81;         % m/s^2
-%  
-%  calcHeight = T_0_refernce/L_lapse_rate *((pressSensorMean/press_refernce)...
-%      ^(-(L_lapse_rate*R_gas_constant/gravity))-1);
-%  
-%  calcHeightVector = [calcHeightVector calcHeight];
-%  set(handles.axes4, 'altitude', calcHeightVector);
-%  
+ T_0_refernce   = 288.5;        % K
+ L_lapse_rate   = -6.5*10^(-3); % K/m
+ press_refernce = 1013;         % mbar
+ R_gas_constant = 287.053;      % J/(kg K)
+ gravity        = 9.81;         % m/s^2
+ 
+ calcHeight = T_0_refernce/L_lapse_rate *((pressSensorMean/press_refernce)...
+     ^(-(L_lapse_rate*R_gas_constant/gravity))-1);
+ 
+  tabledataHeight = [tabledataHeight calcHeight];
+  %set(handles.axes4, 'altitude', tabledataHeight);
+  %axes(handles.axes4)
+  plot(handles.axes4, tabledataHeight)
+  
  drawnow;
 
 %% Write data to file
@@ -421,17 +428,17 @@ set(handles.status_mode, 'String', modeDisp);
  function light_handles_vector = light_handles(handles)
  % Creates an array of handles of the valve states in the GUI for
  % easier management
- light_handles_vector(1)    = handles.ind_pump;
- light_handles_vector(2)    = handles.ind_valve1;
- light_handles_vector(3)    = handles.ind_valve2;
- light_handles_vector(4)    = handles.ind_valve3;
- light_handles_vector(5)    = handles.ind_valve4;
- light_handles_vector(6)    = handles.ind_valve5;
- light_handles_vector(7)    = handles.ind_valve6;
- light_handles_vector(12)    = handles.ind_flush;
- light_handles_vector(13)    = handles.ind_cac;
- light_handles_vector(14)   = handles.ind_htr1;
- light_handles_vector(15)   = handles.ind_htr2;
+ light_handles_vector(1)    = handles.ind_pump.Children;
+ light_handles_vector(2)    = handles.ind_valve1.Children;
+ light_handles_vector(3)    = handles.ind_valve2.Children;
+ light_handles_vector(4)    = handles.ind_valve3.Children;
+ light_handles_vector(5)    = handles.ind_valve4.Children;
+ light_handles_vector(6)    = handles.ind_valve5.Children;
+ light_handles_vector(7)    = handles.ind_valve6.Children;
+ light_handles_vector(12)    = handles.ind_flush.Children;
+ light_handles_vector(13)    = handles.ind_cac.Children;
+ light_handles_vector(14)   = handles.ind_htr1.Children;
+ light_handles_vector(15)   = handles.ind_htr2.Children;
  
  
 function edit2_Callback(hObject, eventdata, handles)
@@ -512,7 +519,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%
 function commandToBuild = buildHeaterCommand(handles)
-commandToBuild(1:5) = 'ht,6,';
+commandToBuild(1:5) = 'ht,2,';
 switch get(get(handles.heater1_control, 'SelectedObject'), 'Tag')
     case 'control_heater1_on'
         commandToBuild(6:7) = '1,';
@@ -528,7 +535,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%
 function commandToBuild = buildAscCommand(handles)
-commandToBuild(1:5) = 'sc,2,';
+commandToBuild(1:5) = 'sc,9,';
 
 switch get(get(handles.pump_control, 'SelectedObject'), 'Tag')
     case 'control_pump_on'
@@ -608,6 +615,9 @@ function send_telecommand_Callback(hObject, eventdata, handles)
 % hObject    handle to send_telecommand (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+t = handles.t;
+data = handles.command;
+fwrite(t, data);
 
 
 % --- Executes on button press in compile_command.
@@ -617,6 +627,9 @@ function compile_command_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 command = buildCommand(handles);
 set(handles.telecommand_format, 'String', command);
+handles.command = command;
+guidata(gcbf, handles);
+
 %disp(breakpoint);
 
 function command = buildCommand(handles)
