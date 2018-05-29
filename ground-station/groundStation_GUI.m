@@ -64,12 +64,15 @@ tabledata2=zeros(10,2);
 calcHeightVector=0;
 
 global tabledataAirflow tabledataPressure tabledataTemperature ...
-    tabledataHumidity green_light red_light tabledataHeight; 
-tabledataAirflow     = zeros(10,2);
-tabledataPressure    = zeros(10,8);
-tabledataTemperature = zeros(10,11);
-tabledataHumidity    = zeros(10,2);
+    tabledataHumidity green_light red_light tabledataHeight time timePlot; 
+tabledataAirflow     = single(zeros(10,1));
+tabledataPressure    = single(zeros(10,7));
+tabledataTemperature = single(zeros(10,10));
+tabledataHumidity    = single(zeros(10,1));
 tabledataHeight      = 0;
+time           = ["Not available";"Not available";"Not available";...
+    "Not available";"Not available";"Not available";"Not available";...
+    "Not available";"Not available";"Not available"];
 
 % Initialise tabs
 handles.tabManager = TabManager( hObject );
@@ -255,7 +258,7 @@ set(handles.constat_udp, 'String', 'Connection Closed');
 function update_udpoutput(u, evt, handles)
 %global tabledata calcHeightVector;
 global tabledataAirflow tabledataPressure tabledataTemperature ...
-    tabledataHumidity green_light red_light tabledataHeight; 
+    tabledataHumidity green_light red_light tabledataHeight time timePlot; 
 data=fread(u)';
 %disp(data);
 dataSize=length(data);
@@ -264,7 +267,7 @@ if gsString(1)==1
     
     i = 4;
     time_stamp = uint8(data(i:(i+3)));
-    time_stamp = swapbytes(typecast(time_stamp, 'uint32'));
+    time_stamp = swapbytes(typecast(time_stamp, 'single'));
     i=i+1;
     
     while i<dataSize(1)
@@ -277,6 +280,7 @@ if gsString(1)==1
                     temp = uint8([data(i:(i+3))]);
                     %disp([text(i:(i+3))]);
                     temp = typecast(temp, 'single');
+%                     temp = swapbytes(temp);
                     tempSensorVal(j) = (temp);
                     i=i+3;
 %                     disp(textq);
@@ -288,6 +292,7 @@ if gsString(1)==1
                     temp = uint8([data(i:(i+3))]);
                     %disp([text(i:(i+3))]);
                     temp = typecast(temp, 'single');
+%                     temp = swapbytes(temp);
                     pressSensorVal(j) = (temp);
                     i=i+3;
 %                     disp(textq);
@@ -299,6 +304,7 @@ if gsString(1)==1
                     temp = uint8([data(i:(i+3))]);
                     %disp([text(i:(i+3))]);
                     temp = typecast(temp, 'single');
+%                     temp = swapbytes(temp);
                     humidSensorVal(j) = (temp);
                     i=i+3;
 %                     disp(textq);
@@ -310,6 +316,7 @@ if gsString(1)==1
                     temp = uint8([data(i:(i+3))]);
                     %disp([text(i:(i+3))]);
                     temp = typecast(temp, 'single');
+%                     temp = swapbytes(temp);
                     airFSensorVal(j) = (temp);
                     i=i+3;
 %                     disp(textq);
@@ -343,28 +350,32 @@ end
  %   time_stamp;     Contains the time stamp of the transmission
  %
  %
-%%   Write Pressure 
+time_str = sprintf("%d:%d:%.0f", evt.Data.AbsTime(4), evt.Data.AbsTime(5), evt.Data.AbsTime(6));
+ %%   Write Pressure 
 pressSensorMean = sum(pressSensorVal)/length(pressSensorVal);
-tabledataPressure = [ time_stamp, pressSensorVal, pressSensorMean ; tabledataPressure(1:end-1,:)];
-set(handles.table_pressure, 'Data', tabledataPressure);
+tabledataPressure = [ pressSensorVal, pressSensorMean ; tabledataPressure(1:end-1,:)];
+time = [time_str; time(1:end-1,:)];
+pressTable = [cellstr(time), num2cell(tabledataPressure)];
+% pressCell = table2cell(pressTable);
+set(handles.table_pressure, 'Data', pressTable);
 % drawnow;
 
-%%   Write temperature
+%   Write temperature
 tempSensorMean =sum(tempSensorVal)/length(tempSensorVal);
-tabledataTemperature = [ time_stamp, tempSensorVal, tempSensorMean; tabledataTemperature(1:end-1,:)];
-set(handles.table_temperature, 'Data', tabledataTemperature);
+tabledataTemperature = [tempSensorVal, tempSensorMean; tabledataTemperature(1:end-1,:)];
+set(handles.table_temperature, 'Data', [cellstr(time), num2cell(tabledataTemperature)]);
 % drawnow;
 
 %%   Write Humidity
 humidSensorMean = sum(humidSensorVal)/length(humidSensorVal);
-tabledataHumidity = [ time_stamp, humidSensorVal; tabledataHumidity(1:end-1,:)];
-set(handles.table_humidity, 'Data', tabledataHumidity);
+tabledataHumidity = [humidSensorVal; tabledataHumidity(1:end-1,:)];
+set(handles.table_humidity, 'Data', [cellstr(time), num2cell(tabledataHumidity)]);
 % drawnow;
 
 %%   Write airflow
 airFSensorMean = sum(airFSensorVal)/length(airFSensorVal);
-tabledataAirflow = [ time_stamp, airFSensorVal; tabledataAirflow(1:end-1,:)];
-set(handles.table_airflow, 'Data', tabledataAirflow);
+tabledataAirflow = [airFSensorVal; tabledataAirflow(1:end-1,:)];
+set(handles.table_airflow, 'Data', [cellstr(time), num2cell(tabledataAirflow)]);
 % drawnow;
 
 %%   Write status of valves
@@ -418,6 +429,7 @@ set(handles.status_mode, 'String', modeDisp);
   tabledataHeight = [tabledataHeight calcHeight];
   %set(handles.axes4, 'altitude', tabledataHeight);
   %axes(handles.axes4)
+%   timePlot = [timePlot, time_str];
   plot(handles.axes4, tabledataHeight)
   
  drawnow;

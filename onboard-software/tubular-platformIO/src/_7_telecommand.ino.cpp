@@ -132,12 +132,16 @@ void telecommand(void *pvParameters)
         collectingCommand (data_tcp, row, col, datasize);
 
         /*Execute Command*/
-        executeMode(mode);
+        
         if (getMode() == manual )
         {
           executeHTR(heaters);
           executeASC(asc);
           // executeSS(ss);
+        }
+        else
+        {
+          executeMode(mode);
         }
       }
     // flagPost(3);  
