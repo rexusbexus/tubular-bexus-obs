@@ -122,9 +122,9 @@ void initValvesControl()
 
 void pumpControl(int cond)
 {
-  Serial.println("Pump control taking sem");
+  // Serial.println("Pump control taking sem");
   xSemaphoreTake(sem, portMAX_DELAY);
-  Serial.println("Entering pump control");
+  // Serial.println("Entering pump control");
   switch (cond){
     case 0:
     digitalWrite(pumpPin, LOW);
@@ -135,14 +135,14 @@ void pumpControl(int cond)
     break;
   }
   xSemaphoreGive(sem);
-  Serial.println("Leaving pump control");
+  // Serial.println("Leaving pump control");
 }
 
 void valvesControl(int valve, int cond)
 {
-  Serial.println("valves control taking sem");
+  // Serial.println("valves control taking sem");
   xSemaphoreTake(sem, portMAX_DELAY);
-  Serial.println("Entering valves control");
+  // Serial.println("Entering valves control");
   if (cond==1)
   {
     switch (valve)
@@ -244,7 +244,7 @@ void valvesControl(int valve, int cond)
   
   }
   xSemaphoreGive(sem);
-  Serial.println("Leaving valves control");
+  // Serial.println("Leaving valves control");
 }
 
 int getCurrentTime()
@@ -294,7 +294,7 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
     }
     else
     {
-      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter]))
+      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter-1]))
       {
         valvesControl(bagcounter, closeState);
         pumpControl(closeState);
@@ -345,12 +345,21 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
     }
     else
     {
-      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter]))
+      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter-1]))
       {
         valvesControl(bagcounter, closeState);
         pumpControl(closeState);
         bagcounter++;
       }
+    }
+  }
+  else
+  {
+    if (valveBag == openState)
+    {
+      valvesControl(bagcounter, closeState);
+      pumpControl(closeState);
+      bagcounter++;
     }
   }
   
@@ -372,7 +381,7 @@ void reading(void *pvParameters)
 
    while(1)
    {
-      Serial.println("I'm at asc periodic");
+      // Serial.println("I'm at asc periodic");
       currMode = getMode();
      
      dummyParam = getASCParam(bagcounter);
@@ -392,7 +401,10 @@ void reading(void *pvParameters)
      case normalAscent:
      if (ascentOrDescent(ascParam))
      {
-       bagcounter = ascentSequence(meanPressureAmbient, ascParam, bagcounter);
+       if (bagcounter <= totalBagNumber)
+       {
+         bagcounter = ascentSequence(meanPressureAmbient, ascParam, bagcounter);
+       }
      }
      break;
      
@@ -400,17 +412,20 @@ void reading(void *pvParameters)
      case normalDescent:
      if (!ascentOrDescent(ascParam))
      {
-       bagcounter = descentSequence(meanPressureAmbient, ascParam, bagcounter);
+       if (bagcounter <= totalBagNumber)
+       {
+         bagcounter = descentSequence(meanPressureAmbient, ascParam, bagcounter);
+       }
      }
      break;
      
      /*SAFE*/
      case safeMode:
      digitalWrite(CACvalve, LOW);
-     pumpControl(0);
+     pumpControl(closeState);
      for (int sd = 1;sd <= 6; sd++)
      {
-       valvesControl(sd, 0);
+       valvesControl(sd, closeState);
      }
      break;
 

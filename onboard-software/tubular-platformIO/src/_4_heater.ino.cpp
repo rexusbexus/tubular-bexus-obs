@@ -43,7 +43,7 @@ std::vector<float> processInitialHtrParameters(char htrParameters[])
       i++; k++;
     }
     newHtrParameter[z] = atof(buf);
-    Serial.println(newHtrParameter[z]);
+    // Serial.println(newHtrParameter[z]);
     z++;
   }
   return newHtrParameter;
@@ -152,11 +152,11 @@ void readingData(void *pvParameters)
   
   while(1)
   {
-    Serial.println("I'm at heater periodic");
+    // Serial.println("I'm at heater periodic");
     //Reads the current mode
     delay(1000);
     currMode = getMode();
-    Serial.println(currMode);
+    // Serial.println(currMode);
     if (currMode == safeMode)
     {
       heaterControl(0,0);
@@ -168,20 +168,20 @@ void readingData(void *pvParameters)
     }
     else
     {
-      Serial.println("Entering else in Heater");
+      // Serial.println("Entering else in Heater");
       readHeaterParameter();
       std::vector<float> dummyHtrData = readData(0);
       tempAtHtr[0]  = dummyHtrData[0];
       tempAtHtr[1]  = dummyHtrData[1];
 
  //   tempAtHtr[1]  = *readData(0);//Must make sure to get the correct tempSensors.
-      Serial.println("Entering heaterCompare");
+      // Serial.println("Entering heaterCompare");
       heater htrflag = heaterCompare();
       heaterControl(htrflag.htr1_flag, htrflag.htr2_flag);
     }
     //Reads the temperature at the two sensors
     flagPost(1);
-    Serial.println("I'm leaving heater periodic");
+    // Serial.println("I'm leaving heater periodic");
     vTaskDelayUntil(&xLastWakeTime, (5000 / portTICK_PERIOD_MS) ); 
   }
     
