@@ -377,6 +377,11 @@ void sampler(void *pvParameters)
       {
          xSemaphoreGiveFromISR(semPeriodic, &xHigherPriorityTaskWoken );
       }
+      if(!client.connected() && getMode() == manual)
+      {
+         client.stop();
+         setMode(standbyMode);
+      }
 
       /*Check current sampling rate*/
       currSamplingRate = getSamplingRate();
