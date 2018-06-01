@@ -1,0 +1,78 @@
+
+Telecommand (TCP)
+
+Telecommand format: “NMEA-like”
+“tub,<n>,<dest1>,<m>,<P1>,<P2>,…,<Pm>,<dest2>,…,<destn>, ..,<parm>"
+
+n 		number of subcommands, n is 0,1,2 or 3
+dest 	Final command destination, ASCCI-Strings:
+		“md” “ht” “sc” "ss"
+m 		number of parameters for the destination, ASCII-coded integer, m is 1, 2 or 3
+Pi 		Parameter
+		All parameters are ASCII-coded integer in interval 0-255
+
+modes (md):
+format	: md, <1>, <modes>
+notes	: modes is a one byte number, (0, 1, 2, 3, 4)
+		
+htr: 
+format	: ht, <6>, <htr1>, <htr2>, <P1L>, <P1H>, <P2L>, <P2H>
+notes 	: htr1 and htr2 are ON (1) or OFF (0)
+		  P1L, P2L are the lower limit for respective heaters.
+		  P1H, P2H are the upper limit for respective heaters.
+		  
+
+
+air sampling control (sc)
+format	: sc, <n>, <pumpcontrol>, <valvesstate>, <vpm1>, <vpm2>,...<vpm16>
+notes	:  is the (number of valves*2) + 2 
+		  pumpcontrol is 1 byte number (1 or 0)
+		  valvesstate is 10 bytes, combination of all valves states (10).
+		  vpm is parameters for valves automation, where the odd numbers represent lower limit and even numbers represent upper limit.
+
+sensor(ss):
+format	: ss, <1>, <SR>
+notes 	: SR is the new sampling rate.
+
+
+Telemetry (UDP)
+
+Telemetry format : "NMEA-like"
+“GS,<n>, <source1>,<m>,<P1>,<P2>,…,<Pm>,<source2>,…,<destn>, ..,<parm>,*<CHK>”
+
+n 		number of telemetry sources, ASCII-coded integer, n is 0,1,2 or 3
+dest 	Telemetry Source, ASCCI-Strings:
+		“tm” “ps” “ts” “hs” “as” “st” “md”
+m 		number of parameters, ASCII-coded integer, m is 1 to 200
+Pi 		Parameter
+		All parameters are binary-coded 16 bit integers
+		
+time:
+notes	: time is a '32 bits' data
+
+pressure sensors(ps):
+format	: ps, <6>, <ps1>, <ps2>...<ps6> ....................30 bytes
+notes	: ps1, ps2..ps6 are 4 bytes float
+
+temperature sensors(ts):
+format	: ts, <6>, <ts1>, <ts2>...<ts9>  ...................69 bytes
+notes	: ts1, ts2..ts6 are 4 bytes float
+
+humidity sensor(hs):
+format	: hs, <1>, <hs1>  ..................................76 byetes
+notes	: hs1 is 4 bytes float
+
+airflow sensor(as):
+format	: as, <1>, <as1>  ..................................83 bytes
+notes	: as1 is 4 bytes float
+
+status(st):
+format 	: st, <status>  ....................................87 bytes
+notes	: status is 2 bytes data i.e. 0b00000000 (valves 1-8), 0b00000000 (valves 9-12 and flush and AAC)
+
+modes(md):
+format	: md, <1>, <modes>  ................................91 bytes
+notes	: modes is a one byte number, (0, 1, 2, 3, 4)
+
+
+Total telemetry size for 10 hours flight is 6552000 bytes.
