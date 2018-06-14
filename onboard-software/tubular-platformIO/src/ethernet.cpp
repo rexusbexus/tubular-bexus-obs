@@ -1,3 +1,8 @@
+/* Name: ethernet.ino.cpp
+ * Purpose: To setup an simple ethernet server that handles both TCP and UDP
+ * Project: Tubular-Bexus.
+ * Authors: Tubular-Bexus software group.
+*/
 #ifndef UNIT_TEST
 #include <Ethernet2.h>
 #include <EthernetUdp2.h>

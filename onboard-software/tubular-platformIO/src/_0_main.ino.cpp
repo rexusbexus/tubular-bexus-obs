@@ -1,3 +1,8 @@
+/* Name: _0_main.ino.cpp
+ * Purpose: To start the onoard software
+ * Project: Tubular-Bexus.
+ * Authors: Tubular-Bexus software group.
+*/
 #ifndef UNIT_TEST
 #include <Arduino.h>
 #include <ArduinoSTL.h>

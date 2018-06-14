@@ -131,6 +131,7 @@ void pumpControl(int cond)
     break;
 
     case 1:
+    heaterControl(0,0); //Turn off heaters when pump is on.
     digitalWrite(pumpPin, HIGH);
     break;
   }

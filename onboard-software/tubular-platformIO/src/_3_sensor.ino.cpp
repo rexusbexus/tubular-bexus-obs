@@ -1,7 +1,8 @@
-/**************************************************
-
-
-***************************************************/
+/* Name: _3_sensor.ino.cpp
+ * Purpose: To interface with the sensors, take samples and store them.
+ * Project: Tubular-Bexus.
+ * Authors: Tubular-Bexus software group.
+*/
 #ifndef UNIT_TEST
 #include "_3_sensor.h"
 #include <SD.h>

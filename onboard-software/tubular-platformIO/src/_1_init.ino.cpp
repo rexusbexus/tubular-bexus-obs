@@ -1,7 +1,8 @@
-/**************************************************
-
-
-***************************************************/
+/* Name: _1_init.ino.cpp
+ * Purpose: To initiate all the objects in the OBSW.
+ * Project: Tubular-Bexus.
+ * Authors: Tubular-Bexus software group.
+*/
 #ifndef UNIT_TEST
 
 #include "_1_init.h"
