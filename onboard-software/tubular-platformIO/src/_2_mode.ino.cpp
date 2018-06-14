@@ -1,7 +1,8 @@
-/**************************************************
-
-
-***************************************************/
+/* Name: _2_mode.ino.cpp
+ * Purpose: To manage and determine wich mode the software shall operate in.
+ * Project: Tubular-Bexus.
+ * Authors: Tubular-Bexus software group.
+*/
 #ifndef UNIT_TEST
 #include "_2_mode.h"
 #include <FreeRTOS_ARM.h>

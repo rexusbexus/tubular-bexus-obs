@@ -1,3 +1,8 @@
+/* Name: _8_monitor.ino.cpp
+ * Purpose: Watchdog that resets the board if not all the flags has been reset.
+ * Project: Tubular-Bexus.
+ * Authors: Tubular-Bexus software group.
+*/
 #include <Arduino.h>
 #define WDT_KEY (0xA5)
 /********************************************************************************
@@ -16,7 +21,6 @@ void watchdogSetup(void) {
 
 void initMonitor()
 {
-  // Serial.println("I'm at initMonitor");
   // Enable watchdog.
   WDT->WDT_MR = WDT_MR_WDD(0xFFF)
                 | WDT_MR_WDRPROC

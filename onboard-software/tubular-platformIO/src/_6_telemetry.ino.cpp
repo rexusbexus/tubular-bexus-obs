@@ -1,6 +1,7 @@
-/* Telemtery object
-   Authors: BEXUS-TUBULAR software team
-
+/* Name: _6_telemetry.ino.cpp
+ * Purpose: To gather the the sampled data and status of valves, pump and heaters.
+ * Project: Tubular-Bexus.
+ * Authors: Tubular-Bexus software group.
 */
 #ifndef UNIT_TEST
 #include <ArduinoSTL.h>
@@ -85,13 +86,14 @@ void transmit() {
 
 
   Udp.write("st,");
-  for (int i = 0; i <= (htr2_pin - pumpPin) ; i++) //Loop number of time there are humidity sensors
+  for (int i = 0; i <= (htr2_pin - pumpPin) ; i++) //Status of valves pump and heaters
   {
     dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(pumpPin + i)) << i);
               
   }
   // Serial.println(status);
-  Udp.write(dummyStatus.bytes[0]); Udp.write(dummyStatus.bytes[1]);
+  Udp.write(dummyStatus.bytes[0]); 
+  Udp.write(dummyStatus.bytes[1]);
   Udp.write(",md,");
   Udp.write(getMode());
   // Serial.println("Wrote mode");

@@ -1,3 +1,8 @@
+/* Name: _7_sensor.ino.cpp
+ * Purpose: To recieve telecommands and interpert them
+ * Project: Tubular-Bexus.
+ * Authors: Tubular-Bexus software group.
+*/
 #ifndef UNIT_TEST
 #include <Ethernet2.h>
 

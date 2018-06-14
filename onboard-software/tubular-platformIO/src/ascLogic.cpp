@@ -1,4 +1,8 @@
-
+/* Name: ascLogic.ino.cpp
+ * Purpose: contains function related to the ASC object.
+ * Project: Tubular-Bexus.
+ * Authors: Tubular-Bexus software group.
+*/
 
 bool ascentOrDescent(float ascParam[])
 {
