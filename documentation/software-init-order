@@ -1,0 +1,73 @@
+# Purpose: Identify tasks in software and their initating order.
+# project: Tubular-Bexus.
+# Authors: Tubular-Bexus software group.
+
+_0_main.ino.cpp is run first.
+    the function void setup() is run
+        Close the connection with SD card.
+        Open the connection with the SD card.
+    
+    call the initAll function in _1_init.ino.cpp
+        
+        ethernet.initEthernet() initiating the ethernet
+                what ip and mac adress is in use
+                Starting initServer() (TCP)
+                Starting initUDP()    (UDP)
+
+        initSemaphore()
+            Creates a semaphore.
+        
+        initRTC()
+            Starts the real time clock.
+
+        initMode()
+            Sets the mode to standby
+        
+        initSensor()
+            Check if  its a simulation or not.
+            
+            Start initHumSensor()
+                Configure humSensor
+            
+            Start initTempSensors()
+                Configure tempSensors
+                
+            Start initSampler()
+                Creates the sampler task <-- TASK -->
+        
+        initASC()
+            //Starting the air sampling control
+            initAscParameters()
+                get initial parameters from SD card
+             
+            initPumpControl()
+                Configure so that the pins for the pump is set as output
+                
+            initValvesControl()
+                Set valve pins as output.
+            
+            initReading()
+                Creates reading task   <-- TASK -->
+            
+        
+        initHeater()
+            initHtrParameters();
+                get initial parameters from SD-Card
+            
+            Set the pins for the heater to output
+            
+            initReadingData();
+                Creates readingData task <-- TASK -->
+    
+        initTelecommand();
+            Creates telecommand task <-- TASK -->
+        
+        initMonitor()
+            Enable the watchdog
+            
+    /* END of initAll
+     * Four (4) tasks generated.
+     * sampler task in _3_sensor.ino.cpp ,
+     * reading task in _5_asc.ino.cpp,
+     * readingData task in _4_heater.ino.cpp,
+     * telecommand task in _7_telecommand.ino.cpp.
