@@ -10,7 +10,8 @@
 #include <M2M_LM75A.h>
 // #include <MS5611.h>
 // #include <MS5xxx.h>
-#include <AWM43300V.h>
+// #include <AWM43300V.h>
+#include <AWM5102VN.h>
 #include <HDC2010.h> //humidity sensor lib
 #include <Ethernet2.h>
 #include <MS5607.h>
@@ -43,7 +44,7 @@ M2M_LM75A tempSensor6;
 M2M_LM75A tempSensor7;
 M2M_LM75A tempSensor8;
 M2M_LM75A tempSensor9;
-AWM43300V afSensor(airFsensorPin);
+AWM5102VN afSensor(airFsensorPin);
 
 pressureSimulation sim_data;
  

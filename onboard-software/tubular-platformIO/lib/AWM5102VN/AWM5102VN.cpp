@@ -1,13 +1,13 @@
-#include <AWM43300V.h>
+#include <AWM5102VN.h>
 
-AWM43300V::AWM43300V(const byte pin)
+AWM5102VN::AWM5102VN(const byte pin)
 {
 	// Arduino analog pin the sensor is connected to
 	_pin = pin;
 	
 }
 
-float AWM43300V::getAF()
+float AWM5102VN::getAF()
 {
 	int sensVal = analogRead(_pin);
 	float AF = 0;

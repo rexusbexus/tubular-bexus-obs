@@ -1,12 +1,12 @@
-#ifndef AWM43300V_h
-#define AWM43300V_h
+#ifndef AWM5102VN_h
+#define AWM5102VN_h
 
 #include <Arduino.h>
 
-class AWM43300V
+class AWM5102VN
 {
 	public:
-	AWM43300V(const byte pin);
+	AWM5102VN(const byte pin);
 	float getAF();
 	
 	private:
