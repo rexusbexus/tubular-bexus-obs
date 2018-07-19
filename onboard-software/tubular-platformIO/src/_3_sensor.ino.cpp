@@ -98,6 +98,16 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
   if (dataFile)
   {
     // Serial.println("I'm at dataFile");
+    dataString += String(rtc.getHours());
+    dataString += ":";
+    dataString += String(rtc.getMinutes());
+    dataString += ":";
+    dataString += String(rtc.getSeconds());
+    dataString += "||";
+
+    dataFile.print(dataString);
+    dataString = "";
+
     for (int i = 0; i < nrTempSensors; i++)
     {
       dataString += String(temperatureData[i]);
