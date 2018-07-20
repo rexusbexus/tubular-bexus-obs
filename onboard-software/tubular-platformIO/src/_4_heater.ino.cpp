@@ -131,7 +131,7 @@ void heaterControl(bool htrOne, bool htrTwo)
   digitalWrite(htr1_pin,htrOne);
 
   if (htrOne && htrTwo) {
-    vTaskDelayUntil(&xLastWakeTime, (1000 / portTICK_PERIOD_MS) ); 
+    //vTaskDelayUntil(&xLastWakeTime, (1000 / portTICK_PERIOD_MS) ); 
   }
   digitalWrite(htr2_pin,htrTwo);
   xSemaphoreGive(sem);    

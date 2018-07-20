@@ -92,12 +92,13 @@ void initHumSensor()
 
 void savingDataToSD(float temperatureData[], float humData[], float pressData[], float afData[])
 {
-  // Serial.println("I'm at savingDataToSD");
+  Serial.println("I'm at savingDataToSD");
+
   String dataString = "";
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if (dataFile)
   {
-    // Serial.println("I'm at dataFile");
+     // Serial.println("I'm at dataFile");
     dataString += String(rtc.getHours());
     dataString += ":";
     dataString += String(rtc.getMinutes());
@@ -107,7 +108,8 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
 
     dataFile.print(dataString);
     dataString = "";
-
+-
+    Serial.println("I'm at dataFile");
     for (int i = 0; i < nrTempSensors; i++)
     {
       dataString += String(temperatureData[i]);
@@ -143,7 +145,8 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     dataString = "";
     for (int i = 0; i < nrAirFSensors; i++)
     {
-      dataString += String(afData[i]);
+      //dataString += String(afData[i]);
+      dataString += analogRead(A0)*3.3/1024;
       dataString += ",";
       if (i == (nrAirFSensors - 1))
       {
@@ -154,10 +157,12 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     dataFile.println();
     dataFile.close();
     // Serial.println("Exiting dataFile");
+    Serial.println(dataString);
   }
   else
   {
     Serial.println("Failed to open datalog.txt");
+    
   }
 }
 
@@ -230,7 +235,7 @@ void sampler(void *pvParameters)
 
    while(1)
    {
-      Serial.println("I'm at sensor periodic");
+      //Serial.println("I'm at sensor periodic");
       xHigherPriorityTaskWoken = pdFALSE;
       uint8_t currMode = getMode();
 
@@ -265,6 +270,8 @@ void sampler(void *pvParameters)
         /*Read airflow from sensor*/
         curAFMeasurement[0] = afSensor.getAF();
         Serial.println("I'm at normal");
+        Serial.println(analogRead(A0)*3.3/1024);
+        Serial.println(curAFMeasurement[0]);
 
       }
       else
