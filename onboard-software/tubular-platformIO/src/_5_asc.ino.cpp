@@ -7,6 +7,7 @@
 */
 #ifndef UNIT_TEST
 #include <SD.h>
+#include "_4_heater.h"
 #include "_5_asc.h"
 #include "ascLogic.h"
 #include "_8_monitor.h"
@@ -121,7 +122,7 @@ void initValvesControl()
 }
 
 void pumpControl(int cond)
-{
+{/*
   // Serial.println("Pump control taking sem");
   xSemaphoreTake(sem, portMAX_DELAY);
   // Serial.println("Entering pump control");
@@ -136,7 +137,7 @@ void pumpControl(int cond)
     break;
   }
   xSemaphoreGive(sem);
-  // Serial.println("Leaving pump control");
+  // Serial.println("Leaving pump control");*/
 }
 
 void valvesControl(int valve, int cond)
