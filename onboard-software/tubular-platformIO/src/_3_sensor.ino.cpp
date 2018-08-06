@@ -8,6 +8,7 @@
 #include <SD.h>
 #include <Wire.h>
 #include <M2M_LM75A.h>
+#include <LM75.h>
 // #include <MS5611.h>
 // #include <MS5xxx.h>
 // #include <AWM43300V.h>
@@ -35,15 +36,12 @@ MS5607 pressSensor4(pressSensorPin4); //ValveCenter Pressure Sensor
 MS5607 pressSensor5(pressSensorPin5); //ValveCenter Pressure Sensor
 MS5607 pressSensor6(pressSensorPin6); //ValveCenter Pressure Sensor
 HDC2010 humSensor(hdcADDR);
-M2M_LM75A tempSensor;
-M2M_LM75A tempSensor2;
-M2M_LM75A tempSensor3;
-M2M_LM75A tempSensor4;
-M2M_LM75A tempSensor5;
-M2M_LM75A tempSensor6;
-M2M_LM75A tempSensor7;
-M2M_LM75A tempSensor8;
-M2M_LM75A tempSensor9;
+
+#define TEMP_ADDR (0x90 >> 1) 
+//I2C start adress
+
+int i2c_transmission = 5;
+
 AWM5102VN afSensor(airFsensorPin);
 
 pressureSimulation sim_data;
@@ -73,6 +71,7 @@ void pressSensorread()
 
 void initHumSensor()
 {
+  
   //Serial.println("I'm at initHumSensor");  
    // Initialize I2C communication
    humSensor.begin();
@@ -107,9 +106,11 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     dataString += "||";
 
     dataFile.print(dataString);
+    //Serial.println(dataString);
     dataString = "";
--
+
     Serial.println("I'm at dataFile");
+    
     for (int i = 0; i < nrTempSensors; i++)
     {
       dataString += String(temperatureData[i]);
@@ -118,6 +119,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
       {
         dataString += "||";
       }
+      //Serial.println(temperatureData[i]);
     }
     dataFile.print(dataString);
     dataString = "";
@@ -157,13 +159,21 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     dataFile.println();
     dataFile.close();
     // Serial.println("Exiting dataFile");
-    Serial.println(dataString);
+    //Serial.println(dataString);
   }
   else
   {
     Serial.println("Failed to open datalog.txt");
+    /*SD.end();
+    SD.begin(sdPin);
+    File reconnect = SD.open("datalog.txt", FILE_WRITE);
+    if (reconnect) {
+      dataFile.println("Reconnected");
+      Serial.println("Reconnected");
+    }*/
     
   }
+  Serial.println("leaving SavingData");
 }
 
 void setSamplingRate(int curSamplingRate)
@@ -201,16 +211,25 @@ std::vector<float> readData(int type)
 
 void initTempSensors()
 {
-  //Serial.println("I'm at initTempSensors");
-  tempSensor.begin();
-  tempSensor2.begin();
-  tempSensor3.begin();
-  tempSensor4.begin();
-  tempSensor5.begin();
-  tempSensor6.begin();
-  tempSensor7.begin();
-  tempSensor8.begin();
-  tempSensor9.begin();
+  Serial.println("I'm at initTempSensors");
+  Wire.begin();
+  for(int i=0;i<=(nrTempSensors-1);i++) 
+  {
+    
+    Wire.beginTransmission(TEMP_ADDR+i);
+      Wire.write(0xAC); // 0xAC : Acces Config
+      Wire.write(0x0C); // Continuous conversion & 12 bits resolution
+    Wire.endTransmission();
+
+    Wire.beginTransmission(TEMP_ADDR+i);
+      Wire.write((int)(0x51)); // Start Conversion
+    Wire.endTransmission();
+    Serial.println(TEMP_ADDR+i);
+  }
+
+  //"The special one", is baked into a pressure sensor.
+  //tempSensor9.begin();
+
 }
 
 
@@ -235,7 +254,9 @@ void sampler(void *pvParameters)
 
    while(1)
    {
-      //Serial.println("I'm at sensor periodic");
+      Serial.println("I'm at sensor periodic");
+      //Serial.print("Time: ");
+      //Serial.println(rtc.getSeconds());
       xHigherPriorityTaskWoken = pdFALSE;
       uint8_t currMode = getMode();
 
@@ -255,23 +276,53 @@ void sampler(void *pvParameters)
         //float temperatureHDC = humSensor.readTemp();
         curHumMeasurement[0] = humSensor.readHumidity();
 
+
         /*Read temperature from sensors*/
-        curTemperatureMeasurement[0] = tempSensor.getTemperature();
-        curTemperatureMeasurement[1] = tempSensor2.getTemperature();
-        curTemperatureMeasurement[2] = tempSensor3.getTemperature();
-        curTemperatureMeasurement[3] = tempSensor4.getTemperature();
-        curTemperatureMeasurement[4] = tempSensor5.getTemperature();
-        curTemperatureMeasurement[5] = tempSensor6.getTemperature();
-        curTemperatureMeasurement[6] = tempSensor7.getTemperature();
-        curTemperatureMeasurement[7] = tempSensor8.getTemperature();
-        curTemperatureMeasurement[8] = tempSensor9.getTemperature(); //pressure sensor
-        
+        Serial.println("Temp reading");
+        float tempCon = 0;
+        for(uint8_t i=0;i<(nrTempSensors-1);i++)
+        {
+          Serial.print("Sensor adress: "); Serial.println(TEMP_ADDR+i);
+          tempCon = 0;
+          Wire.beginTransmission(TEMP_ADDR+i);
+            Wire.write((int)(0xAA));        // @AA : Temperature
+          i2c_transmission = Wire.endTransmission();
+          if (i2c_transmission==0) {
+            Wire.requestFrom(TEMP_ADDR+i,2);        // READ 2 bytes
+            Wire.available();                 // 1st byte
+              char msb = Wire.read();      // receive a byte
+            Wire.available();                 // 2nd byte
+              char lsb = Wire.read()>>4;      // receive a byte
+
+            // T° processing, works for 12-bits resolution
+          
+            float tempCon =0;
+
+            if (msb >= 0x80) { //if sign bit is set, msben temp is negative
+              tempCon =  (float)msb - 256 - (float)lsb/16;
+            }
+            else 
+            {  
+              tempCon = (float)msb+(float)lsb/16;  
+            }
+            Serial.print("Sensor number:"); Serial.print(TEMP_ADDR+i); Serial.print("    Temp con: "); Serial.print(tempCon); Serial.println(" C ");
+            curTemperatureMeasurement[i] = tempCon;
+          }
+          else {
+            curTemperatureMeasurement[i] = -1000;
+            Serial.print("Error at: "); Serial.println(i);
+           }
+        }
+        Serial.println("Leaving temp reading");
+        //Serial.println("leaving Temp reading");
       
+
+
         /*Read airflow from sensor*/
         curAFMeasurement[0] = afSensor.getAF();
-        Serial.println("I'm at normal");
-        Serial.println(analogRead(A0)*3.3/1024);
-        Serial.println(curAFMeasurement[0]);
+        //Serial.println("I'm at normal");
+        //Serial.println(analogRead(A0)*3.3/1024);
+        //Serial.println(curAFMeasurement[0]);
 
       }
       else
@@ -367,12 +418,12 @@ void sampler(void *pvParameters)
       
         /*Save all data to SD*/
         savingDataToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement, curAFMeasurement);
-
+        //Serial.println("Left SavingData");
       meanPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
-      
+      //Serial.println("Left pressure mean");
       /*Calculating Pressure Difference*/
       pressDifference = calculatingPressureDifference(meanPressureAmbient);
-
+      //Serial.println("Left press diff");
       /*Change mode if the condition is satisfied*/
       if (pressDifference<pressDifferentThresholdneg && getMode() != manual)
       {
@@ -386,9 +437,10 @@ void sampler(void *pvParameters)
       {
         setMode(safeMode);
       }
-
+      
       /*Transmit telemetry to GS*/
       transmit();
+      //Serial.println("Transmit");
       
       /*Listen to GS*/
       EthernetClient client = ethernet.checkClientAvailibility();
@@ -398,14 +450,14 @@ void sampler(void *pvParameters)
       }
       if(!client.connected() && getMode() == manual)
       {
-         client.stop();
-         setMode(standbyMode);
+         /*client.stop();
+         setMode(standbyMode);*/
       }
-
+      //Serial.println("Listen for GS");
       /*Check current sampling rate*/
       currSamplingRate = getSamplingRate();
       flagPost(0);
-      // Serial.println("I'm leaving sensor periodic");
+      Serial.println("I'm leaving sensor periodic");
       vTaskDelayUntil(&xLastWakeTime, (currSamplingRate / portTICK_PERIOD_MS) );
    }
 }
