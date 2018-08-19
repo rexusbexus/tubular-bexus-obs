@@ -7,8 +7,7 @@
 #include "_3_sensor.h"
 #include <SD.h>
 #include <Wire.h>
-#include <M2M_LM75A.h>
-#include <LM75.h>
+// #include <M2M_LM75A.h>
 // #include <MS5611.h>
 // #include <MS5xxx.h>
 // #include <AWM43300V.h>
@@ -29,12 +28,10 @@
 extern ethernet ethernet;
 extern RTCDue rtc;
 
-MS5607 pressSensor(pressSensorPin1); //Ambient Pressure Sensor
+MS5607 pressSensor1(pressSensorPin1); //Ambient Pressure Sensor
 MS5607 pressSensor2(pressSensorPin2); //Ambient Pressure Sensor
-MS5607 pressSensor3(pressSensorPin3); //Ambient Pressure Sensor
+MS5607 pressSensor3(pressSensorPin3); //ValveCenter Pressure Sensor
 MS5607 pressSensor4(pressSensorPin4); //ValveCenter Pressure Sensor
-MS5607 pressSensor5(pressSensorPin5); //ValveCenter Pressure Sensor
-MS5607 pressSensor6(pressSensorPin6); //ValveCenter Pressure Sensor
 HDC2010 humSensor(hdcADDR);
 
 #define TEMP_ADDR (0x90 >> 1) 
@@ -50,12 +47,20 @@ bool simulationOrNot;
 extern SemaphoreHandle_t sem;
 int samplingRate = 1000;
 
+void initPressureSensor()
+{
+  pressSensor1.reset_sequence(pressSensorPin1);
+  pressSensor2.reset_sequence(pressSensorPin2);
+  pressSensor3.reset_sequence(pressSensorPin3);
+  pressSensor4.reset_sequence(pressSensorPin4);
+}
+
 void pressSensorread()
 {
   int i = 0;
-  pressSensor.readADC_calc(i);;
+  //pressSensor.readADC_calc(i);;
   // pressSensor.Readout();
-  pressSensor2.readADC_calc(i);
+  /*pressSensor2.readADC_calc(i);
   // pressSensor2.Readout();
   pressSensor3.readADC_calc(i);;
   // pressSensor3.Readout();
@@ -64,7 +69,7 @@ void pressSensorread()
   pressSensor5.readADC_calc(i);;
   // pressSensor5.Readout();
   pressSensor6.readADC_calc(i);;
-  // pressSensor6.Readout();
+  // pressSensor6.Readout();*/
 }
 
 
@@ -262,19 +267,47 @@ void sampler(void *pvParameters)
 
       if (!simulationOrNot)
       {
-        pressSensorread();
+        //Start Convertion (of pressure) for all pressure sensor(s).
+        pressSensor1.convertionD1(4, pressSensorPin1);
+        pressSensor2.convertionD1(4, pressSensorPin2);
+        pressSensor3.convertionD1(4, pressSensorPin3);
+        pressSensor4.convertionD1(4, pressSensorPin4);
+
+        //Read pressure for all pressure sensor(s).
+        pressSensor1.ADCpress = pressSensor1.readADC(pressSensorPin1);
+        pressSensor2.ADCpress = pressSensor2.readADC(pressSensorPin2);
+        pressSensor3.ADCpress = pressSensor3.readADC(pressSensorPin3);
+        pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin4);
+
+        //Start Convertion (of temperature) for all pressure sensor(s).
+        pressSensor1.convertionD2(4, pressSensorPin1);
+        pressSensor2.convertionD2(4, pressSensorPin2);
+        pressSensor3.convertionD2(4, pressSensorPin3);
+        pressSensor4.convertionD2(4, pressSensorPin4);
+
+        //Read temperature for all pressure sensor(s).
+        pressSensor1.ADCtemp = pressSensor1.readADC(pressSensorPin1);
+        pressSensor2.ADCtemp = pressSensor2.readADC(pressSensorPin2);
+        pressSensor3.ADCtemp = pressSensor3.readADC(pressSensorPin3);
+        pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin4);
+
+        //Calculating the correct temperature and pressure.
+        pressSensor1.ADC_calc(pressSensor1.ADCpress, pressSensor1.ADCtemp);
+        pressSensor2.ADC_calc(pressSensor2.ADCpress, pressSensor2.ADCtemp);
+        pressSensor3.ADC_calc(pressSensor3.ADCpress, pressSensor3.ADCtemp);
+        pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);
 
         /*Read pressure from sensors*/
-        curPressureMeasurement[0] = pressSensor.getPressure();
-        curPressureMeasurement[1] = pressSensor2.getPressure();   
-        curPressureMeasurement[2] = pressSensor3.getPressure();
-        curPressureMeasurement[3] = pressSensor4.getPressure();
-        curPressureMeasurement[4] = pressSensor5.getPressure();   
-        curPressureMeasurement[5] = pressSensor6.getPressure();
+        curPressureMeasurement[0] = pressSensor1.pres;
+        curPressureMeasurement[1] = pressSensor2.pres;   
+        curPressureMeasurement[2] = pressSensor3.pres;
+        curPressureMeasurement[3] = pressSensor4.pres;
+
+        Serial.print("Pressure sensor1: "); Serial.println(curPressureMeasurement[0]);
 
         /*read humidity from HDC*/
         //float temperatureHDC = humSensor.readTemp();
-        curHumMeasurement[0] = humSensor.readHumidity();
+        //curHumMeasurement[0] = humSensor.readHumidity();
 
 
         /*Read temperature from sensors*/
@@ -282,7 +315,7 @@ void sampler(void *pvParameters)
         float tempCon = 0;
         for(uint8_t i=0;i<(nrTempSensors-1);i++)
         {
-          Serial.print("Sensor adress: "); Serial.println(TEMP_ADDR+i);
+          //Serial.print("Sensor adress: "); Serial.println(TEMP_ADDR+i);
           tempCon = 0;
           Wire.beginTransmission(TEMP_ADDR+i);
             Wire.write((int)(0xAA));        // @AA : Temperature
