@@ -44,8 +44,8 @@ int flag[3] = {0};
  * Flag 3: _7_telecommand.ino.cpp
 */
 void flagPost(int flagNr) {
-  Serial.print(flagNr);
-  Serial.println("At flagpost");
+  
+  Serial.print("At flagpost : "); Serial.println(flagNr);
   flag[flagNr] = 1;
   if (flag[0] == 1 && flag[1] == 1 && flag[2] == 1) {
     Serial.println("Kicking the can");

@@ -52,9 +52,11 @@ void initAll()
     initSemaphore();
     initRTC();
     initMode();
-    initSensor();
     initASC();
     initHeater();
+    initSensor();
+    
+    
     
     initTelecommand();
     initMonitor();

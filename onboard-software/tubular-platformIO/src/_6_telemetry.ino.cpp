@@ -14,6 +14,7 @@
 #include "_3_sensor.h"
 #include "_4_heater.h"
 #include "_5_asc.h"
+#include "ethernet.h"
 
 
 int16_t status=0b0000000000000000;
@@ -21,6 +22,7 @@ extern unsigned int localPort;
 IPAddress remote(1, 1, 1, 2);
 extern EthernetUDP Udp;
 extern RTCDue rtc;
+extern ethernet ethernet;
 
 void transmit() {
   // Serial.println("I'm at transmit");
@@ -29,6 +31,9 @@ void transmit() {
   std::vector<float>  pressData = readData(2);
   std::vector<float>  airFData = readData(3);
   // Serial.println("Finished gathering data");
+  EthernetClient client = ethernet.checkClientAvailibility();
+  if (client)
+  {
   Udp.beginPacket(remote, localPort);
   Udp.write("gs,");
   Udp.write(rtc.unixtime());
@@ -98,6 +103,10 @@ void transmit() {
   Udp.write(getMode());
   // Serial.println("Wrote mode");
   Udp.endPacket();
+  }
+  else{
+
+  }
   // Serial.println("Exiting Transmit");
 }
 #endif

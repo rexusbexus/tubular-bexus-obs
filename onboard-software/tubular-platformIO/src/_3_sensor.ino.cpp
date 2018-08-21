@@ -49,16 +49,18 @@ int samplingRate = 1000;
 
 void initPressureSensor()
 {
-  pressSensor1.reset_sequence(pressSensorPin1);
-  pressSensor2.reset_sequence(pressSensorPin2);
-  pressSensor3.reset_sequence(pressSensorPin3);
-  pressSensor4.reset_sequence(pressSensorPin4);
-
-  delay(15);
   pressSensor1.PROMread(pressSensorPin1);
   pressSensor2.PROMread(pressSensorPin2);
   pressSensor3.PROMread(pressSensorPin3);
   pressSensor4.PROMread(pressSensorPin4);
+}
+
+void resetPressureSensor()
+{
+   pressSensor1.reset_sequence(pressSensorPin1);
+   pressSensor2.reset_sequence(pressSensorPin2);
+   pressSensor3.reset_sequence(pressSensorPin3);
+   pressSensor4.reset_sequence(pressSensorPin4);
 }
 
 void pressSensorread()
@@ -336,7 +338,7 @@ void sampler(void *pvParameters)
             {  
               tempCon = (float)msb+(float)lsb/16;  
             }
-            Serial.print("Sensor number:"); Serial.print(TEMP_ADDR+i); Serial.print("    Temp con: "); Serial.print(tempCon); Serial.println(" C ");
+            // Serial.print("Sensor number:"); Serial.print(TEMP_ADDR+i); Serial.print("    Temp con: "); Serial.print(tempCon); Serial.println(" C ");
             curTemperatureMeasurement[i] = tempCon;
           }
           else {
@@ -489,7 +491,7 @@ void sampler(void *pvParameters)
       /*Check current sampling rate*/
       currSamplingRate = getSamplingRate();
       flagPost(0);
-      Serial.println("I'm leaving sensor periodic");
+      // Serial.println("I'm leaving sensor periodic");
       vTaskDelayUntil(&xLastWakeTime, (currSamplingRate / portTICK_PERIOD_MS) );
    }
 }
@@ -515,6 +517,7 @@ void initSensor()
         sim_data = getSimulationData();
         Serial.println("Succes getting simulation data");
    }
+   resetPressureSensor();
    initHumSensor();
    initTempSensors();
    initPressureSensor();
