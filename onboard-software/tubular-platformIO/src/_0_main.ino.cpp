@@ -24,6 +24,7 @@
 
 #include "_1_init.h"
 #include "ethernet.h"
+#include "_3_sensor.h"
 
 #define sdPin           4
 
@@ -33,29 +34,29 @@ void setup()
 {
     // pinMode(sdPin,OUTPUT);
     pinMode(sdPin,OUTPUT);
-    pinMode(5,OUTPUT);
-    pinMode(38,OUTPUT);
-    pinMode(39,OUTPUT);
-    pinMode(40,OUTPUT);
-    pinMode(41,OUTPUT);
-    pinMode(42,OUTPUT);
-    pinMode(43,OUTPUT);
+    pinMode(pressSensorPin1,OUTPUT);
+    pinMode(pressSensorPin2,OUTPUT);
+    pinMode(pressSensorPin3,OUTPUT);
+    pinMode(pressSensorPin4,OUTPUT);
+    pinMode(pressSensorPin5,OUTPUT);
+    pinMode(pressSensorPin6,OUTPUT);
+    pinMode(pressSensorPin7,OUTPUT);
     Serial.begin(9600);
 
-    digitalWrite(5,HIGH);
-    digitalWrite(38,HIGH);
-    digitalWrite(39,HIGH);
-    digitalWrite(40,HIGH);
-    digitalWrite(41,HIGH);
-    digitalWrite(42,HIGH);
-    digitalWrite(43,HIGH);
+    digitalWrite(pressSensorPin1,HIGH);
+    digitalWrite(pressSensorPin2,HIGH);
+    digitalWrite(pressSensorPin3,HIGH);
+    digitalWrite(pressSensorPin4,HIGH);
+    digitalWrite(pressSensorPin5,HIGH);
+    digitalWrite(pressSensorPin6,HIGH);
+    digitalWrite(pressSensorPin7,HIGH);
 
     SPI.begin();
     SD.end();
     if(!SD.begin(sdPin))
     {
       Serial.println("Card initialization failed");
-      return;
+      //return;
     }
     
     

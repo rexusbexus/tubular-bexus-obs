@@ -53,6 +53,12 @@ void initPressureSensor()
   pressSensor2.reset_sequence(pressSensorPin2);
   pressSensor3.reset_sequence(pressSensorPin3);
   pressSensor4.reset_sequence(pressSensorPin4);
+
+  delay(15);
+  pressSensor1.PROMread(pressSensorPin1);
+  pressSensor2.PROMread(pressSensorPin2);
+  pressSensor3.PROMread(pressSensorPin3);
+  pressSensor4.PROMread(pressSensorPin4);
 }
 
 void pressSensorread()
@@ -511,6 +517,7 @@ void initSensor()
    }
    initHumSensor();
    initTempSensors();
+   initPressureSensor();
    initSampler();
 }
 #endif
