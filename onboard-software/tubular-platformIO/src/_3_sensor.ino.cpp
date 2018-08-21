@@ -57,19 +57,39 @@ void initPressureSensor()
 
 void pressSensorread()
 {
-  int i = 0;
-  //pressSensor.readADC_calc(i);;
-  // pressSensor.Readout();
-  /*pressSensor2.readADC_calc(i);
-  // pressSensor2.Readout();
-  pressSensor3.readADC_calc(i);;
-  // pressSensor3.Readout();
-  pressSensor4.readADC_calc(i);;
-  // pressSensor4.Readout();
-  pressSensor5.readADC_calc(i);;
-  // pressSensor5.Readout();
-  pressSensor6.readADC_calc(i);;
-  // pressSensor6.Readout();*/
+  //Start Convertion (of pressure) for all pressure sensor(s).
+        pressSensor1.convertionD1(4, pressSensorPin1);
+        pressSensor2.convertionD1(4, pressSensorPin2);
+        pressSensor3.convertionD1(4, pressSensorPin3);
+        pressSensor4.convertionD1(4, pressSensorPin4);
+
+        delay(15);
+
+        //Read pressure for all pressure sensor(s).
+        pressSensor1.ADCpress = pressSensor1.readADC(pressSensorPin1);
+        pressSensor2.ADCpress = pressSensor2.readADC(pressSensorPin2);
+        pressSensor3.ADCpress = pressSensor3.readADC(pressSensorPin3);
+        pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin4);
+
+        //Start Convertion (of temperature) for all pressure sensor(s).
+        pressSensor1.convertionD2(4, pressSensorPin1);
+        pressSensor2.convertionD2(4, pressSensorPin2);
+        pressSensor3.convertionD2(4, pressSensorPin3);
+        pressSensor4.convertionD2(4, pressSensorPin4);
+
+        delay(15);
+
+        //Read temperature for all pressure sensor(s).
+        pressSensor1.ADCtemp = pressSensor1.readADC(pressSensorPin1);
+        pressSensor2.ADCtemp = pressSensor2.readADC(pressSensorPin2);
+        pressSensor3.ADCtemp = pressSensor3.readADC(pressSensorPin3);
+        pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin4);
+
+        //Calculating the correct temperature and pressure.
+        pressSensor1.ADC_calc(pressSensor1.ADCpress, pressSensor1.ADCtemp);
+        pressSensor2.ADC_calc(pressSensor2.ADCpress, pressSensor2.ADCtemp);
+        pressSensor3.ADC_calc(pressSensor3.ADCpress, pressSensor3.ADCtemp);
+        pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);
 }
 
 
@@ -267,41 +287,13 @@ void sampler(void *pvParameters)
 
       if (!simulationOrNot)
       {
-        //Start Convertion (of pressure) for all pressure sensor(s).
-        pressSensor1.convertionD1(4, pressSensorPin1);
-        pressSensor2.convertionD1(4, pressSensorPin2);
-        pressSensor3.convertionD1(4, pressSensorPin3);
-        pressSensor4.convertionD1(4, pressSensorPin4);
-
-        //Read pressure for all pressure sensor(s).
-        pressSensor1.ADCpress = pressSensor1.readADC(pressSensorPin1);
-        pressSensor2.ADCpress = pressSensor2.readADC(pressSensorPin2);
-        pressSensor3.ADCpress = pressSensor3.readADC(pressSensorPin3);
-        pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin4);
-
-        //Start Convertion (of temperature) for all pressure sensor(s).
-        pressSensor1.convertionD2(4, pressSensorPin1);
-        pressSensor2.convertionD2(4, pressSensorPin2);
-        pressSensor3.convertionD2(4, pressSensorPin3);
-        pressSensor4.convertionD2(4, pressSensorPin4);
-
-        //Read temperature for all pressure sensor(s).
-        pressSensor1.ADCtemp = pressSensor1.readADC(pressSensorPin1);
-        pressSensor2.ADCtemp = pressSensor2.readADC(pressSensorPin2);
-        pressSensor3.ADCtemp = pressSensor3.readADC(pressSensorPin3);
-        pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin4);
-
-        //Calculating the correct temperature and pressure.
-        pressSensor1.ADC_calc(pressSensor1.ADCpress, pressSensor1.ADCtemp);
-        pressSensor2.ADC_calc(pressSensor2.ADCpress, pressSensor2.ADCtemp);
-        pressSensor3.ADC_calc(pressSensor3.ADCpress, pressSensor3.ADCtemp);
-        pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);
+        pressSensorread();
 
         /*Read pressure from sensors*/
-        curPressureMeasurement[0] = pressSensor1.pres;
-        curPressureMeasurement[1] = pressSensor2.pres;   
-        curPressureMeasurement[2] = pressSensor3.pres;
-        curPressureMeasurement[3] = pressSensor4.pres;
+        curPressureMeasurement[0] = pressSensor1.getPres();
+        curPressureMeasurement[1] = pressSensor2.getPres();   
+        curPressureMeasurement[2] = pressSensor3.getPres();
+        curPressureMeasurement[3] = pressSensor4.getPres();
 
         Serial.print("Pressure sensor1: "); Serial.println(curPressureMeasurement[0]);
 
