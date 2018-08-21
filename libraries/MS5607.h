@@ -14,6 +14,12 @@ class MS5607
         int pinSelect;
         uint8_t convertD1;
         uint8_t convertD2;
+		uint16_t PROMbyte[8];
+        int32_t TEMP; 
+        int32_t pres;
+		//float TEMP;
+		//float pres;
+        
         
     public:
         MS5607(int PIN);
@@ -24,11 +30,11 @@ class MS5607
         uint32_t readADC(int pinSelect);
         void ADC_calc(uint32_t ADCpress, uint32_t ADCtemp);
         //float getPressure(int i);
-        uint16_t PROMbyte[8];
-        int32_t TEMP;
-        int32_t pres;
-        uint32_t ADCpress;
+		int32_t getTemp();
+		int32_t getPres();
+		uint32_t ADCpress;
         uint32_t ADCtemp;
+        
 
     
     

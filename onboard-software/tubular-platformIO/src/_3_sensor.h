@@ -20,7 +20,7 @@
    Pressusre sensors and  will use MOSI-SDI, MISO-SDO, SCK-SCLK, and digital pins-(CSB)chipselect pins.
 */
 /*The followings are chipselect pins */
-#define pressSensorPin1 37
+#define pressSensorPin1 5
 #define pressSensorPin2 38
 #define pressSensorPin3 39
 #define pressSensorPin4 40
