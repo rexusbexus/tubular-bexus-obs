@@ -453,10 +453,11 @@ void sampler(void *pvParameters)
         savingDataToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement, curAFMeasurement);
         //Serial.println("Left SavingData");
       meanPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
-      //Serial.println("Left pressure mean");
+      // Serial.println("Left pressure mean");
       /*Calculating Pressure Difference*/
       pressDifference = calculatingPressureDifference(meanPressureAmbient);
-      //Serial.println("Left press diff");
+      // Serial.println("Left press diff");
+      Serial.println(pressDifference);
       /*Change mode if the condition is satisfied*/
       if (pressDifference<pressDifferentThresholdneg && getMode() != manual)
       {
@@ -470,10 +471,10 @@ void sampler(void *pvParameters)
       {
         setMode(safeMode);
       }
-      
+      Serial.println("Begin Transmit");
       /*Transmit telemetry to GS*/
       transmit();
-      //Serial.println("Transmit");
+      Serial.println("Transmit Done");
       
       /*Listen to GS*/
       EthernetClient client = ethernet.checkClientAvailibility();

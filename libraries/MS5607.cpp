@@ -57,7 +57,7 @@ void MS5607::convertionD2(int i, int pinSelect) {
 // read all the bytes individually 
 void MS5607::PROMread(int pinSelect)
 {   
-    uint16_t PROMbyte[8] = {0};
+    PROMbyte[8] = {0};
     byte ROMcommand = 0xA0;
 
     for (uint8_t k = 0; k <= 7; k++) {
@@ -98,7 +98,7 @@ uint32_t MS5607::readADC(int pinSelect) {
 void MS5607::ADC_calc(uint32_t ADCpress, uint32_t ADCtemp) {
 
     int32_t deltaT  = ADCtemp - PROMbyte[5] * 256;
-    int32_t TEMP    = 2000 + deltaT * PROMbyte[6] / 8388608;
+    TEMP    = 2000 + deltaT * PROMbyte[6] / 8388608;
 
     long int OFFSET  = (PROMbyte[2] * 131072) + (PROMbyte[4] * deltaT) / (64);
     if (OFFSET > 25769410560) { //min and max have to be defined per datasheet.
@@ -114,5 +114,32 @@ void MS5607::ADC_calc(uint32_t ADCpress, uint32_t ADCtemp) {
       // SENS = -8589672450;
     }
 
-    int32_t pres   = ((ADCpress * SENS / 2097152) - OFFSET) / (32768);
+    pres   = ((ADCpress * SENS / 2097152) - OFFSET) / (32768);
+	
+	/*double T2=0., OFF2=0., SENS2=0.;
+	if(TEMP<2000) {
+	  T2=deltaT*deltaT/pow(2,31);
+	  OFF2=61*(TEMP-2000)*(TEMP-2000)/pow(2,4);
+	  SENS2=2*(TEMP-2000)*(TEMP-2000);
+	  if(TEMP<-1500) {
+	    OFF2+=15*(TEMP+1500)*(TEMP+1500);
+	    SENS2+=8*(TEMP+1500)*(TEMP+1500);
+	  }
+	}
+	
+	TEMP-=T2;
+	OFFSET-=OFF2;
+	SENS-=SENS2;
+	pres=(((ADCpress*SENS)/pow(2,21)-OFFSET)/pow(2,15));*/
+	
   }
+  
+int32_t MS5607::getTemp()
+{
+	return TEMP;
+}
+
+int32_t MS5607::getPres()
+{
+	return pres;
+}
