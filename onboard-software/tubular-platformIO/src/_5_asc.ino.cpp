@@ -383,7 +383,7 @@ void reading(void *pvParameters)
 
    while(1)
    {
-      // Serial.println("I'm at asc periodic");
+      Serial.println("I'm at asc periodic");
       currMode = getMode();
      
      dummyParam = getASCParam(bagcounter);
@@ -436,7 +436,7 @@ void reading(void *pvParameters)
      break;
    }
    flagPost(2);
-  //  Serial.println("I'm leaving asc periodic");
+   Serial.println("I'm leaving asc periodic");
    vTaskDelayUntil(&xLastWakeTime, (800 / portTICK_PERIOD_MS) );
    }
 }
@@ -449,7 +449,7 @@ void initReading()
     ,  (const portCHAR *) "reading"   // Name
     ,  2048  // This stack size 
     ,  NULL
-    ,  1  // Priority
+    ,  2  // Priority
     ,  NULL );
 }
 
