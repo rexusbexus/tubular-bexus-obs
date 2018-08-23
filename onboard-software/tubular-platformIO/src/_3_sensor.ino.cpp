@@ -142,7 +142,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     //Serial.println(dataString);
     dataString = "";
 
-    Serial.println("I'm at dataFile");
+    // Serial.println("I'm at dataFile");
     
     for (int i = 0; i < nrTempSensors; i++)
     {
@@ -197,8 +197,8 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
   else
   {
     Serial.println("Failed to open datalog.txt");
-    /*SD.end();
-    SD.begin(sdPin);
+    SD.end();
+    /*SD.begin(sdPin);
     File reconnect = SD.open("datalog.txt", FILE_WRITE);
     if (reconnect) {
       dataFile.println("Reconnected");
@@ -257,7 +257,7 @@ void initTempSensors()
     Wire.beginTransmission(TEMP_ADDR+i);
       Wire.write((int)(0x51)); // Start Conversion
     Wire.endTransmission();
-    Serial.println(TEMP_ADDR+i);
+    // Serial.println(TEMP_ADDR+i);
   }
 
   //"The special one", is baked into a pressure sensor.
@@ -343,7 +343,7 @@ void sampler(void *pvParameters)
           }
           else {
             curTemperatureMeasurement[i] = -1000;
-            Serial.print("Error at: "); Serial.println(i);
+            // Serial.print("Error at: "); Serial.println(i);
            }
         }
         Serial.println("Leaving temp reading");
@@ -457,7 +457,7 @@ void sampler(void *pvParameters)
       /*Calculating Pressure Difference*/
       pressDifference = calculatingPressureDifference(meanPressureAmbient);
       // Serial.println("Left press diff");
-      Serial.println(pressDifference);
+      // Serial.println(pressDifference);
       /*Change mode if the condition is satisfied*/
       if (pressDifference<pressDifferentThresholdneg && getMode() != manual)
       {
@@ -471,10 +471,10 @@ void sampler(void *pvParameters)
       {
         setMode(safeMode);
       }
-      Serial.println("Begin Transmit");
+      // Serial.println("Begin Transmit");
       /*Transmit telemetry to GS*/
       transmit();
-      Serial.println("Transmit Done");
+      // Serial.println("Transmit Done");
       
       /*Listen to GS*/
       EthernetClient client = ethernet.checkClientAvailibility();
@@ -484,9 +484,10 @@ void sampler(void *pvParameters)
       }
       if(!client.connected() && getMode() == manual)
       {
-         /*client.stop();
-         setMode(standbyMode);*/
+        //  client.stop();
+        //  setMode(standbyMode);
       }
+
       //Serial.println("Listen for GS");
       /*Check current sampling rate*/
       currSamplingRate = getSamplingRate();

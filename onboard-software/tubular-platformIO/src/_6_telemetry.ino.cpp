@@ -31,9 +31,10 @@ void transmit() {
   std::vector<float>  pressData = readData(2);
   std::vector<float>  airFData = readData(3);
   // Serial.println("Finished gathering data");
-  EthernetClient client = ethernet.checkClientAvailibility();
-  if (client)
-  {
+  // EthernetClient client = ethernet.checkClientAvailibility();
+  // if (client)
+  // {
+  Serial.println("Transmitting");
   Udp.beginPacket(remote, localPort);
   Udp.write("gs,");
   Udp.write(rtc.unixtime());
@@ -103,10 +104,10 @@ void transmit() {
   Udp.write(getMode());
   // Serial.println("Wrote mode");
   Udp.endPacket();
-  }
-  else{
+  // }
+  // else{
 
-  }
+  // }
   // Serial.println("Exiting Transmit");
 }
 #endif
