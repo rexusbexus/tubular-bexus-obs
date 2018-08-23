@@ -142,6 +142,7 @@ void telecommand(void *pvParameters)
         {
           executeHTR(heaters);
           executeASC(asc);
+          executeMode(mode);
           // executeSS(ss);
         }
         else

@@ -1,5 +1,6 @@
     
 #include "commandTranslator.h" 
+#include "_4_heater.h"
 
 std::vector<std::vector<byte>> mode(1, std::vector<byte>(1, 0));
 std::vector<std::vector<byte>> heaters(6, std::vector<byte>(3, 0));
@@ -87,6 +88,11 @@ void collectingCommand (byte data_tcp[], int row, int col, byte datasize)
                 }
             }
             k=k+2+nrParam;
+        }
+        else
+        {
+            heaters[0][0] = digitalRead(htr1_pin);
+            heaters[1][0] = digitalRead(htr2_pin);
         }
 
         if (k==(row))
