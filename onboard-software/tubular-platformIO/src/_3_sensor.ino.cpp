@@ -46,6 +46,7 @@ pressureSimulation sim_data;
 bool simulationOrNot;
 extern SemaphoreHandle_t sem;
 int samplingRate = 1000;
+int connectionTimeout;
 
 void initPressureSensor()
 {
@@ -298,10 +299,10 @@ void sampler(void *pvParameters)
         pressSensorread();
 
         /*Read pressure from sensors*/
-        curPressureMeasurement[0] = pressSensor1.getPres();
-        curPressureMeasurement[1] = pressSensor2.getPres();   
-        curPressureMeasurement[2] = pressSensor3.getPres();
-        curPressureMeasurement[3] = pressSensor4.getPres();
+        curPressureMeasurement[0] = pressSensor1.getPres()/float(100);
+        curPressureMeasurement[1] = pressSensor2.getPres()/float(100);   
+        curPressureMeasurement[2] = pressSensor3.getPres()/float(100);
+        curPressureMeasurement[3] = pressSensor4.getPres()/float(100);
 
         Serial.print("Pressure sensor1: "); Serial.println(curPressureMeasurement[0]);
 
@@ -482,10 +483,11 @@ void sampler(void *pvParameters)
       {
          xSemaphoreGiveFromISR(semPeriodic, &xHigherPriorityTaskWoken );
       }
-      if(!client.connected() && getMode() == manual)
+      Serial.print("PHYCFGR : "); Serial.println(w5500.getPHYCFGR());
+      if(w5500.getPHYCFGR() == 186 && getMode() == manual)
       {
-        //  client.stop();
-        //  setMode(standbyMode);
+         client.stop();
+         setMode(standbyMode);
       }
 
       //Serial.println("Listen for GS");
