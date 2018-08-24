@@ -379,11 +379,8 @@ void sampler(void *pvParameters)
           }
           else {
             curTemperatureMeasurement[i] = -1000;
-//<<<<<<< master
             // Serial.print("Error at: "); Serial.println(i);
-//=======
-            //Serial.print("Error at: "); Serial.println(i);
-//>>>>>>> sdcard-new-file-creation
+
            }
         }
         Serial.println("Leaving temp reading");
@@ -497,11 +494,8 @@ void sampler(void *pvParameters)
       /*Calculating Pressure Difference*/
       pressDifference = calculatingPressureDifference(meanPressureAmbient);
       // Serial.println("Left press diff");
-//<<<<<<< master
       // Serial.println(pressDifference);
-//=======
-      //Serial.println(pressDifference);
-//>>>>>>> sdcard-new-file-creation
+
       /*Change mode if the condition is satisfied*/
       if (pressDifference<pressDifferentThresholdneg && getMode() != manual)
       {
