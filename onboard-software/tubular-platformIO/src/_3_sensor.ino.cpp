@@ -127,6 +127,41 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
 {
   Serial.println("I'm at savingDataToSD");
 
+  /*  If current file exceds a certain size
+      create new file with a new name. Majority
+      voting is used to decide the name of the file.
+      TODO... 
+
+  // Use tripple redundancy if a file corrupts when updating value.
+  File value1 = SD.open("/values/value001.txt");
+  File value2 = SD.open("/values/value002.txt");
+  File value3 = SD.open("/values/value003.txt");
+
+  if(value1.read()==value2.read()==value3.read())
+  {
+    //Serial.println("Hello------------^^");
+  } else {
+    int sum[3] = {0};  
+    if(value1.read()==value2.read()) {
+      // We have majority result if true  
+
+    }
+
+    TODO turn into function?
+    if(value1.read()==value3.read()) {
+
+      sum[0]= sum[0] + 1;  
+      sum[2] = sum[2] + 1; 
+    }
+    if(value2.read()==value3.read()){
+      sum[1] = sum[1] + 1; 
+      sum[0]= sum[0] + 1; 
+    }
+    
+    //bool test_bool = value1.read() xor value2.read();
+    
+  }*/
+
   String dataString = "";
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if (dataFile)
@@ -317,7 +352,7 @@ void sampler(void *pvParameters)
         for(uint8_t i=0;i<(nrTempSensors-1);i++)
         {
           //Serial.print("Sensor adress: "); Serial.println(TEMP_ADDR+i);
-          tempCon = 0;
+          //tempCon = 0;
           Wire.beginTransmission(TEMP_ADDR+i);
             Wire.write((int)(0xAA));        // @AA : Temperature
           i2c_transmission = Wire.endTransmission();
@@ -344,7 +379,11 @@ void sampler(void *pvParameters)
           }
           else {
             curTemperatureMeasurement[i] = -1000;
+//<<<<<<< master
             // Serial.print("Error at: "); Serial.println(i);
+//=======
+            //Serial.print("Error at: "); Serial.println(i);
+//>>>>>>> sdcard-new-file-creation
            }
         }
         Serial.println("Leaving temp reading");
@@ -458,7 +497,11 @@ void sampler(void *pvParameters)
       /*Calculating Pressure Difference*/
       pressDifference = calculatingPressureDifference(meanPressureAmbient);
       // Serial.println("Left press diff");
+//<<<<<<< master
       // Serial.println(pressDifference);
+//=======
+      //Serial.println(pressDifference);
+//>>>>>>> sdcard-new-file-creation
       /*Change mode if the condition is satisfied*/
       if (pressDifference<pressDifferentThresholdneg && getMode() != manual)
       {
