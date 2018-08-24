@@ -23,6 +23,7 @@ IPAddress remote(1, 1, 1, 2);
 extern EthernetUDP Udp;
 extern RTCDue rtc;
 extern ethernet ethernet;
+extern EthernetClient client;
 
 void transmit() {
   // Serial.println("I'm at transmit");
@@ -32,7 +33,7 @@ void transmit() {
   std::vector<float>  airFData = readData(3);
   // Serial.println("Finished gathering data");
   // EthernetClient client = ethernet.checkClientAvailibility();
-  // if (client)
+  // if(w5500.getPHYCFGR() == 191)
   // {
   Serial.println("Transmitting");
   Udp.beginPacket(remote, localPort);

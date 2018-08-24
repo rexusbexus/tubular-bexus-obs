@@ -11,6 +11,6 @@ float AWM5102VN::getAF()
 {
 	int sensVal = analogRead(_pin);
 	float AF = 0;
-	AF = 2.5*(sensVal*5/1023) - 2.5; //Notes: 1 Vdc = 0 SLPM
+	AF = 2.5*(float(sensVal)*5/1023) - 2.5; //Notes: 1 Vdc = 0 SLPM
 	return AF;
 }
