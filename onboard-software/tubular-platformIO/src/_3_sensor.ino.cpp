@@ -46,6 +46,7 @@ pressureSimulation sim_data;
 bool simulationOrNot;
 extern SemaphoreHandle_t sem;
 int samplingRate = 1000;
+int connectionTimeout;
 
 void initPressureSensor()
 {
@@ -177,7 +178,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     //Serial.println(dataString);
     dataString = "";
 
-    Serial.println("I'm at dataFile");
+    // Serial.println("I'm at dataFile");
     
     for (int i = 0; i < nrTempSensors; i++)
     {
@@ -232,8 +233,8 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
   else
   {
     Serial.println("Failed to open datalog.txt");
-    /*SD.end();
-    SD.begin(sdPin);
+    SD.end();
+    /*SD.begin(sdPin);
     File reconnect = SD.open("datalog.txt", FILE_WRITE);
     if (reconnect) {
       dataFile.println("Reconnected");
@@ -292,7 +293,7 @@ void initTempSensors()
     Wire.beginTransmission(TEMP_ADDR+i);
       Wire.write((int)(0x51)); // Start Conversion
     Wire.endTransmission();
-    Serial.println(TEMP_ADDR+i);
+    // Serial.println(TEMP_ADDR+i);
   }
 
   //"The special one", is baked into a pressure sensor.
@@ -333,10 +334,10 @@ void sampler(void *pvParameters)
         pressSensorread();
 
         /*Read pressure from sensors*/
-        curPressureMeasurement[0] = pressSensor1.getPres();
-        curPressureMeasurement[1] = pressSensor2.getPres();   
-        curPressureMeasurement[2] = pressSensor3.getPres();
-        curPressureMeasurement[3] = pressSensor4.getPres();
+        curPressureMeasurement[0] = pressSensor1.getPres()/float(100);
+        curPressureMeasurement[1] = pressSensor2.getPres()/float(100);   
+        curPressureMeasurement[2] = pressSensor3.getPres()/float(100);
+        curPressureMeasurement[3] = pressSensor4.getPres()/float(100);
 
         Serial.print("Pressure sensor1: "); Serial.println(curPressureMeasurement[0]);
 
@@ -378,7 +379,11 @@ void sampler(void *pvParameters)
           }
           else {
             curTemperatureMeasurement[i] = -1000;
+//<<<<<<< master
+            // Serial.print("Error at: "); Serial.println(i);
+//=======
             //Serial.print("Error at: "); Serial.println(i);
+//>>>>>>> sdcard-new-file-creation
            }
         }
         Serial.println("Leaving temp reading");
@@ -492,7 +497,11 @@ void sampler(void *pvParameters)
       /*Calculating Pressure Difference*/
       pressDifference = calculatingPressureDifference(meanPressureAmbient);
       // Serial.println("Left press diff");
+//<<<<<<< master
+      // Serial.println(pressDifference);
+//=======
       //Serial.println(pressDifference);
+//>>>>>>> sdcard-new-file-creation
       /*Change mode if the condition is satisfied*/
       if (pressDifference<pressDifferentThresholdneg && getMode() != manual)
       {
@@ -506,10 +515,10 @@ void sampler(void *pvParameters)
       {
         setMode(safeMode);
       }
-      Serial.println("Begin Transmit");
+      // Serial.println("Begin Transmit");
       /*Transmit telemetry to GS*/
       transmit();
-      Serial.println("Transmit Done");
+      // Serial.println("Transmit Done");
       
       /*Listen to GS*/
       EthernetClient client = ethernet.checkClientAvailibility();
@@ -517,11 +526,13 @@ void sampler(void *pvParameters)
       {
          xSemaphoreGiveFromISR(semPeriodic, &xHigherPriorityTaskWoken );
       }
-      if(!client.connected() && getMode() == manual)
+      Serial.print("PHYCFGR : "); Serial.println(w5500.getPHYCFGR());
+      if(w5500.getPHYCFGR() == 186 && getMode() == manual)
       {
-         /*client.stop();
-         setMode(standbyMode);*/
+         client.stop();
+         setMode(standbyMode);
       }
+
       //Serial.println("Listen for GS");
       /*Check current sampling rate*/
       currSamplingRate = getSamplingRate();

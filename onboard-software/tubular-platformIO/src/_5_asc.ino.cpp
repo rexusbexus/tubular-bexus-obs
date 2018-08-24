@@ -122,22 +122,23 @@ void initValvesControl()
 }
 
 void pumpControl(int cond)
-{/*
+{
   // Serial.println("Pump control taking sem");
   xSemaphoreTake(sem, portMAX_DELAY);
   // Serial.println("Entering pump control");
-  switch (cond){
-    case 0:
-    digitalWrite(pumpPin, LOW);
-    break;
+  // switch (cond){
+  //   case 0:
+  //   digitalWrite(pumpPin, LOW);
+  //   break;
 
-    case 1:
-    heaterControl(0,0); //Turn off heaters when pump is on.
-    digitalWrite(pumpPin, HIGH);
-    break;
-  }
+  //   case 1:
+  //   heaterControl(0,0); //Turn off heaters when pump is on.
+  //   digitalWrite(pumpPin, HIGH);
+  //   break;
+  // }
+  digitalWrite(pumpPin, cond);
   xSemaphoreGive(sem);
-  // Serial.println("Leaving pump control");*/
+  // Serial.println("Leaving pump control");
 }
 
 void valvesControl(int valve, int cond)
