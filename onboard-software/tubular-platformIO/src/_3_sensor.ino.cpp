@@ -42,11 +42,13 @@ int i2c_transmission = 5;
 AWM5102VN afSensor(airFsensorPin);
 
 pressureSimulation sim_data;
+EthernetClient client;
  
 bool simulationOrNot;
 extern SemaphoreHandle_t sem;
 int samplingRate = 1000;
-int connectionTimeout;
+int connectionTimeout = 70;
+int tcReceived;
 
 void initPressureSensor()
 {
@@ -521,13 +523,15 @@ void sampler(void *pvParameters)
       // Serial.println("Transmit Done");
       
       /*Listen to GS*/
-      EthernetClient client = ethernet.checkClientAvailibility();
+      client = ethernet.checkClientAvailibility();
       if(client.available()>0)
       {
+         tcReceived = getCurrentTime();
          xSemaphoreGiveFromISR(semPeriodic, &xHigherPriorityTaskWoken );
       }
-      Serial.print("PHYCFGR : "); Serial.println(w5500.getPHYCFGR());
-      if(w5500.getPHYCFGR() == 186 && getMode() == manual)
+      
+      
+      if(getCurrentTime() > (tcReceived + connectionTimeout)  && getMode() == manual)
       {
          client.stop();
          setMode(standbyMode);
