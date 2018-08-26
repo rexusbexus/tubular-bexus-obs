@@ -14,8 +14,8 @@ EthernetUDP Udp;
 void ethernet::initEthernet()
 {
     //Serial.println("I'm at initEthernet");
-    w5500.setRetransmissionCount(uint8_t(0));
-    w5500.setRetransmissionTime(uint16_t(100));
+    // w5500.setRetransmissionCount(uint8_t(0));
+    // w5500.setRetransmissionTime(uint16_t(100));
     byte mac[] = { 0x2C, 0xF7, 0xF1, 0x08, 0x0F, 0x57 };
     IPAddress ip(1, 1, 1, 1); //Local IPv4 adress
     //IPAddress myDns(192,168,1, 1);
