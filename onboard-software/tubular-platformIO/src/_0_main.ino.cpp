@@ -26,7 +26,7 @@
 #include "ethernet.h"
 #include "_3_sensor.h"
 
-#define sdPin           4
+
 
 
 /*init*/

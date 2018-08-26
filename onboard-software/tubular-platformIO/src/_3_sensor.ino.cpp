@@ -34,6 +34,8 @@ MS5607 pressSensor3(pressSensorPin3); //ValveCenter Pressure Sensor
 MS5607 pressSensor4(pressSensorPin4); //ValveCenter Pressure Sensor
 HDC2010 humSensor(hdcADDR);
 
+Sd2Card card;
+
 #define TEMP_ADDR (0x90 >> 1) 
 //I2C start adress
 
@@ -42,13 +44,19 @@ int i2c_transmission = 5;
 AWM5102VN afSensor(airFsensorPin);
 
 pressureSimulation sim_data;
-EthernetClient client;
  
 bool simulationOrNot;
 extern SemaphoreHandle_t sem;
 int samplingRate = 1000;
-int connectionTimeout = 70;
-int tcReceived;
+int connectionTimeout;
+
+File dataLog;
+File root;
+File nextFile;
+boolean eof = false;
+int count=0;
+String file = "";
+String fileNum = "";
 
 void initPressureSensor()
 {
@@ -130,45 +138,57 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
   Serial.println("I'm at savingDataToSD");
 
   /*  If current file exceds a certain size
-      create new file with a new name. Majority
-      voting is used to decide the name of the file.
-      TODO... 
+  //    create new file with a new name. 
+  */
 
-  // Use tripple redundancy if a file corrupts when updating value.
-  File value1 = SD.open("/values/value001.txt");
-  File value2 = SD.open("/values/value002.txt");
-  File value3 = SD.open("/values/value003.txt");
+  Serial.print("EOF"); Serial.println(eof);
+  root = SD.open("/log/");
+  if(root) {
 
-  if(value1.read()==value2.read()==value3.read())
-  {
-    //Serial.println("Hello------------^^");
-  } else {
-    int sum[3] = {0};  
-    if(value1.read()==value2.read()) {
-      // We have majority result if true  
+    while(!eof)
+     {
+        count++;
+      Serial.print("Count: ");  Serial.println(count);
+      nextFile=root.openNextFile();
+     
+       if(!nextFile)
+       {
+         eof=true;
+       }
+     
+     if(eof)
+     {
+     fileNum = String(count);
+     file = "/log/log"+fileNum+".txt";
+     Serial.print("Name of file: "); Serial.println(file);
+     }
+     
+     nextFile.close();
+   }
+   root.close();
+   char fileName[file.length()+1];
+   file.toCharArray(fileName, sizeof(fileName));
+   dataLog = SD.open(fileName, FILE_WRITE);
+   Serial.print("Current file size: "); Serial.println(dataLog.size());
+   if(dataLog.size()>(50*1024)) {
+     count = 0;
+     eof = false;
+     Serial.println("EOF. Set to false.");
+     
+   }
+   if(!dataLog) {
+     Serial.print("Failed to open: "); Serial.println(fileName);
+   }
+   Serial.print("file.length(): "); Serial.println(file.length());
+   
 
-    }
 
-    TODO turn into function?
-    if(value1.read()==value3.read()) {
-
-      sum[0]= sum[0] + 1;  
-      sum[2] = sum[2] + 1; 
-    }
-    if(value2.read()==value3.read()){
-      sum[1] = sum[1] + 1; 
-      sum[0]= sum[0] + 1; 
-    }
-    
-    //bool test_bool = value1.read() xor value2.read();
-    
-  }*/
 
   String dataString = "";
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
-  if (dataFile)
+  //File dataLog = SD.open("datalog.txt", FILE_WRITE);
+  if (dataLog)
   {
-     // Serial.println("I'm at dataFile");
+     // Serial.println("I'm at dataLog");
     dataString += String(rtc.getHours());
     dataString += ":";
     dataString += String(rtc.getMinutes());
@@ -176,11 +196,11 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     dataString += String(rtc.getSeconds());
     dataString += "||";
 
-    dataFile.print(dataString);
+    dataLog.print(dataString);
     //Serial.println(dataString);
     dataString = "";
 
-    // Serial.println("I'm at dataFile");
+    // Serial.println("I'm at dataLog");
     
     for (int i = 0; i < nrTempSensors; i++)
     {
@@ -192,7 +212,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
       }
       //Serial.println(temperatureData[i]);
     }
-    dataFile.print(dataString);
+    dataLog.print(dataString);
     dataString = "";
     for (int i = 0; i < nrHumidSensors; i++)
     {
@@ -203,7 +223,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
         dataString += "||";
       }
     }
-    dataFile.print(dataString);
+    dataLog.print(dataString);
     dataString = "";
     for (int i = 0; i < nrPressSensors; i++)
     {
@@ -214,7 +234,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
         dataString += "||";
       }
     }
-    dataFile.print(dataString);
+    dataLog.print(dataString);
     dataString = "";
     for (int i = 0; i < nrAirFSensors; i++)
     {
@@ -226,22 +246,21 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
         dataString += "||";
       }
     }
-    dataFile.print(dataString);
-    dataFile.println();
-    dataFile.close();
-    // Serial.println("Exiting dataFile");
+    dataLog.print(dataString);
+    dataLog.println();
+    dataLog.close();
+
+    // Serial.println("Exiting dataLog");
     //Serial.println(dataString);
+  }
+ 
   }
   else
   {
-    Serial.println("Failed to open datalog.txt");
+    Serial.println("Failed to open root");
+    Serial.print("sdPin: ");Serial.println(digitalRead(sdPin));
     SD.end();
-    /*SD.begin(sdPin);
-    File reconnect = SD.open("datalog.txt", FILE_WRITE);
-    if (reconnect) {
-      dataFile.println("Reconnected");
-      Serial.println("Reconnected");
-    }*/
+
     
   }
   Serial.println("leaving SavingData");
@@ -381,11 +400,8 @@ void sampler(void *pvParameters)
           }
           else {
             curTemperatureMeasurement[i] = -1000;
-//<<<<<<< master
             // Serial.print("Error at: "); Serial.println(i);
-//=======
-            //Serial.print("Error at: "); Serial.println(i);
-//>>>>>>> sdcard-new-file-creation
+
            }
         }
         Serial.println("Leaving temp reading");
@@ -499,11 +515,8 @@ void sampler(void *pvParameters)
       /*Calculating Pressure Difference*/
       pressDifference = calculatingPressureDifference(meanPressureAmbient);
       // Serial.println("Left press diff");
-//<<<<<<< master
       // Serial.println(pressDifference);
-//=======
-      //Serial.println(pressDifference);
-//>>>>>>> sdcard-new-file-creation
+
       /*Change mode if the condition is satisfied*/
       if (pressDifference<pressDifferentThresholdneg && getMode() != manual)
       {
@@ -523,15 +536,13 @@ void sampler(void *pvParameters)
       // Serial.println("Transmit Done");
       
       /*Listen to GS*/
-      client = ethernet.checkClientAvailibility();
+      EthernetClient client = ethernet.checkClientAvailibility();
       if(client.available()>0)
       {
-         tcReceived = getCurrentTime();
          xSemaphoreGiveFromISR(semPeriodic, &xHigherPriorityTaskWoken );
       }
-      
-      
-      if(getCurrentTime() > (tcReceived + connectionTimeout)  && getMode() == manual)
+      Serial.print("PHYCFGR : "); Serial.println(w5500.getPHYCFGR());
+      if(w5500.getPHYCFGR() == 186 && getMode() == manual)
       {
          client.stop();
          setMode(standbyMode);
