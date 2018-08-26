@@ -15,6 +15,7 @@
 
 #define pressSensorPSpin TBD
 #define sdCS 4
+#define sdPin           4
 
 /*
    Pressusre sensors and  will use MOSI-SDI, MISO-SDO, SCK-SCLK, and digital pins-(CSB)chipselect pins.
