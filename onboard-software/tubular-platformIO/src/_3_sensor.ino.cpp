@@ -16,6 +16,7 @@
 #include <Ethernet2.h>
 #include <MS5607.h>
 #include <FreeRTOS_ARM.h>
+#include "Series3500.h"
 
 
 #include "ethernet.h"
@@ -32,6 +33,7 @@ MS5607 pressSensor1(pressSensorPin1); //Ambient Pressure Sensor
 MS5607 pressSensor2(pressSensorPin2); //Ambient Pressure Sensor
 MS5607 pressSensor3(pressSensorPin3); //ValveCenter Pressure Sensor
 MS5607 pressSensor4(pressSensorPin4); //ValveCenter Pressure Sensor
+Series3500 pressSensorStatic(staticPressPin); //Static pressure sensor pin
 HDC2010 humSensor(hdcADDR);
 
 // Sd2Card card;
@@ -360,6 +362,7 @@ void sampler(void *pvParameters)
         curPressureMeasurement[1] = pressSensor2.getPres()/float(100);   
         curPressureMeasurement[2] = pressSensor3.getPres()/float(100);
         curPressureMeasurement[3] = pressSensor4.getPres()/float(100);
+        curPressureMeasurement[4] = pressSensorStatic.getPress();
 
         Serial.print("Pressure sensor1: "); Serial.println(curPressureMeasurement[0]);
 

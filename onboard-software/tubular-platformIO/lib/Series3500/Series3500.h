@@ -1,12 +1,12 @@
-#ifndef 3500Series_h
-#define 3500Series_h
+#ifndef SERIES3500_H
+#define SERIES3500_H
 
 #include <Arduino.h>
 
-class 3500Series
+class Series3500
 {
 	public:
-	3500Series(const byte pin);
+	Series3500(const byte pin);
 	float getPress();
 	
 	private:
