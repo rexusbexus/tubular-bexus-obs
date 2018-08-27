@@ -34,7 +34,7 @@ MS5607 pressSensor3(pressSensorPin3); //ValveCenter Pressure Sensor
 MS5607 pressSensor4(pressSensorPin4); //ValveCenter Pressure Sensor
 HDC2010 humSensor(hdcADDR);
 
-Sd2Card card;
+// Sd2Card card;
 
 #define TEMP_ADDR (0x90 >> 1) 
 //I2C start adress
