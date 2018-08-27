@@ -57,19 +57,19 @@ void MS5607::convertionD2(int i, int pinSelect) {
 // read all the bytes individually 
 void MS5607::PROMread(int pinSelect)
 {   
-    PROMbyte[8] = {-1};
+    PROMbyte[8] = {0};
     byte ROMcommand = 0xA0;
-    Serial.print("Sensor:"); Serial.println(pinSelect);
+    // Serial.print("Sensor:"); Serial.println(pinSelect);
     for (uint8_t k = 0; k <= 7; k++) {
 
         SPI.beginTransaction(SPISettings(10000, MSBFIRST, SPI_MODE0));
         digitalWrite(pinSelect, LOW);
 
         PROMbyte[k] = SPI.transfer(ROMcommand + 2 * k);
-        Serial.print("PROMbyte: buffer "); Serial.println(PROMbyte[k]);
+        // Serial.print("PROMbyte: buffer "); Serial.println(PROMbyte[k]);
         PROMbyte[k] = SPI.transfer16(0xFFFF);
         
-        Serial.print("PROMbyte adress: "); Serial.print(ROMcommand + 2 * k); Serial.print(". Value: "); Serial.println(PROMbyte[k]);
+        // Serial.print("PROMbyte adress: "); Serial.print(ROMcommand + 2 * k); Serial.print(". Value: "); Serial.println(PROMbyte[k]);
          
     
         digitalWrite(pinSelect, HIGH);//chipSelectPin1

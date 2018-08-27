@@ -52,7 +52,7 @@ void setup()
     digitalWrite(pressSensorPin7,HIGH);
 
     SPI.begin();
-    SD.end();
+    // SD.end();
     if(!SD.begin(sdPin))
     {
       Serial.println("Card initialization failed");
