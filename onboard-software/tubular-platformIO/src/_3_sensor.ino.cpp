@@ -48,7 +48,8 @@ pressureSimulation sim_data;
 bool simulationOrNot;
 extern SemaphoreHandle_t sem;
 int samplingRate = 1000;
-int connectionTimeout;
+int connectionTimeout = 70;
+int tcReceived;
 
 File dataLog;
 File root;
@@ -539,12 +540,13 @@ void sampler(void *pvParameters)
       EthernetClient client = ethernet.checkClientAvailibility();
       if(client.available()>0)
       {
+         tcReceived = getCurrentTime();
          xSemaphoreGiveFromISR(semPeriodic, &xHigherPriorityTaskWoken );
       }
-      Serial.print("PHYCFGR : "); Serial.println(w5500.getPHYCFGR());
-      if(w5500.getPHYCFGR() == 186 && getMode() == manual)
+      // Serial.print("PHYCFGR : "); Serial.println(w5500.getPHYCFGR());
+      if((tcReceived + connectionTimeout) < getCurrentTime() && getMode() == manual)
       {
-         client.stop();
+        //  client.stop();
          setMode(standbyMode);
       }
 
