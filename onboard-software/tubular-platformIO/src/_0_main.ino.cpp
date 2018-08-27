@@ -59,7 +59,6 @@ void setup()
       //return;
     }
     
-    
     //server.begin();
     initAll();
     vTaskStartScheduler();
