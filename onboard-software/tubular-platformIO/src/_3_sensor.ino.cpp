@@ -32,7 +32,7 @@ extern RTCDue rtc;
 MS5607 pressSensor1(pressSensorPin1); //Ambient Pressure Sensor
 MS5607 pressSensor2(pressSensorPin2); //Ambient Pressure Sensor
 MS5607 pressSensor3(pressSensorPin3); //ValveCenter Pressure Sensor
-MS5607 pressSensor4(pressSensorPin4); //ValveCenter Pressure Sensor
+MS5607 pressSensor4(pressSensorPin7); //ValveCenter Pressure Sensor
 Series3500 pressSensorStatic(staticPressPin); //Static pressure sensor pin
 HDC2010 humSensor(hdcADDR);
 
@@ -63,22 +63,34 @@ String fileNum = "";
 
 void initPressureSensor()
 {
+  if(!simulationOrNot){
   pressSensor1.PROMread(pressSensorPin1);
   pressSensor2.PROMread(pressSensorPin2);
   pressSensor3.PROMread(pressSensorPin3);
   pressSensor4.PROMread(pressSensorPin4);
+  }
+  else{
+  pressSensor4.PROMread(pressSensorPin4);
+  }
 }
 
 void resetPressureSensor()
 {
+   if(!simulationOrNot){
    pressSensor1.reset_sequence(pressSensorPin1);
    pressSensor2.reset_sequence(pressSensorPin2);
    pressSensor3.reset_sequence(pressSensorPin3);
    pressSensor4.reset_sequence(pressSensorPin4);
+   }
+   else{
+     pressSensor4.reset_sequence(pressSensorPin4);
+   }
+
 }
 
 void pressSensorread()
 {
+  if(!simulationOrNot){
   //Start Convertion (of pressure) for all pressure sensor(s).
         pressSensor1.convertionD1(4, pressSensorPin1);
         pressSensor2.convertionD1(4, pressSensorPin2);
@@ -112,6 +124,17 @@ void pressSensorread()
         pressSensor2.ADC_calc(pressSensor2.ADCpress, pressSensor2.ADCtemp);
         pressSensor3.ADC_calc(pressSensor3.ADCpress, pressSensor3.ADCtemp);
         pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);
+  }
+  else{
+    pressSensor4.convertionD1(4, pressSensorPin4);
+    delay(15);
+    pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin4);
+    delay(10);
+    pressSensor4.convertionD2(4, pressSensorPin4);
+    delay(15);
+    pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin4);
+    pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);
+  }
 }
 
 
@@ -497,6 +520,7 @@ void sampler(void *pvParameters)
             //   curAFMeasurement[l] = sim_data.airflowSim[l][7];
             // }
           }
+          pressSensorread();
           curPressureMeasurement[3] = pressSensorStatic.getPress();
           curAFMeasurement[0] = afSensor.getAF();
 
@@ -537,7 +561,7 @@ void sampler(void *pvParameters)
 
            }
         }
-        curTemperatureMeasurement[8] = pressSensor4.getTemp();
+        curTemperatureMeasurement[8] = pressSensor4.getTemp()/float(100);
         
       }
 
@@ -625,16 +649,13 @@ void initSensor()
       sim_data = getSimulationData();
       Serial.println("Succes getting simulation data");
    }
-   else
-   {
-      resetPressureSensor();  
-   }
+   
+  resetPressureSensor();  
+  
   initHumSensor(); 
   initTempSensors();
-  if (!simulationOrNot)
-  {
-    initPressureSensor(); 
-  }
+  initPressureSensor(); 
+  
   initSampler();
 }
 #endif

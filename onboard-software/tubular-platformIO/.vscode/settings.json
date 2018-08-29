@@ -55,6 +55,12 @@
         "valarray": "cpp",
         "vector": "cpp",
         "cstdint": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "array": "cpp",
+        "clocale": "cpp",
+        "cstdarg": "cpp",
+        "unordered_map": "cpp",
+        "fstream": "cpp",
+        "tuple": "cpp"
     }
 }

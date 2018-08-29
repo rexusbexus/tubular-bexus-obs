@@ -41,6 +41,7 @@ void setup()
     pinMode(pressSensorPin5,OUTPUT);
     pinMode(pressSensorPin6,OUTPUT);
     pinMode(pressSensorPin7,OUTPUT);
+    pinMode(10, OUTPUT);
     Serial.begin(9600);
 
     digitalWrite(pressSensorPin1,HIGH);
@@ -50,6 +51,7 @@ void setup()
     digitalWrite(pressSensorPin5,HIGH);
     digitalWrite(pressSensorPin6,HIGH);
     digitalWrite(pressSensorPin7,HIGH);
+    digitalWrite(10,HIGH);
 
     SPI.begin();
     // SD.end();
