@@ -21,6 +21,7 @@ int pumpStartTime;
 int valveBagStartTime;
 // int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
 int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
+float current_volume = 0;
 
 
 std::vector<float> getASCParam(int bag)
@@ -264,6 +265,14 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
   int valveBag = digitalRead(valve1 + bagcounter - 1);
   int valveFlush = digitalRead(flushValve);
   int pumpState = digitalRead(pumpPin);
+
+  std::vector<float> current_pressure = readData(2);
+  std::vector<float> current_flowrate = readData(3);
+  current_flowrate[0] = current_flowrate[0]/60;
+
+  float volume_limit = 3;
+  float pressure_limit = 120;
+  
   
   if (ascentSamplingLogic(meanPressureAmbient, ascParam))
   {
@@ -297,12 +306,26 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
     }
     else
     {
-      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter-1]))
+      float press_diff_in_bag = current_pressure[3] - current_pressure[0];
+      press_diff_in_bag = float abs(press_diff_in_bag);
+      current_volume = current_volume + (current_flowrate[0] * (getCurrentTime() - valveBagStartTime));
+
+      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter-1]) || current_volume > volume_limit || press_diff_in_bag > pressure_limit)
       {
         valvesControl(bagcounter, closeState);
         pumpControl(closeState);
+        current_volume = 0;
         bagcounter++;
       }
+    }
+  }
+  else
+  {
+    if (valveBag == openState)
+    {
+      valvesControl(bagcounter, closeState);
+      pumpControl(closeState);
+      bagcounter++;
     }
   }
   
@@ -315,6 +338,13 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
   int valveBag = digitalRead(valve1 + bagcounter - 1);
   int valveFlush = digitalRead(flushValve);
   int pumpState = digitalRead(pumpPin);
+
+  std::vector<float> current_pressure = readData(2);
+  std::vector<float> current_flowrate = readData(3);
+  current_flowrate[0] = current_flowrate[0]/60;
+
+  float volume_limit = 3;
+  float pressure_limit = 120;
   
   if (descentSamplingLogic(meanPressureAmbient, ascParam))
   {
@@ -348,7 +378,10 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
     }
     else
     {
-      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter-1]))
+      float press_diff_in_bag = current_pressure[3] - current_pressure[0];
+      press_diff_in_bag = float abs(press_diff_in_bag);
+      current_volume = current_volume + (current_flowrate[0] * (getCurrentTime() - valveBagStartTime));
+      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter-1]) || current_volume > volume_limit || press_diff_in_bag > pressure_limit)
       {
         valvesControl(bagcounter, closeState);
         pumpControl(closeState);
