@@ -23,7 +23,7 @@ function varargout = groundStation_GUI(varargin)
 % Edit the above text to modify the response to help groundStation_GUI
 
 
-% Last Modified by GUIDE v2.5 05-May-2018 15:20:27
+% Last Modified by GUIDE v2.5 29-Aug-2018 10:42:09
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -64,12 +64,15 @@ tabledata2=zeros(10,2);
 calcHeightVector=0;
 
 global tabledataAirflow tabledataPressure tabledataTemperature ...
-    tabledataHumidity green_light red_light tabledataHeight time timePlot; 
+    tabledataHumidity green_light red_light tabledataHeight time timePlot... 
+    row dataBuffer; 
 tabledataAirflow     = single(zeros(10,1));
 tabledataPressure    = single(zeros(10,7));
 tabledataTemperature = single(zeros(10,10));
 tabledataHumidity    = single(zeros(10,1));
 tabledataHeight      = 0;
+row                = 3;
+dataBuffer         = [];
 time           = ["Not available";"Not available";"Not available";...
     "Not available";"Not available";"Not available";"Not available";...
     "Not available";"Not available";"Not available"];
@@ -258,7 +261,8 @@ set(handles.constat_udp, 'String', 'Connection Closed');
 function update_udpoutput(u, evt, handles)
 %global tabledata calcHeightVector;
 global tabledataAirflow tabledataPressure tabledataTemperature ...
-    tabledataHumidity green_light red_light tabledataHeight time timePlot; 
+    tabledataHumidity green_light red_light tabledataHeight time timePlot...
+    row dataBuffer; 
 data=fread(u)';
 %disp(data);
 dataSize=length(data);
@@ -430,7 +434,16 @@ set(handles.status_mode, 'String', modeDisp);
   %set(handles.axes4, 'altitude', tabledataHeight);
   %axes(handles.axes4)
 %   timePlot = [timePlot, time_str];
-  plot(handles.axes4, tabledataHeight)
+  plot(handles.axes4, tabledataHeight);
+  
+  tableCompiled = [time(1,1), tabledataPressure(1,1:6), tabledataTemperature(1,1:9), tabledataAirflow(1,1), tabledataHumidity(1,1)];
+  dataBuffer = [dataBuffer; tableCompiled];
+  
+ % write the data to file to row Ax
+%  range = sprintf("A%d", row);
+%  xlswrite('log/logFile.xls', tableCompiled, 'Sheet1', range);
+%  row = row + 1;
+  
   
  drawnow;
 
@@ -677,3 +690,16 @@ function edit3_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in save_data.
+function save_data_Callback(hObject, eventdata, handles)
+% hObject    handle to save_data (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global dataBuffer row;
+range = sprintf("A%d", row);
+xlswrite('log/logFile.xls', dataBuffer, 'Sheet1', range);
+[r, c] = size(dataBuffer);
+row = row + r;
+dataBuffer  = [];

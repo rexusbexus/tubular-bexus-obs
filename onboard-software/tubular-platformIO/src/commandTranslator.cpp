@@ -1,6 +1,7 @@
     
 #include "commandTranslator.h" 
 #include "_4_heater.h"
+#include "_5_asc.h"
 
 std::vector<std::vector<byte>> mode(1, std::vector<byte>(1, 0));
 std::vector<std::vector<byte>> heaters(6, std::vector<byte>(3, 0));
@@ -111,6 +112,26 @@ void collectingCommand (byte data_tcp[], int row, int col, byte datasize)
                 } 
             }
             k=k+2+nrParam;
+        }
+        else
+        {
+            for(int i = 0; i < 9; i++)
+            {
+                if (i == 0)
+                {
+                    asc[i][0] = digitalRead(pumpPin);
+                }
+                if (i == 7)
+                {
+                    asc[i][0] = digitalRead(flushValve);
+                }
+                if (i == 8)
+                {
+                    asc[i][0] = digitalRead(CACvalve);
+                    break;
+                }
+                asc[i][0] = digitalRead(valve1+(i-1));
+            }
         }
 
         if (k==(row))

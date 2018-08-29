@@ -28,7 +28,7 @@
 #define closeState 0
 #define openState 1
 #define totalBagNumber 6
-#define flushingTime 3
+#define flushingTime 60
 
 //extern float ascParameter[16];
 void initASC();
