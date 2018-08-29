@@ -318,10 +318,10 @@ pressureSimulation getSimulationData ()
 {
   pressureSimulation Sim_struct;
   float pressureSimData [] = {1000,75,46.8,81.2,103,141,193.3,1000};
-  float temperatureSimData [] = {20,15,10,5,-5,-10,-7,-9};
-  float humSimData [] = {100,80,70,30,40,20,10,40};
+  float temperatureSimData [] = {20,15,10,5,-5,-10,5,20};
+  float humSimData [] = {0,0,0,0,0,0,0,0};
   float airflowSimData [] = {400,1000,300,500,692,582,932,412};
-  int timeSimData [] = {0,15,30,45,60,75,90,105};
+  int timeSimData [] = {0,5400,6900,14520,14700,15000,15300,17700};
   for (int k = 0; k < 2; k++)
   {
     for (int g = 0; g < 8; g++)

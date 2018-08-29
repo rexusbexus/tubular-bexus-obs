@@ -19,8 +19,8 @@ int secondsOpen;
 int flushStartTime;
 int pumpStartTime;
 int valveBagStartTime;
-// int bagFillingTime [] = {43, 46, 53, 50, 47, 41};
-int bagFillingTime [] = {4, 4, 4, 4, 4, 4};
+// int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
+int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
 
 
 std::vector<float> getASCParam(int bag)

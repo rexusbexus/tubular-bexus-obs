@@ -361,8 +361,8 @@ void sampler(void *pvParameters)
         curPressureMeasurement[0] = pressSensor1.getPres()/float(100);
         curPressureMeasurement[1] = pressSensor2.getPres()/float(100);   
         curPressureMeasurement[2] = pressSensor3.getPres()/float(100);
-        curPressureMeasurement[3] = pressSensor4.getPres()/float(100);
-        curPressureMeasurement[4] = pressSensorStatic.getPress();
+        // curPressureMeasurement[3] = pressSensor4.getPres()/float(100);
+        curPressureMeasurement[3] = pressSensorStatic.getPress();
 
         Serial.print("Pressure sensor1: "); Serial.println(curPressureMeasurement[0]);
 
@@ -441,25 +441,25 @@ void sampler(void *pvParameters)
                 curPressureMeasurement[l] = 0;
               }
             }
-            for (int l = 0; l < nrTempSensors; l++)
-            {
-              if (l<2)
-              {
-                curTemperatureMeasurement[l] = sim_data.temperatureSim[l][seq];
-              }
-              else
-              {
-                curTemperatureMeasurement[l] = 0;
-              }
-            }
+            // for (int l = 0; l < nrTempSensors; l++)
+            // {
+            //   if (l<2)
+            //   {
+            //     curTemperatureMeasurement[l] = sim_data.temperatureSim[l][seq];
+            //   }
+            //   else
+            //   {
+            //     curTemperatureMeasurement[l] = 0;
+            //   }
+            // }
             for (int l = 0; l < nrHumidSensors; l++)
             {
               curHumMeasurement[l] = sim_data.humSim[l][seq];
             }
-            for (int l = 0; l < nrAirFSensors; l++)
-            {
-              curAFMeasurement[l] = sim_data.airflowSim[l][seq];
-            }
+            // for (int l = 0; l < nrAirFSensors; l++)
+            // {
+            //   curAFMeasurement[l] = sim_data.airflowSim[l][seq];
+            // }
           }
         }
         if (secondsNow > sim_data.simulationTime[7])
@@ -476,26 +476,66 @@ void sampler(void *pvParameters)
                 curPressureMeasurement[l] = 0;
               }
             }
-            for (int l = 0; l < nrTempSensors; l++)
-            {
-              if (l<2)
-              {
-                curTemperatureMeasurement[l] = sim_data.temperatureSim[l][7];
-              }
-              else
-              {
-                curTemperatureMeasurement[l] = 0;
-              }
-            }
+            // for (int l = 0; l < nrTempSensors; l++)
+            // {
+            //   if (l<2)
+            //   {
+            //     curTemperatureMeasurement[l] = sim_data.temperatureSim[l][7];
+            //   }
+            //   else
+            //   {
+            //     curTemperatureMeasurement[l] = 0;
+            //   }
+            // }
             for (int l = 0; l < nrHumidSensors; l++)
             {
               curHumMeasurement[l] = sim_data.humSim[l][7];
             }
-            for (int l = 0; l < nrAirFSensors; l++)
-            {
-              curAFMeasurement[l] = sim_data.airflowSim[l][7];
-            }
+            // for (int l = 0; l < nrAirFSensors; l++)
+            // {
+            //   curAFMeasurement[l] = sim_data.airflowSim[l][7];
+            // }
           }
+          curPressureMeasurement[3] = pressSensorStatic.getPress();
+          curAFMeasurement[0] = afSensor.getAF();
+
+          /*Read temperature from sensors*/
+        Serial.println("Temp reading");
+        float tempCon = 0;
+        for(uint8_t i=0;i<(nrTempSensors-1);i++)
+        {
+          //Serial.print("Sensor adress: "); Serial.println(TEMP_ADDR+i);
+          //tempCon = 0;
+          Wire.beginTransmission(TEMP_ADDR+i);
+            Wire.write((int)(0xAA));        // @AA : Temperature
+          i2c_transmission = Wire.endTransmission();
+          if (i2c_transmission==0) {
+            Wire.requestFrom(TEMP_ADDR+i,2);        // READ 2 bytes
+            Wire.available();                 // 1st byte
+              char msb = Wire.read();      // receive a byte
+            Wire.available();                 // 2nd byte
+              char lsb = Wire.read()>>4;      // receive a byte
+
+            // T° processing, works for 12-bits resolution
+          
+            float tempCon =0;
+
+            if (msb >= 0x80) { //if sign bit is set, msben temp is negative
+              tempCon =  (float)msb - 256 - (float)lsb/16;
+            }
+            else 
+            {  
+              tempCon = (float)msb+(float)lsb/16;  
+            }
+            // Serial.print("Sensor number:"); Serial.print(TEMP_ADDR+i); Serial.print("    Temp con: "); Serial.print(tempCon); Serial.println(" C ");
+            curTemperatureMeasurement[i] = tempCon;
+          }
+          else {
+            curTemperatureMeasurement[i] = -1000;
+            // Serial.print("Error at: "); Serial.println(i);
+
+           }
+        }
         
       }
 
@@ -580,13 +620,19 @@ void initSensor()
    simulationOrNot = checkSimulationOrNot(); 
    if (simulationOrNot)
    {
-        sim_data = getSimulationData();
-        Serial.println("Succes getting simulation data");
+      sim_data = getSimulationData();
+      Serial.println("Succes getting simulation data");
    }
-   resetPressureSensor();
-   initHumSensor();
-   initTempSensors();
-   initPressureSensor();
-   initSampler();
+   else
+   {
+      resetPressureSensor();  
+   }
+  initHumSensor(); 
+  initTempSensors();
+  if (!simulationOrNot)
+  {
+    initPressureSensor(); 
+  }
+  initSampler();
 }
 #endif

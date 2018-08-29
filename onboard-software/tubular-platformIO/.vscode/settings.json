@@ -54,6 +54,7 @@
         "utility": "cpp",
         "valarray": "cpp",
         "vector": "cpp",
-        "cstdint": "cpp"
+        "cstdint": "cpp",
+        "*.tcc": "cpp"
     }
 }
