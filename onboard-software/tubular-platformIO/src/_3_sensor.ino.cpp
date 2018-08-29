@@ -408,6 +408,7 @@ void sampler(void *pvParameters)
 
            }
         }
+        curTemperatureMeasurement[8] = pressSensor4.getTemp();
         Serial.println("Leaving temp reading");
         //Serial.println("leaving Temp reading");
       
@@ -536,6 +537,7 @@ void sampler(void *pvParameters)
 
            }
         }
+        curTemperatureMeasurement[8] = pressSensor4.getTemp();
         
       }
 
