@@ -13,6 +13,7 @@
 #include "_7_telecommand.h"
 #include "_8_monitor.h"
 #include "ethernet.h"
+#include <utility/w5500.h>
 
 SemaphoreHandle_t sem;
 SemaphoreHandle_t semPeriodic;
@@ -47,7 +48,7 @@ void initRTC()
 void initAll()
 {
     pinMode(13, OUTPUT);
-    
+
     ethernet.initEthernet();
     initSemaphore();
     initRTC();
