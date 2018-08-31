@@ -214,6 +214,12 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
   //File dataLog = SD.open("datalog.txt", FILE_WRITE);
   if (dataLog)
   {
+     if(dataLog.size()<10)
+     {
+       String headers = "TIME, TEMPERATURE, PRESSURE, AIRFLOW, HUMIDITY,";
+       dataLog.print(headers);
+
+     }
      // Serial.println("I'm at dataLog");
     dataString += String(rtc.getHours());
     dataString += ":";
@@ -278,12 +284,6 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     dataLog.print(dataString);
 
     dataLog.println();
-
-    if(eof == false)
-    {
-      String headers = "TIME, TEMPERATURE, PRESSURE, AIRFLOW, HUMIDITY,";
-      dataLog.print(headers);
-    }
     dataLog.close();
 
     // Serial.println("Exiting dataLog");
