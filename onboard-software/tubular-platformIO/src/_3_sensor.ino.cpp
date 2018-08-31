@@ -260,7 +260,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
       dataString += ",";
       if (i == (nrAirFSensors - 1))
       {
-        dataString += ";";
+        dataString += " ";
       }
     }
     dataLog.print(dataString);
@@ -272,7 +272,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
       dataString += ",";
       if (i == (nrHumidSensors - 1))
       {
-        dataString += "  ";
+        dataString += ";";
       }
     }
     dataLog.print(dataString);
