@@ -135,7 +135,7 @@ void heaterControl(bool htrOne, bool htrTwo)
     heaterOn = getCurrentTime(); 
     
   }
-  if (getCurrentTime() > (heaterOn+1))
+  if (getCurrentTime() > (heaterOn+2))
   {
     time_flag = true; 
   }
@@ -149,7 +149,7 @@ void heaterControl(bool htrOne, bool htrTwo)
     digitalWrite(htr2_pin,htrTwo);
     time_flag = false; 
   }
-  else
+  else if((htrOne & htrTwo) == 0)
   {
     digitalWrite(htr2_pin,htrTwo);
      

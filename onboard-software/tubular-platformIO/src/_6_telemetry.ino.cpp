@@ -33,8 +33,8 @@ void transmit() {
   std::vector<float>  airFData = readData(3);
   // Serial.println("Finished gathering data");
   // EthernetClient client = ethernet.checkClientAvailibility();
-  if(w5500.getPHYCFGR() == 191)
-  {
+  // if(w5500.getPHYCFGR() == 191)
+  // {
   Serial.println("Transmitting");
   Udp.beginPacket(remote, localPort);
   Udp.write("gs,");
@@ -105,7 +105,7 @@ void transmit() {
   Udp.write(getMode());
   // Serial.println("Wrote mode");
   Udp.endPacket();
-  }
+  // }
   // else{
 
   // }

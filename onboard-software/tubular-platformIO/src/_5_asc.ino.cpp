@@ -310,7 +310,7 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
       press_diff_in_bag = float abs(press_diff_in_bag);
       current_volume = current_volume + (current_flowrate[0] * (getCurrentTime() - valveBagStartTime));
 
-      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter-1]) || current_volume > volume_limit || press_diff_in_bag > pressure_limit)
+      if (getCurrentTime() > (valveBagStartTime+bagFillingTime[bagcounter-1]) || current_volume >= volume_limit || press_diff_in_bag > pressure_limit)
       {
         valvesControl(bagcounter, closeState);
         pumpControl(closeState);

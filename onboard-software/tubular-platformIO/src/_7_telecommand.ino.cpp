@@ -50,13 +50,49 @@ void executeHTR(std::vector<std::vector<byte>> &heatersC)
 
 void openCloseValveManual(byte pumpvalve[])
 {
+  bool doubleValveControl = false;
+  int count = 0;
+
+  if (pumpvalve[0] == 1)
+  {
+    heaterControl(0, 0);
+  }
   pumpControl(pumpvalve[0]);
   for (int i = 1; i < 7; i++)
   {
     valvesControl(i, pumpvalve[i]);
+    if(pumpvalve[i] == 1)
+    {
+      count++;
+      if (count == 2)
+      {
+        doubleValveControl = true;
+        break;
+      }
+    }
   }
-  valvesControl(11, pumpvalve[7]);
-  digitalWrite(CACvalve, pumpvalve[8]);
+  if(doubleValveControl)
+  {
+
+  }
+  else
+  {
+    valvesControl(11, pumpvalve[7]);
+    if(pumpvalve[7] == 1)
+    {
+      count++;
+      if (count == 2)
+      {
+        doubleValveControl = true;
+      }
+    }
+    else
+    {
+      digitalWrite(CACvalve, pumpvalve[8]);
+    }
+    
+  }
+  
   
 }
 
