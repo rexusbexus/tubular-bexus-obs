@@ -88,7 +88,7 @@ void initAscParameters()
   }
   else
   {
-    float backupAscParam[] = {80,70,51.8,41.8,76.2,86.2,98,108,136,146,188.3,198.3};
+    float backupAscParam[] = {85,65,56.8,36.8,71.2,91.2,95,111,131,151,183.3,203.3};
     setASCParameter(backupAscParam);
     Serial.println("Failed to open asc.txt");
   }

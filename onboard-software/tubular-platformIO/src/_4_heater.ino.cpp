@@ -11,13 +11,16 @@
 #include <vector>
 #include "heaterLogic.h"
 #include "_8_monitor.h"
-
+#include "_5_asc.h"
 #include "_4_heater.h"
 
 extern std::vector<float> htrParam;
 extern std::vector<float> tempAtHtr;
 float htrParameter[4];
 extern SemaphoreHandle_t sem;
+int heaterOn;
+bool time_flag = false;
+
 //std::vector<char> htr_flag[2];
 
 std::vector<float> processInitialHtrParameters(char htrParameters[])
@@ -126,15 +129,32 @@ void setHeaterParameter(float newParameter[])
  * 
  */
 void heaterControl(bool htrOne, bool htrTwo)
-{
+{  
+  if (digitalRead(htr1_pin) == 0 && htrOne == 1)
+  {
+    heaterOn = getCurrentTime(); 
+    
+  }
+  if (getCurrentTime() > (heaterOn+1))
+  {
+    time_flag = true; 
+  }
+  
   xSemaphoreTake(sem, portMAX_DELAY);
   digitalWrite(htr1_pin,htrOne);
+  
 
-  if (htrOne && htrTwo) {
+  if (htrOne && htrTwo && time_flag) {
     //vTaskDelayUntil(&xLastWakeTime, (1000 / portTICK_PERIOD_MS) ); 
+    digitalWrite(htr2_pin,htrTwo);
+    time_flag = false; 
   }
-  digitalWrite(htr2_pin,htrTwo);
-  xSemaphoreGive(sem);    
+  else
+  {
+    digitalWrite(htr2_pin,htrTwo);
+     
+  } 
+  xSemaphoreGive(sem);  
 }
 
 

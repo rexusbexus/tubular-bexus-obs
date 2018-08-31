@@ -98,11 +98,12 @@ uint32_t MS5607::readADC(int pinSelect) {
     SPI.beginTransaction(SPISettings(10000, MSBFIRST, SPI_MODE0));
     digitalWrite(pinSelect, LOW);
 
-    ADCvalue = SPI.transfer(0x00);
+    SPI.transfer(0x00);
     ADCvalue_MSB = SPI.transfer16(0xFFFF);
     ADCvalue = SPI.transfer(0xFF);
-    ADCvalue_MSB >> 8;
-    ADCvalue = ADCvalue_MSB + ADCvalue;
+    ADCvalue_MSB = ADCvalue_MSB << 8;
+    ADCvalue = (ADCvalue_MSB) + (ADCvalue);
+    // ADCvalue = (SPI.transfer16(0xFF) >> 8) | (SPI.transfer(0xFF));
 
     digitalWrite(pinSelect, HIGH);
     SPI.endTransaction();
@@ -113,40 +114,43 @@ uint32_t MS5607::readADC(int pinSelect) {
 
 void MS5607::ADC_calc(uint32_t ADCpress, uint32_t ADCtemp) {
 
-    int32_t deltaT  = ADCtemp - PROMbyte[5] * 256;
-    TEMP    = 2000 + deltaT * PROMbyte[6] / 8388608;
+    int64_t deltaT  = ADCtemp - ((uint32_t)PROMbyte[5] * 256);
+    TEMP    = 2000 + ((deltaT * PROMbyte[6]) >> 23);
 
-    long int OFFSET  = (PROMbyte[2] * 131072) + (PROMbyte[4] * deltaT) / (64);
+    int64_t OFFSET  = ((int64_t)PROMbyte[2] << 17) + (((int64_t)PROMbyte[4] * deltaT) >> 6);
     if (OFFSET > 25769410560) { //min and max have to be defined per datasheet.
       //OFFSET = 25769410560;
     } else if (OFFSET < -17179344900) {
       //OFFSET = -17179344900;
     }
 
-    long int SENS    = (PROMbyte[1] * 65536) + (PROMbyte[3] * deltaT) / (128);
+    int64_t SENS    = ((int64_t)PROMbyte[1] << 16) + (((int64_t)PROMbyte[3] * deltaT) >> 7);
     if (SENS > 12884705280) { //min and max have to be defined per datasheet.
       // SENS = 12884705280;
     } else if (OFFSET < -8589672450) {
       // SENS = -8589672450;
     }
 
-    pres   = ((ADCpress * SENS / 2097152) - OFFSET) / (32768);
+    // pres   = ((ADCpress * SENS / 2097152) - OFFSET) / (32768);
 	
-	/*double T2=0., OFF2=0., SENS2=0.;
+	int32_t T2 = 0; 
+    int64_t OFF2 = 0; 
+    int64_t SENS2 = 0;
 	if(TEMP<2000) {
-	  T2=deltaT*deltaT/pow(2,31);
-	  OFF2=61*(TEMP-2000)*(TEMP-2000)/pow(2,4);
-	  SENS2=2*(TEMP-2000)*(TEMP-2000);
+	  T2 = ((deltaT * deltaT) >> 31);
+	  OFF2 = 61 * (TEMP - 2000) * (TEMP - 2000) >> 4;
+	  SENS2 = 2 * (TEMP - 2000) * (TEMP - 2000);
 	  if(TEMP<-1500) {
-	    OFF2+=15*(TEMP+1500)*(TEMP+1500);
-	    SENS2+=8*(TEMP+1500)*(TEMP+1500);
+	    OFF2 += 15 * (TEMP + 1500) * (TEMP + 1500);
+	    SENS2 += 8 * (TEMP + 1500) * (TEMP + 1500);
 	  }
+      TEMP -= T2;
+      OFFSET -= OFF2;
+	  SENS -= SENS2;
 	}
 	
-	TEMP-=T2;
-	OFFSET-=OFF2;
-	SENS-=SENS2;
-	pres=(((ADCpress*SENS)/pow(2,21)-OFFSET)/pow(2,15));*/
+	
+	pres = (((ADCpress * SENS) >> 21 ) - OFFSET) >> 15;
 	
   }
   

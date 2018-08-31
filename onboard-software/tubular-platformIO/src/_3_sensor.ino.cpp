@@ -70,7 +70,7 @@ void initPressureSensor()
   pressSensor4.PROMread(pressSensorPin4);
   }
   else{
-  pressSensor4.PROMread(pressSensorPin4);
+  pressSensor4.PROMread(pressSensorPin7);
   }
 }
 
@@ -80,10 +80,10 @@ void resetPressureSensor()
    pressSensor1.reset_sequence(pressSensorPin1);
    pressSensor2.reset_sequence(pressSensorPin2);
    pressSensor3.reset_sequence(pressSensorPin3);
-   pressSensor4.reset_sequence(pressSensorPin4);
+   pressSensor4.reset_sequence(pressSensorPin7);
    }
    else{
-     pressSensor4.reset_sequence(pressSensorPin4);
+     pressSensor4.reset_sequence(pressSensorPin7);
    }
 
 }
@@ -95,7 +95,7 @@ void pressSensorread()
         pressSensor1.convertionD1(4, pressSensorPin1);
         pressSensor2.convertionD1(4, pressSensorPin2);
         pressSensor3.convertionD1(4, pressSensorPin3);
-        pressSensor4.convertionD1(4, pressSensorPin4);
+        pressSensor4.convertionD1(4, pressSensorPin7);
 
         delay(15);
 
@@ -103,13 +103,13 @@ void pressSensorread()
         pressSensor1.ADCpress = pressSensor1.readADC(pressSensorPin1);
         pressSensor2.ADCpress = pressSensor2.readADC(pressSensorPin2);
         pressSensor3.ADCpress = pressSensor3.readADC(pressSensorPin3);
-        pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin4);
+        pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin7);
 
         //Start Convertion (of temperature) for all pressure sensor(s).
         pressSensor1.convertionD2(4, pressSensorPin1);
         pressSensor2.convertionD2(4, pressSensorPin2);
         pressSensor3.convertionD2(4, pressSensorPin3);
-        pressSensor4.convertionD2(4, pressSensorPin4);
+        pressSensor4.convertionD2(4, pressSensorPin7);
 
         delay(15);
 
@@ -117,7 +117,7 @@ void pressSensorread()
         pressSensor1.ADCtemp = pressSensor1.readADC(pressSensorPin1);
         pressSensor2.ADCtemp = pressSensor2.readADC(pressSensorPin2);
         pressSensor3.ADCtemp = pressSensor3.readADC(pressSensorPin3);
-        pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin4);
+        pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin7);
 
         //Calculating the correct temperature and pressure.
         pressSensor1.ADC_calc(pressSensor1.ADCpress, pressSensor1.ADCtemp);
@@ -126,13 +126,13 @@ void pressSensorread()
         pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);
   }
   else{
-    pressSensor4.convertionD1(4, pressSensorPin4);
+    pressSensor4.convertionD1(4, pressSensorPin7);
     delay(15);
-    pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin4);
+    pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin7);
     delay(10);
-    pressSensor4.convertionD2(4, pressSensorPin4);
+    pressSensor4.convertionD2(4, pressSensorPin7);
     delay(15);
-    pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin4);
+    pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin7);
     pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);
   }
 }
@@ -174,7 +174,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     while(!eof)
      {
         count++;
-      Serial.print("Count: ");  Serial.println(count);
+      // Serial.print("Count: ");  Serial.println(count);
       nextFile=root.openNextFile();
      
        if(!nextFile)
@@ -195,8 +195,8 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
    char fileName[file.length()+1];
    file.toCharArray(fileName, sizeof(fileName));
    dataLog = SD.open(fileName, FILE_WRITE);
-   Serial.print("Current file size: "); Serial.println(dataLog.size());
-   if(dataLog.size()>(50*1024)) {
+  //  Serial.print("Current file size: "); Serial.println(dataLog.size());
+   if(dataLog.size()>(200*1024)) {
      count = 0;
      eof = false;
      Serial.println("EOF. Set to false.");
@@ -205,7 +205,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
    if(!dataLog) {
      Serial.print("Failed to open: "); Serial.println(fileName);
    }
-   Serial.print("file.length(): "); Serial.println(file.length());
+  //  Serial.print("file.length(): "); Serial.println(file.length());
    
 
 
@@ -220,7 +220,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     dataString += String(rtc.getMinutes());
     dataString += ":";
     dataString += String(rtc.getSeconds());
-    dataString += "||";
+    dataString += ",";
 
     dataLog.print(dataString);
     //Serial.println(dataString);
@@ -234,22 +234,12 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
       dataString += ",";
       if (i == (nrTempSensors - 1))
       {
-        dataString += "||";
+        dataString += "  ";
       }
       //Serial.println(temperatureData[i]);
     }
     dataLog.print(dataString);
-    dataString = "";
-    for (int i = 0; i < nrHumidSensors; i++)
-    {
-      dataString += String(humData[i]);
-      dataString += ",";
-      if (i == (nrHumidSensors - 1))
-      {
-        dataString += "||";
-      }
-    }
-    dataLog.print(dataString);
+
     dataString = "";
     for (int i = 0; i < nrPressSensors; i++)
     {
@@ -257,10 +247,11 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
       dataString += ",";
       if (i == (nrPressSensors - 1))
       {
-        dataString += "||";
+        dataString += "  ";
       }
     }
     dataLog.print(dataString);
+    
     dataString = "";
     for (int i = 0; i < nrAirFSensors; i++)
     {
@@ -269,11 +260,30 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
       dataString += ",";
       if (i == (nrAirFSensors - 1))
       {
-        dataString += "||";
+        dataString += ";";
       }
     }
     dataLog.print(dataString);
+
+    dataString = "";
+    for (int i = 0; i < nrHumidSensors; i++)
+    {
+      dataString += String(humData[i]);
+      dataString += ",";
+      if (i == (nrHumidSensors - 1))
+      {
+        dataString += "  ";
+      }
+    }
+    dataLog.print(dataString);
+
     dataLog.println();
+
+    if(eof == false)
+    {
+      String headers = "TIME, TEMPERATURE, PRESSURE, AIRFLOW, HUMIDITY,";
+      dataLog.print(headers);
+    }
     dataLog.close();
 
     // Serial.println("Exiting dataLog");
@@ -284,7 +294,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
   else
   {
     Serial.println("Failed to open root");
-    Serial.print("sdPin: ");Serial.println(digitalRead(sdPin));
+    // Serial.print("sdPin: ");Serial.println(digitalRead(sdPin));
     SD.end();
 
     
@@ -522,6 +532,8 @@ void sampler(void *pvParameters)
           }
           pressSensorread();
           curPressureMeasurement[3] = pressSensorStatic.getPress();
+          curPressureMeasurement[4] = pressSensor4.getPres()/float(100);
+          Serial.print("Pressure : "); Serial.println(curPressureMeasurement[4]);
           curAFMeasurement[0] = afSensor.getAF();
 
           /*Read temperature from sensors*/
