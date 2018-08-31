@@ -255,6 +255,8 @@ stopasync(u);
 fclose(u);
 delete(u);
 clear u;
+global dataBuffer;
+dataBuffer = [];
 
 set(handles.constat_udp, 'String', 'Connection Closed');
 
