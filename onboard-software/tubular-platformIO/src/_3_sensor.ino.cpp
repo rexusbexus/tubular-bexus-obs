@@ -362,7 +362,8 @@ void sampler(void *pvParameters)
    float curTemperatureMeasurement[nrTempSensors] = {0};
    float curHumMeasurement[nrHumidSensors] = {0};
    float curAFMeasurement[nrAirFSensors] = {0};
-   float meanPressureAmbient;
+   //float medianPressureAmbient;
+   float medianPressureAmbient;
    int currSamplingRate;
 
    static BaseType_t xHigherPriorityTaskWoken;
@@ -521,10 +522,42 @@ void sampler(void *pvParameters)
         /*Save all data to SD*/
         savingDataToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement, curAFMeasurement);
         //Serial.println("Left SavingData");
-      meanPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
+      
+      int orderMedian[3]={0};
+      if (curPressureMeasurement[0]>=curPressureMeasurement[1])
+      {
+        orderMedian[0]=+1;
+      } else
+      {
+        orderMedian[1]=+1;
+      }
+
+      if (curPressureMeasurement[0]>=curPressureMeasurement[2])
+      {
+        orderMedian[0]=+1;
+      } else
+      {
+        orderMedian[2]=+1;
+      }
+
+      if (curPressureMeasurement[1]>=curPressureMeasurement[2])
+      {
+        orderMedian[1]=+1;
+      } else
+      {
+        orderMedian[2]=+1;
+      }
+
+      for (int medianFind = 0; medianFind==2; medianFind++){
+        if (orderMedian[medianFind]==1) {
+          medianPressureAmbient = curPressureMeasurement[medianFind];
+        }
+      }
+
+      //medianPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       // Serial.println("Left pressure mean");
       /*Calculating Pressure Difference*/
-      pressDifference = calculatingPressureDifference(meanPressureAmbient);
+      pressDifference = calculatingPressureDifference(medianPressureAmbient);
       // Serial.println("Left press diff");
       // Serial.println(pressDifference);
 
@@ -537,7 +570,7 @@ void sampler(void *pvParameters)
       {
           setMode(normalDescent);
       }
-      else if (currMode==normalDescent && meanPressureAmbient>=safeModeThreshold)
+      else if (currMode==normalDescent && medianPressureAmbient>=safeModeThreshold)
       {
         setMode(safeMode);
       }
