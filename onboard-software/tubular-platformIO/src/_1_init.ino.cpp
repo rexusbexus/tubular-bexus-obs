@@ -56,9 +56,6 @@ void initAll()
     initASC();
     initHeater();
     initSensor();
-    
-    
-    
     initTelecommand();
     initMonitor();
     

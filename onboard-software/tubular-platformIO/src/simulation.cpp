@@ -3,9 +3,39 @@
 #include <vector>
 #include "sensorManager.h"
 
+// File timeSim;
+// pressureSimulation Sim_struct;
+
+std::vector<int> getSeconds(char all_data[])
+{
+  // char buf[8];
+  std::vector<int> seconds(8);
+  int i = 0;  int b = 0;
+  while(b<8)
+  {
+    int k = 0;
+    char buf[8] = {0};
+    while(1)
+    {
+      if (all_data[i] == ',')
+      {
+        i++;
+        break;
+      }
+      buf[k] = all_data[i];
+      
+      i++; k++;
+    }
+    seconds[b] = atoi(buf);
+    
+    b++;
+  }
+  return seconds;
+}
+
 bool checkSimulationOrNot()
 {
-  File sim = SD.open("sim.txt");
+  File sim = SD.open("sim.txt", FILE_READ);
   if (sim)
   {
     sim.close();
@@ -123,12 +153,12 @@ std::vector<std::vector<int>> getAirflow(char all_data[])
   return Airflow;
 }
 
-std::vector<std::vector<int>> getPressure(char all_data[])
+std::vector<std::vector<float>> getPressure(char all_data[])
 {
   
-  std::vector<std::vector<int>> pressure(2, std::vector<int> (8,0));
+  std::vector<std::vector<float>> pressure(3, std::vector<float> (8,0));
   int i = 0;  int c = 0; int b = 0;
-  while(b<2)
+  while(b<3)
   {
     while(1)
     {
@@ -141,6 +171,11 @@ std::vector<std::vector<int>> getPressure(char all_data[])
         }
         while(1)
         {
+            if (all_data[i] == '|')
+            {
+              // i++; 
+              break;
+            }
             if (all_data[i] == ',')
             {
                 i++; 
@@ -150,8 +185,8 @@ std::vector<std::vector<int>> getPressure(char all_data[])
       
             i++; k++;
         }
-        pressure[b][c] = atoi(buf);
-        Serial.println(pressure[b][c]);
+        pressure[b][c] = atof(buf);
+        // Serial.println(pressure[b][c]);
         c++;
     }
     b++; c = 0;
@@ -159,32 +194,7 @@ std::vector<std::vector<int>> getPressure(char all_data[])
   return pressure;
 }
 
-std::vector<int> getSeconds(char all_data[])
-{
-  // char buf[8];
-  std::vector<int> seconds(8);
-  int i = 0;  int b = 0;
-  while(b<8)
-  {
-    int k = 0;
-    char buf[8] = {0};
-    while(1)
-    {
-      if (all_data[i] == ',')
-      {
-        i++;
-        break;
-      }
-      buf[k] = all_data[i];
-      
-      i++; k++;
-    }
-    seconds[b] = atoi(buf);
-    
-    b++;
-  }
-  return seconds;
-}
+
 
 // pressureSimulation getSimulationData ()
 // {
@@ -317,18 +327,18 @@ std::vector<int> getSeconds(char all_data[])
 pressureSimulation getSimulationData ()
 {
   pressureSimulation Sim_struct;
-  float pressureSimData [] = {1000,75,46.8,81.2,103,141,193.3,1000};
+  // float pressureSimData [] = {1000,75,46.8,81.2,103,141,193.3,1000};
   float temperatureSimData [] = {20,15,10,5,-5,-10,5,20};
   float humSimData [] = {0,0,0,0,0,0,0,0};
   float airflowSimData [] = {400,1000,300,500,692,582,932,412};
-  int timeSimData [] = {0,5400,6900,14520,14700,15000,15300,17700};
-  for (int k = 0; k < 2; k++)
-  {
-    for (int g = 0; g < 8; g++)
-    {
-      Sim_struct.pressureSim[k][g] = pressureSimData[g];
-    }
-  }
+  // int timeSimData [] = {0,5400,6900,14520,14700,15000,15300,17700};
+  // for (int k = 0; k < 2; k++)
+  // {
+  //   for (int g = 0; g < 8; g++)
+  //   {
+  //     Sim_struct.pressureSim[k][g] = pressureSimData[g];
+  //   }
+  // }
 
   for (int k = 0; k < 2; k++)
   {
@@ -355,10 +365,81 @@ pressureSimulation getSimulationData ()
   }
 
  
-  for (int g = 0; g < 8; g++)
-  {
-    Sim_struct.simulationTime[g] = timeSimData[g];
-  }
+  // for (int g = 0; g < 8; g++)
+  // {
+  //   Sim_struct.simulationTime[g] = timeSimData[g];
+  // }
+  File simP = SD.open("siP.txt", FILE_READ);
   
+  if (simP)
+  {
+    // Serial.println("siP");
+    char press_data[simP.size()];
+    int i = 0;
+    
+    while (simP.available())
+    {
+      press_data[i] = simP.read();
+      i++;
+    }
+    // Serial.println(String(press_data));
+    // delay(10000);
+    std::vector<std::vector<float>> pressure = getPressure(press_data);
+    for (int g = 0; g < 3; g++)
+    {
+      for (int c = 0; c < 8; c++)
+      {
+          Sim_struct.pressureSim[g][c] = pressure[g][c];
+      }
+    }
+    simP.close();
+  }
+  else
+  {
+    Serial.println("Failed to open siP.txt");
+    float pressureSimData [] = {1000,75,46.8,81.2,103,141,193.3,1000};
+    for (int k = 0; k < 3; k++)
+    {
+      for (int g = 0; g < 8; g++)
+      {
+        Sim_struct.pressureSim[k][g] = pressureSimData[g];
+      }
+    }
+  }
+
+  File timeSim = SD.open("tim.txt", FILE_READ);
+  // Serial.println(timeSim);
+  if(timeSim)
+  {
+    char time_data[timeSim.size()];
+    int i = 0;
+    
+    // Serial.println("Start reading siTi.txt");
+
+    while (timeSim.available())
+    {
+      time_data[i] = timeSim.read();
+      i++;
+    }
+    // Serial.println("Finished reading siTi.txt");
+
+    std::vector<int> seconds = getSeconds(time_data);
+    for (int g = 0; g < 8; g++)
+    {
+      Sim_struct.simulationTime[g] = seconds[g];
+    }
+    timeSim.close();
+  }
+  else
+  {
+    Serial.println("Failed to open tim.txt");
+    int timeSimData [] = {0,5400,6900,14520,14700,15000,15300,17700};
+    for (int g = 0; g < 8; g++)
+    {
+      Sim_struct.simulationTime[g] = timeSimData[g];
+    }
+    // timeSim.close();
+  }
+
   return Sim_struct;
 }
