@@ -262,8 +262,8 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     dataString = "";
     for (int i = 0; i < nrAirFSensors; i++)
     {
-      //dataString += String(afData[i]);
-      dataString += analogRead(A0)*3.3/1024;
+      dataString += String(afData[i]);
+      //dataString += analogRead(A0)*3.3/1024;
       dataString += ",";
       if (i == (nrAirFSensors - 1))
       {
@@ -428,7 +428,7 @@ void sampler(void *pvParameters)
             /*Read pressure from sensors*/
             for (int l = 0; l < nrPressSensors; l++)
             {
-              if (l<2)
+              if (l<3)
               {
                 curPressureMeasurement[l] = sim_data.pressureSim[l][seq];
               }
@@ -463,7 +463,7 @@ void sampler(void *pvParameters)
             /*Read pressure from sensors*/
             for (int l = 0; l < nrPressSensors; l++)
             {
-              if (l<2)
+              if (l<3)
               {
                 curPressureMeasurement[l] = sim_data.pressureSim[l][7];
               }
@@ -548,14 +548,15 @@ void sampler(void *pvParameters)
         orderMedian[2]=+1;
       }
 
-      for (int medianFind = 0; medianFind==2; medianFind++){
+      for (int medianFind = 0; medianFind<=2; medianFind++){
         if (orderMedian[medianFind]==1) {
           medianPressureAmbient = curPressureMeasurement[medianFind];
+          break;
         }
       }
 
       //medianPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
-      // Serial.println("Left pressure mean");
+      Serial.print("Pressure median Value: "); Serial.println(medianPressureAmbient);
       /*Calculating Pressure Difference*/
       pressDifference = calculatingPressureDifference(medianPressureAmbient);
       // Serial.println("Left press diff");
