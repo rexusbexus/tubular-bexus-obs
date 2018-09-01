@@ -492,7 +492,7 @@ void sampler(void *pvParameters)
             // }
           }
           pressSensorread();
-          curPressureMeasurement[3] = pressSensorStatic.getPress();
+          curPressureMeasurement[3] = 0;//pressSensorStatic.getPress();
           curPressureMeasurement[4] = pressSensor4.getPres()/float(100);
           Serial.print("Pressure : "); Serial.println(curPressureMeasurement[4]);
           curAFMeasurement[0] = afSensor.getAF();
@@ -502,41 +502,6 @@ void sampler(void *pvParameters)
         for(uint8_t i=0;i<(nrTempSensors-1);i++) {
             curTemperatureMeasurement[i] = DS1631.getTemperature(TEMP_ADDR+i);
         }
-        /*float tempCon = 0;
-        for(uint8_t i=0;i<(nrTempSensors-1);i++)
-        {
-          //Serial.print("Sensor adress: "); Serial.println(TEMP_ADDR+i);
-          //tempCon = 0;
-          Wire.beginTransmission(TEMP_ADDR+i);
-            Wire.write((int)(0xAA));        // @AA : Temperature
-          i2c_transmission = Wire.endTransmission();
-          if (i2c_transmission==0) {
-            Wire.requestFrom(TEMP_ADDR+i,2);        // READ 2 bytes
-            Wire.available();                 // 1st byte
-              char msb = Wire.read();      // receive a byte
-            Wire.available();                 // 2nd byte
-              char lsb = Wire.read()>>4;      // receive a byte
-
-            // T° processing, works for 12-bits resolution
-          
-            float tempCon =0;
-
-            if (msb >= 0x80) { //if sign bit is set, msben temp is negative
-              tempCon =  (float)msb - 256 - (float)lsb/16;
-            }
-            else 
-            {  
-              tempCon = (float)msb+(float)lsb/16;  
-            }
-            // Serial.print("Sensor number:"); Serial.print(TEMP_ADDR+i); Serial.print("    Temp con: "); Serial.print(tempCon); Serial.println(" C ");
-            curTemperatureMeasurement[i] = tempCon;
-          }
-          else {
-            curTemperatureMeasurement[i] = -1000;
-            // Serial.print("Error at: "); Serial.println(i);
-
-           }
-        }*/
         curTemperatureMeasurement[8] = pressSensor4.getTemp()/float(100);
         
       }
@@ -564,11 +529,11 @@ void sampler(void *pvParameters)
       // Serial.println(pressDifference);
 
       /*Change mode if the condition is satisfied*/
-      if (pressDifference<pressDifferentThresholdneg && getMode() != manual)
+      if (pressDifference<pressDifferentThresholdneg && getMode() != manual && getMode() != safeMode && getMode() != normalDescent)
       {
         setMode(normalAscent);
       }
-      else if (pressDifference>pressDifferentThresholdpos && getMode() != manual)
+      else if (pressDifference>pressDifferentThresholdpos && getMode() != manual && getMode() != safeMode)
       {
           setMode(normalDescent);
       }

@@ -4,6 +4,7 @@ float tempReading [nrTempSensors];
 float humReading [nrHumidSensors];
 float pressReading [nrPressSensors];
 float afReading[nrAirFSensors];
+float pressDifference = 0;
 
 static float tempPressure[2] = {0};
 
@@ -107,16 +108,19 @@ std::vector<float> readDataFromSensorBuffers(int type)
 
 float calculatingPressureDifference(float meanPressureAmbient)
 {
-    float pressDifference;
     tempPressure[1] = meanPressureAmbient;
     
-    if (tempPressure[0] == 0)
+    if (tempPressure[0] == 0 )
     {
         tempPressure[0] = meanPressureAmbient;
         return 0;
     } 
-    pressDifference = tempPressure[1] - tempPressure[0];
+    pressDifference = pressDifference + tempPressure[1] - tempPressure[0];
     tempPressure[0] = meanPressureAmbient;
+    if (tempPressure[0]< -35 || tempPressure[0] > 35)
+    {
+        pressDifference = 0;
+    }
 
     return pressDifference;
 }
