@@ -591,7 +591,7 @@ void sampler(void *pvParameters)
       if((tcReceived + connectionTimeout) < getCurrentTime() && getMode() == manual)
       {
         //  client.stop();
-         setMode(standbyMode);
+         //setMode(standbyMode); //Complicates testing
       }
 
       //Serial.println("Listen for GS");
