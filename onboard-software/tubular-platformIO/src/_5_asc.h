@@ -12,12 +12,12 @@
  * Pin 20, 21 reserved for SDA and SCL for I2C connection with temperature sensors and humidity sensor
  */
 #define pumpPin 22
-#define valve1 23
-#define valve2 24
-#define valve3 25
-#define valve4 26
-#define valve5 27
-#define valve6 28
+#define valve1 28
+#define valve2 25
+#define valve3 23
+#define valve4 27
+#define valve5 24
+#define valve6 26
 #define valve7 29
 #define valve8 30
 #define valve9 31
