@@ -73,6 +73,8 @@ void openCloseValveManual(byte pumpvalve[])
   }
   if(doubleValveControl)
   {
+    valvesControl(11, LOW);
+    digitalWrite(CACvalve, LOW);
 
   }
   else
@@ -86,7 +88,7 @@ void openCloseValveManual(byte pumpvalve[])
         doubleValveControl = true;
       }
     }
-    else
+    if (!doubleValveControl)
     {
       digitalWrite(CACvalve, pumpvalve[8]);
     }
