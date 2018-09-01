@@ -108,6 +108,10 @@ std::vector<float> readDataFromSensorBuffers(int type)
 
 float calculatingPressureDifference(float meanPressureAmbient)
 {
+    if (tempPressure[0]< -35 || tempPressure[0] > 35)
+    {
+        pressDifference = 0;
+    }
     tempPressure[1] = meanPressureAmbient;
     
     if (tempPressure[0] == 0 )
@@ -117,10 +121,7 @@ float calculatingPressureDifference(float meanPressureAmbient)
     } 
     pressDifference = pressDifference + tempPressure[1] - tempPressure[0];
     tempPressure[0] = meanPressureAmbient;
-    if (tempPressure[0]< -35 || tempPressure[0] > 35)
-    {
-        pressDifference = 0;
-    }
+    
 
     return pressDifference;
 }
