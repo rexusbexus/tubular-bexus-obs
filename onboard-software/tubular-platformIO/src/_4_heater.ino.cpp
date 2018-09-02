@@ -78,7 +78,7 @@ void initHtrParameters()
   }
   else
   {
-    float backupHtrParam[] = {15,20,-5,0};
+    float backupHtrParam[] = {15,25,0,10};
     setHeaterParameter(backupHtrParam);
     Serial.println("Failed to open htr.txt");
   }
@@ -100,7 +100,7 @@ void readHeaterParameter()
   int i=0;
   xSemaphoreTake(sem, portMAX_DELAY);
   //htrParam = htrParameter;
-  for ( i = 0; i < 3; i++) {
+  for ( i = 0; i <= 3; i++) {
       htrParam[i] = htrParameter[i];
    }
   xSemaphoreGive(sem);    
@@ -130,6 +130,16 @@ void setHeaterParameter(float newParameter[])
  */
 void heaterControl(bool htrOne, bool htrTwo)
 {  
+  if (htrOne==true){
+    Serial.print("heater 1: "); Serial.println(htrOne);
+  }
+  if (htrTwo==true){
+    Serial.print("Heater 2: "); Serial.println(htrTwo);
+  }
+  Serial.print("Lower Parameter for heater1: "); Serial.println(htrParam[0]);
+  Serial.print("Higher Parameter for heater1: "); Serial.println(htrParam[1]);
+  Serial.print("Lower Parameter for heater2: "); Serial.println(htrParam[2]);
+  Serial.print("Higher Parameter for heater2: "); Serial.println(htrParam[3]);
   if (digitalRead(htr1_pin) == 0 && htrOne == 1)
   {
     heaterOn = getCurrentTime(); 
@@ -143,17 +153,22 @@ void heaterControl(bool htrOne, bool htrTwo)
   xSemaphoreTake(sem, portMAX_DELAY);
   digitalWrite(htr1_pin,htrOne);
   
-
+  Serial.print("Time flag: "); Serial.println(time_flag);
+  
   if (htrOne && htrTwo && time_flag) {
+    Serial.print("Evaluation "); Serial.println("1");
     //vTaskDelayUntil(&xLastWakeTime, (1000 / portTICK_PERIOD_MS) ); 
     digitalWrite(htr2_pin,htrTwo);
     time_flag = false; 
+    heaterOn = 0;
   }
-  else if((htrOne & htrTwo) == 0)
+  if((htrOne & htrTwo) == 0)
   {
+    Serial.print("Evaluation "); Serial.println("2");
     digitalWrite(htr2_pin,htrTwo);
-     
-  } 
+
+  }
+
   xSemaphoreGive(sem);  
 }
 
@@ -178,7 +193,8 @@ void readingData(void *pvParameters)
   {
     // Serial.println("I'm at heater periodic");
     //Reads the current mode
-    delay(1000);
+    readHeaterParameter();
+    //delay(1000);
     currMode = getMode();
     // Serial.println(currMode);
     if (currMode == safeMode)

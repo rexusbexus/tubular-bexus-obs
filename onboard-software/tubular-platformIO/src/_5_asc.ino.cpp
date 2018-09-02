@@ -125,6 +125,9 @@ void initValvesControl()
 
 void pumpControl(int cond)
 {
+  if (cond==1) {
+    heaterControl(0,0); //Turn off heaters when pump is on.
+  }
   // Serial.println("Pump control taking sem");
   xSemaphoreTake(sem, portMAX_DELAY);
   // Serial.println("Entering pump control");

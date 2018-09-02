@@ -93,12 +93,24 @@ void transmit() {
 
 
   Udp.write("st,");
-  for (int i = 0; i <= (htr2_pin - pumpPin) ; i++) //Status of valves pump and heaters
-  {
-    dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(pumpPin + i)) << i);
-              
-  }
-  // Serial.println(status);
+
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(pumpPin)) << 0);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(valve1)) << 1);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(valve2)) << 2);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(valve3)) << 3);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(valve4)) << 4);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(valve5)) << 5);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(valve6)) << 6);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(valve7)) << 7);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(valve8)) << 8);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(valve9)) << 9);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(valve10)) << 10);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(flushValve)) << 11);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(CACvalve)) << 12);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(htr1_pin)) << 13);
+      dummyStatus.val = (dummyStatus.val) | (int16_t(digitalRead(htr2_pin)) << 14);
+      
+      // Serial.println(status);
   Udp.write(dummyStatus.bytes[0]); 
   Udp.write(dummyStatus.bytes[1]);
   Udp.write(",md,");
