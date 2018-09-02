@@ -258,12 +258,38 @@ int getCurrentTime()
   return secondsNow;
 }
 
+int getValvePin(int whichBag)
+{
+  switch (whichBag)
+  {
+    case 1:
+    return valve1;
+
+    case 2:
+    return valve2;
+
+    case 3:
+    return valve3;
+
+    case 4:
+    return valve4;
+
+    case 5:
+    return valve5;
+
+    case 6:
+    return valve6;
+
+  }
+  return 0;
+}
+
 int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 {
   digitalWrite(CACvalve, HIGH);
   
   // int secondsNow = getCurrentTime();
-  int valveBag = digitalRead(valve1 + bagcounter - 1);
+  int valveBag = digitalRead(getValvePin(bagcounter));
   int valveFlush = digitalRead(flushValve);
   int pumpState = digitalRead(pumpPin);
 
@@ -345,7 +371,7 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 
 int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 {
-  int valveBag = digitalRead(valve1 + bagcounter - 1);
+  int valveBag = digitalRead(getValvePin(bagcounter));
   int valveFlush = digitalRead(flushValve);
   int pumpState = digitalRead(pumpPin);
 
