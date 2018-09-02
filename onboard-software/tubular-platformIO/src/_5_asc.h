@@ -14,10 +14,10 @@
 #define pumpPin 22
 #define valve1 28
 #define valve2 25
-#define valve3 23
-#define valve4 27
-#define valve5 24
-#define valve6 26
+#define valve3 27
+#define valve4 23
+#define valve5 26
+#define valve6 24
 #define valve7 29
 #define valve8 30
 #define valve9 31
@@ -35,6 +35,7 @@ void initASC();
 void setASCParameter(float newParameter[16]);
 void valvesControl(int valve, int cond);
 void pumpControl(int cond);
+int getValvePin(int whichBag);
 int getCurrentTime();
 
 #endif
