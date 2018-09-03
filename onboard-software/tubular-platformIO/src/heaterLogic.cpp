@@ -29,20 +29,6 @@ heater heaterCompare(){
     Serial.print("Temp1: "); Serial.println(tempAtHtr[0]);
     Serial.print("Temp2: "); Serial.println(tempAtHtr[1]);
     
-
-    if(digitalRead(pumpPin)==1){
-        //As long the pump is is on keep the heaters off.
-        htr_flag_struc.htr1_flag = 0;
-        htr_flag_struc.htr2_flag = 0;
-        return htr_flag_struc;
-    }
-    //if (tempAtHtr[0]<=-80 || tempAtHtr[1]>=100 || tempAtHtr[2]<=-80 || tempAtHtr[3]>=100)
-    //{
-      /*
-       * Check if within correct value of parameters
-       * Also works for errors in tempAtHtr[].
-       */
-    //}    
     if (htrParam[0]>=tempAtHtr[0])
     {
         /*  IF parameter is larger or equal to 
@@ -75,13 +61,12 @@ heater heaterCompare(){
          */
         htr_flag_struc.htr2_flag = 0;
     }
-   /* if ()
-    {
-        // If error occurs turn off heater.
-           
+    if(digitalRead(pumpPin)==1){
+        //As long the pump is is on keep the heaters off.
         htr_flag_struc.htr1_flag = 0;
-        htr_flag_struc.htr2_flag = 0;
-    }*/
+        //htr_flag_struc.htr2_flag = 0;
+        return htr_flag_struc;
+    }
 
 
   Serial.println("Leaving heaterCompare");
