@@ -9,8 +9,14 @@ AWM5102VN::AWM5102VN(const byte pin)
 
 float AWM5102VN::getAF()
 {
-	int sensVal = analogRead(_pin);
+	int sensVal=0;
+	//int avgSensVal;
+	for (int i=0;i<49;i++){
+		sensVal += analogRead(_pin);
+		delay(1);
+	}
+	sensVal = sensVal/49;
 	float AF = 0;
-	AF = (float(sensVal)*3.3/1023 - 1) / (2.3); //Notes: 1 Vdc = 0 SLPM
+	AF = (10*((float(sensVal)*3.3/1023 - 0.33)) / (2.97)); //Notes: 1 Vdc = 0 SLPM
 	return AF;
 }

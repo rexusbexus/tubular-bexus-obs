@@ -156,9 +156,9 @@ std::vector<std::vector<int>> getAirflow(char all_data[])
 std::vector<std::vector<float>> getPressure(char all_data[])
 {
   
-  std::vector<std::vector<float>> pressure(3, std::vector<float> (8,0));
+  std::vector<std::vector<float>> pressure(4, std::vector<float> (8,0));
   int i = 0;  int c = 0; int b = 0;
-  while(b<3)
+  while(b<4)
   {
     while(1)
     {
@@ -386,7 +386,7 @@ pressureSimulation getSimulationData ()
     // Serial.println(String(press_data));
     // delay(10000);
     std::vector<std::vector<float>> pressure = getPressure(press_data);
-    for (int g = 0; g < 3; g++)
+    for (int g = 0; g < 4; g++)
     {
       for (int c = 0; c < 8; c++)
       {

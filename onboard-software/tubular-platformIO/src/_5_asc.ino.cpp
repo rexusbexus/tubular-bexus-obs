@@ -19,8 +19,8 @@ int secondsOpen;
 int flushStartTime;
 int pumpStartTime;
 int valveBagStartTime;
-// int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
-int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
+ int bagFillingTime [] = {10, 10, 10, 10, 10, 10};
+//int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
 float current_volume = 0;
 int lastMeasurement = 0;
 
@@ -126,6 +126,7 @@ void initValvesControl()
 void pumpControl(int cond)
 {
   if (cond==1) {
+    //digitalWrite(htr1_pin,0);
     heaterControl(0,0); //Turn off heaters when pump is on.
   }
   // Serial.println("Pump control taking sem");
@@ -308,19 +309,20 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
   {
     if (valveBag == closeState)
     {
-      if (pumpState == closeState)
+      if (valveFlush == closeState)
       {
-        pumpControl(openState);
-        pumpStartTime = getCurrentTime();
+        valvesControl(11, openState);
+        flushStartTime = getCurrentTime();
+        
       }
       else
       {
-        if (getCurrentTime() > pumpStartTime+1)
+        if (getCurrentTime() > flushStartTime+1)
         {
-          if (valveFlush == closeState)
+          if (pumpState == closeState)
           {
-            valvesControl(11, openState);
-            flushStartTime = getCurrentTime();
+            pumpControl(openState);
+            pumpStartTime = getCurrentTime();
           }
           else
           {
@@ -353,6 +355,7 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
         valvesControl(bagcounter, closeState);
         pumpControl(closeState);
         current_volume = 0;
+        lastMeasurement = 0;
         bagcounter++;
       }
     }
@@ -364,6 +367,8 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
       valvesControl(bagcounter, closeState);
       pumpControl(closeState);
       bagcounter++;
+      current_volume = 0;
+      lastMeasurement = 0;
       valvesControl(11, 0);
     }
   }
@@ -389,19 +394,20 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
   {
     if (valveBag == closeState)
     {
-      if (pumpState == closeState)
+      if (valveFlush == closeState)
       {
-        pumpControl(openState);
-        pumpStartTime = getCurrentTime();
+        valvesControl(11, openState);
+        flushStartTime = getCurrentTime();
+        
       }
       else
       {
-        if (getCurrentTime() > pumpStartTime+1)
+        if (getCurrentTime() > flushStartTime+1)
         {
-          if (valveFlush == closeState)
+          if (pumpState == closeState)
           {
-            valvesControl(11, openState);
-            flushStartTime = getCurrentTime();
+            pumpControl(openState);
+            pumpStartTime = getCurrentTime();
           }
           else
           {
@@ -433,6 +439,8 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
       {
         valvesControl(bagcounter, closeState);
         pumpControl(closeState);
+        current_volume = 0;
+        lastMeasurement = 0;
         bagcounter++;
       }
     }
@@ -444,6 +452,8 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
       valvesControl(bagcounter, closeState);
       pumpControl(closeState);
       bagcounter++;
+      current_volume = 0;
+      lastMeasurement = 0;
       valvesControl(11, 0);
     }
   }
@@ -515,6 +525,7 @@ void reading(void *pvParameters)
      /*SAFE*/
      case safeMode:
      digitalWrite(CACvalve, LOW);
+     valvesControl(11, closeState);
      pumpControl(closeState);
      for (int sd = 1;sd <= 6; sd++)
      {

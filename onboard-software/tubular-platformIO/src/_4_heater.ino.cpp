@@ -211,8 +211,8 @@ void readingData(void *pvParameters)
       // Serial.println("Entering else in Heater");
       readHeaterParameter();
       std::vector<float> dummyHtrData = readData(0);
-      tempAtHtr[0]  = dummyHtrData[0];
-      tempAtHtr[1]  = dummyHtrData[1];
+      tempAtHtr[0]  = dummyHtrData[1];
+      tempAtHtr[1]  = dummyHtrData[0];
 
  //   tempAtHtr[1]  = *readData(0);//Must make sure to get the correct tempSensors.
       // Serial.println("Entering heaterCompare");

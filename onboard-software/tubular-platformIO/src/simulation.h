@@ -5,7 +5,7 @@
 
 struct pressureSimulation{
   int simulationTime[8];
-  float pressureSim[3][8];
+  float pressureSim[4][8];
   float temperatureSim[2][8];
   float airflowSim[nrAirFSensors][8];
   float humSim[nrHumidSensors][8];

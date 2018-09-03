@@ -68,7 +68,7 @@ void initPressureSensor()
   pressSensor1.PROMread(pressSensorPin1);
   pressSensor2.PROMread(pressSensorPin2);
   pressSensor3.PROMread(pressSensorPin3);
-  pressSensor4.PROMread(pressSensorPin4);
+  pressSensor4.PROMread(pressSensorPin7);
   }
   else{
   pressSensor4.PROMread(pressSensorPin7);
@@ -403,7 +403,8 @@ void sampler(void *pvParameters)
             curTemperatureMeasurement[i] = DS1631.getTemperature(TEMP_ADDR+i);
         }
 
-        curTemperatureMeasurement[8] = pressSensor4.getTemp();
+        curTemperatureMeasurement[8] = pressSensor4.getTemp()/float(100);
+        curPressureMeasurement[4] = pressSensor4.getPres()/float(100);
         Serial.println("Leaving temp reading");
         //Serial.println("leaving Temp reading");
       
@@ -428,7 +429,7 @@ void sampler(void *pvParameters)
             /*Read pressure from sensors*/
             for (int l = 0; l < nrPressSensors; l++)
             {
-              if (l<3)
+              if (l<4)
               {
                 curPressureMeasurement[l] = sim_data.pressureSim[l][seq];
               }
@@ -493,7 +494,7 @@ void sampler(void *pvParameters)
             // }
           }
           pressSensorread();
-          curPressureMeasurement[3] = 0;//pressSensorStatic.getPress();
+          //curPressureMeasurement[3] = pressSensorStatic.getPress();
           curPressureMeasurement[4] = pressSensor4.getPres()/float(100);
           Serial.print("Pressure : "); Serial.println(curPressureMeasurement[4]);
           curAFMeasurement[0] = afSensor.getAF();

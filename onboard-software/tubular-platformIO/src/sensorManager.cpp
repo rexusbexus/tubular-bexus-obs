@@ -117,6 +117,10 @@ float calculatingPressureDifference(float meanPressureAmbient)
     if (tempPressure[0] == 0 )
     {
         tempPressure[0] = meanPressureAmbient;
+        if(tempPressure[0] < 0){
+            tempPressure[0] = 0;
+        }
+        
         return 0;
     } 
     pressDifference = pressDifference + tempPressure[1] - tempPressure[0];
