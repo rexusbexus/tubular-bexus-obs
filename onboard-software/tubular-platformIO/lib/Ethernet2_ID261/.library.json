@@ -1,0 +1,35 @@
+{
+    "name": "Ethernet2", 
+    "repository": {
+        "url": "https://github.com/adafruit/Ethernet2.git", 
+        "type": "git"
+    }, 
+    "platforms": [
+        "atmelavr", 
+        "atmelsam", 
+        "espressif8266", 
+        "intel_arc32", 
+        "microchippic32", 
+        "nordicnrf51", 
+        "teensy", 
+        "timsp430"
+    ], 
+    "frameworks": [
+        "arduino"
+    ], 
+    "version": "1.0", 
+    "authors": [
+        {
+            "url": "info@arduino.cc", 
+            "maintainer": false, 
+            "email": null, 
+            "name": "Arduino"
+        }
+    ], 
+    "keywords": [
+        "communication", 
+        "ethernet"
+    ], 
+    "id": 261, 
+    "description": "Enables network connection (local and Internet) using the Arduino Ethernet board or shield. For all Arduino boards."
+}
