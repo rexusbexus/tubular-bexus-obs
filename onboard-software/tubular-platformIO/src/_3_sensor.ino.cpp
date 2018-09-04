@@ -33,7 +33,7 @@ DS1631 DS1631;
 
 MS5607 pressSensor1(pressSensorPin1); //Ambient Pressure Sensor
 MS5607 pressSensor2(pressSensorPin2); //Ambient Pressure Sensor
-MS5607 pressSensor3(pressSensorPin3); //ValveCenter Pressure Sensor
+// MS5607 pressSensor3(pressSensorPin3); //ValveCenter Pressure Sensor
 MS5607 pressSensor4(pressSensorPin7); //ValveCenter Pressure Sensor
 Series3500 pressSensorStatic(staticPressPin); //Static pressure sensor pin
 HDC2010 humSensor(hdcADDR);
@@ -67,7 +67,7 @@ void initPressureSensor()
   if(!simulationOrNot){
   pressSensor1.PROMread(pressSensorPin1);
   pressSensor2.PROMread(pressSensorPin2);
-  pressSensor3.PROMread(pressSensorPin3);
+  // pressSensor3.PROMread(pressSensorPin3);
   pressSensor4.PROMread(pressSensorPin7);
   }
   else{
@@ -80,7 +80,7 @@ void resetPressureSensor()
    if(!simulationOrNot){
    pressSensor1.reset_sequence(pressSensorPin1);
    pressSensor2.reset_sequence(pressSensorPin2);
-   pressSensor3.reset_sequence(pressSensorPin3);
+  //  pressSensor3.reset_sequence(pressSensorPin3);
    pressSensor4.reset_sequence(pressSensorPin7);
    }
    else{
@@ -95,7 +95,7 @@ void pressSensorread()
   //Start Convertion (of pressure) for all pressure sensor(s).
         pressSensor1.convertionD1(4, pressSensorPin1);
         pressSensor2.convertionD1(4, pressSensorPin2);
-        pressSensor3.convertionD1(4, pressSensorPin3);
+        // pressSensor3.convertionD1(4, pressSensorPin3);
         pressSensor4.convertionD1(4, pressSensorPin7);
 
         delay(15);
@@ -103,13 +103,13 @@ void pressSensorread()
         //Read pressure for all pressure sensor(s).
         pressSensor1.ADCpress = pressSensor1.readADC(pressSensorPin1);
         pressSensor2.ADCpress = pressSensor2.readADC(pressSensorPin2);
-        pressSensor3.ADCpress = pressSensor3.readADC(pressSensorPin3);
+        // pressSensor3.ADCpress = pressSensor3.readADC(pressSensorPin3);
         pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin7);
 
         //Start Convertion (of temperature) for all pressure sensor(s).
         pressSensor1.convertionD2(4, pressSensorPin1);
         pressSensor2.convertionD2(4, pressSensorPin2);
-        pressSensor3.convertionD2(4, pressSensorPin3);
+        // pressSensor3.convertionD2(4, pressSensorPin3);
         pressSensor4.convertionD2(4, pressSensorPin7);
 
         delay(15);
@@ -117,13 +117,13 @@ void pressSensorread()
         //Read temperature for all pressure sensor(s).
         pressSensor1.ADCtemp = pressSensor1.readADC(pressSensorPin1);
         pressSensor2.ADCtemp = pressSensor2.readADC(pressSensorPin2);
-        pressSensor3.ADCtemp = pressSensor3.readADC(pressSensorPin3);
+        // pressSensor3.ADCtemp = pressSensor3.readADC(pressSensorPin3);
         pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin7);
 
         //Calculating the correct temperature and pressure.
         pressSensor1.ADC_calc(pressSensor1.ADCpress, pressSensor1.ADCtemp);
         pressSensor2.ADC_calc(pressSensor2.ADCpress, pressSensor2.ADCtemp);
-        pressSensor3.ADC_calc(pressSensor3.ADCpress, pressSensor3.ADCtemp);
+        // pressSensor3.ADC_calc(pressSensor3.ADCpress, pressSensor3.ADCtemp);
         pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);
   }
   else{
@@ -386,7 +386,7 @@ void sampler(void *pvParameters)
         /*Read pressure from sensors*/
         curPressureMeasurement[0] = pressSensor1.getPres()/float(100);
         curPressureMeasurement[1] = pressSensor2.getPres()/float(100);   
-        curPressureMeasurement[2] = pressSensor3.getPres()/float(100);
+        // curPressureMeasurement[2] = pressSensor3.getPres()/float(100);
         // curPressureMeasurement[3] = pressSensor4.getPres()/float(100);
         curPressureMeasurement[3] = pressSensorStatic.getPress();
 
