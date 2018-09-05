@@ -7,8 +7,8 @@
 
 
 struct heater {
-  bool htr1_flag;
-  bool htr2_flag;
+  bool htr1_flag = false;
+  bool htr2_flag = false;
 };
 
 struct heater heaterCompare();
