@@ -76,8 +76,8 @@ void MS5607::PROMread(int pinSelect)
         SPI.endTransaction();
     }
         
-        SPI.beginTransaction(SPISettings(10000, MSBFIRST, SPI_MODE0));
-        digitalWrite(pinSelect, LOW);
+        // SPI.beginTransaction(SPISettings(10000, MSBFIRST, SPI_MODE0));
+        // digitalWrite(pinSelect, LOW);
 
         /*PROMbyte[0] = SPI.transfer(ROMcommand);
         //Serial.print("PROMbyte: buffer "); Serial.println(PROMbyte[0]);
