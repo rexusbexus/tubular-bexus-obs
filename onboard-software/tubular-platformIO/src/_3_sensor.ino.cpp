@@ -94,31 +94,46 @@ void pressSensorread()
   if(!simulationOrNot){
   //Start Convertion (of pressure) for all pressure sensor(s).
         pressSensor1.convertionD1(4, pressSensorPin1);
+        delay(15);
+        pressSensor1.ADCpress = pressSensor1.readADC(pressSensorPin1);
+        delay(10);
+        pressSensor1.convertionD2(4, pressSensorPin1);
+        delay(15);
+        pressSensor1.ADCtemp = pressSensor1.readADC(pressSensorPin1);
+        
         pressSensor2.convertionD1(4, pressSensorPin2);
+        delay(15);
+        pressSensor2.ADCpress = pressSensor2.readADC(pressSensorPin2);
+        delay(10);
+        pressSensor2.convertionD2(4, pressSensorPin2);
+        delay(15);
+        pressSensor2.ADCtemp = pressSensor2.readADC(pressSensorPin2);
+
         // pressSensor3.convertionD1(4, pressSensorPin3);
         pressSensor4.convertionD1(4, pressSensorPin7);
-
         delay(15);
+        pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin7);
+        delay(10);
+        pressSensor4.convertionD2(4, pressSensorPin7);
+        delay(15);
+        pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin7);
 
         //Read pressure for all pressure sensor(s).
-        pressSensor1.ADCpress = pressSensor1.readADC(pressSensorPin1);
-        pressSensor2.ADCpress = pressSensor2.readADC(pressSensorPin2);
+        
         // pressSensor3.ADCpress = pressSensor3.readADC(pressSensorPin3);
-        pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin7);
+        
 
         //Start Convertion (of temperature) for all pressure sensor(s).
-        pressSensor1.convertionD2(4, pressSensorPin1);
-        pressSensor2.convertionD2(4, pressSensorPin2);
+        
+        
         // pressSensor3.convertionD2(4, pressSensorPin3);
-        pressSensor4.convertionD2(4, pressSensorPin7);
-
-        delay(15);
+        
 
         //Read temperature for all pressure sensor(s).
-        pressSensor1.ADCtemp = pressSensor1.readADC(pressSensorPin1);
-        pressSensor2.ADCtemp = pressSensor2.readADC(pressSensorPin2);
+        
+        
         // pressSensor3.ADCtemp = pressSensor3.readADC(pressSensorPin3);
-        pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin7);
+        
 
         //Calculating the correct temperature and pressure.
         pressSensor1.ADC_calc(pressSensor1.ADCpress, pressSensor1.ADCtemp);
