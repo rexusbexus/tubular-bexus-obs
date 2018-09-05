@@ -23,8 +23,8 @@ heater heaterCompare(){
 //bool htr1_flag;
 //bool htr2_flag;
 //bool *htr_flag[2];
-    htr_flag_struc.htr1_flag = 0;
-    htr_flag_struc.htr2_flag = 0;
+    // htr_flag_struc.htr1_flag = 0;
+    // htr_flag_struc.htr2_flag = 0;
     Serial.println("I'm at heaterCompare");
     Serial.print("Temp1: "); Serial.println(tempAtHtr[0]);
     Serial.print("Temp2: "); Serial.println(tempAtHtr[1]);
