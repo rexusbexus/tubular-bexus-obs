@@ -182,10 +182,13 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
   /*  If current file exceds a certain size
   //    create new file with a new name. 
   */
-
+  delay(150);
   Serial.print("EOF"); Serial.println(eof);
-  root = SD.open("/log/");
+  root = SD.open("/");
+  Serial.println("SD OPEN.");
   if(root) {
+    root.close();
+     root = SD.open("/log/");
 
     while(!eof)
      {
