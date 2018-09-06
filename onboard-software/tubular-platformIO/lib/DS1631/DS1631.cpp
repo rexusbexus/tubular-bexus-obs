@@ -23,6 +23,7 @@ float DS1631::getTemperature(uint8_t ADDRESS) {
         
         if (i2c_transmission==0) {
             Wire.requestFrom(ADDRESS,2);        // READ 2 bytes
+            delay(15);
             Wire.available();                 // 1st byte
                 char msb = Wire.read();      // receive a byte
             Wire.available();                 // 2nd byte
@@ -33,7 +34,7 @@ float DS1631::getTemperature(uint8_t ADDRESS) {
             float tempCon =0;
 
             if (msb >= 0x80) { //if sign bit is set, msben temp is negative
-              tempCon =  (float)msb - 256 - (float)lsb/16;
+              tempCon =  ((float)msb - 256) + ((float)lsb/16);
             }
             else 
             {  
