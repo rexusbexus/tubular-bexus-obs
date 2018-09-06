@@ -316,6 +316,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     
   }
   Serial.println("leaving SavingData");
+  delay(10);
 }
 
 void setSamplingRate(int curSamplingRate)
@@ -405,7 +406,7 @@ void sampler(void *pvParameters)
         // curPressureMeasurement[3] = pressSensor4.getPres()/float(100);
         curPressureMeasurement[3] = pressSensorStatic.getPress();
 
-        Serial.print("Pressure sensor1: "); Serial.println(curPressureMeasurement[0]);
+        // Serial.print("Pressure sensor1: "); Serial.println(curPressureMeasurement[0]);
 
         /*read humidity from HDC*/
         //float temperatureHDC = humSensor.readTemp();
@@ -413,14 +414,15 @@ void sampler(void *pvParameters)
 
 
         /*Read temperature from sensors*/
-        Serial.println("Temp reading");
+        // Serial.println("Temp reading");
         for(uint8_t i=0;i<(nrTempSensors-1);i++) {
             curTemperatureMeasurement[i] = DS1631.getTemperature(TEMP_ADDR+i);
         }
+        Serial.print("Temp sensor value: "); Serial.println(curTemperatureMeasurement[7]);
 
         curTemperatureMeasurement[8] = pressSensor4.getTemp()/float(100);
         curPressureMeasurement[4] = pressSensor4.getPres()/float(100);
-        Serial.println("Leaving temp reading");
+        // Serial.println("Leaving temp reading");
         //Serial.println("leaving Temp reading");
       
 
@@ -572,7 +574,7 @@ void sampler(void *pvParameters)
       }
 
       //medianPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
-      Serial.print("Pressure median Value: "); Serial.println(medianPressureAmbient);
+      // Serial.print("Pressure median Value: "); Serial.println(medianPressureAmbient);
       /*Calculating Pressure Difference*/
       pressDifference = calculatingPressureDifference(medianPressureAmbient);
       // Serial.println("Left press diff");
