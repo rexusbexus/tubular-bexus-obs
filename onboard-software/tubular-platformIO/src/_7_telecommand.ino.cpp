@@ -21,6 +21,7 @@ extern ethernet ethernet;
 extern std::vector<std::vector<byte>> mode;
 extern std::vector<std::vector<byte>> heaters;
 extern std::vector<std::vector<byte>> asc;
+extern std::vector<std::vector<byte>> schedule;
 extern std::vector<std::vector<byte>> ss; 
 
 
@@ -98,28 +99,43 @@ void openCloseValveManual(byte pumpvalve[])
   
 }
 
+void executeScheduler(std::vector<std::vector<byte>> &scd)
+{
+  char buf [6] = {0};
+  float dummyParam [2];
+  int whichBag = 0;
+  
+  for (int i = 0; i<3; i++)
+  {
+    if (i == 0)
+    {
+      whichBag = scd[i][0];
+    }
+    else
+    {
+      for (int k = 0; k < 3; k++) 
+      {
+        buf[k] = scd[i][k];
+      }
+      // param.bytes[3] = byte(0);
+      dummyParam[i-1] = atof(buf);
+      Serial.println(dummyParam[i-1]);
+    }
+  }
+  samplingScheduler(whichBag, dummyParam);
+}
+
 void executeASC(std::vector<std::vector<byte>> &scC)
 {
-  char buf [6];
+  
   byte pumpvalve[9];
-  // float dummyParam [totalBagNumber*2];
+  
   // floatval param;
 
   for(int i = 0; i < 9; i++)
   {
     pumpvalve[i] = scC[i][0];
   }
- 
-  // for (int i = 11; i<23; i++)
-  // {
-  //   for (int k = 0; k < 3; k++) 
-  //   {
-  //     buf[k] = scC[i][k];
-  //   }
-  //   // param.bytes[3] = byte(0);
-  //   dummyParam[i-11] = atof(buf);
-  // }
-  // setASCParameter(dummyParam);
   openCloseValveManual(pumpvalve);
 }
 
@@ -180,6 +196,7 @@ void telecommand(void *pvParameters)
         {
           executeHTR(heaters);
           executeASC(asc);
+          executeScheduler(schedule);
           executeMode(mode);
           // executeSS(ss);
         }

@@ -6,7 +6,8 @@
 std::vector<std::vector<byte>> mode(1, std::vector<byte>(1, 0));
 std::vector<std::vector<byte>> heaters(6, std::vector<byte>(3, 0));
 std::vector<std::vector<byte>> asc(27, std::vector<byte>(3, 0));
-std::vector<std::vector<byte>> ss(1, std::vector<byte>(1, 0)); 
+std::vector<std::vector<byte>> ss(1, std::vector<byte>(1, 0));
+std::vector<std::vector<byte>> schedule(3, std::vector<byte>(3, 0)); 
     
 std::vector<std::vector<byte>> scanBuffer(byte bufferD[], int row, int col, byte datasize)
 {
@@ -66,18 +67,6 @@ void collectingCommand (byte data_tcp[], int row, int col, byte datasize)
     int k = 2;
     for (int jenis = 1; jenis <= nrSubCommand; jenis++)
     {
-        if (command[k][0] == 'm' && command[k][1] == 'd')
-        {
-            nrParam = command[k+1][0] - '0';
-            mode[0][0] = command[k+2][0] - '0';
-            k=k+2+nrParam;
-        }
-
-        if (k==(row))
-        {
-            break;
-        }
-
         if (command[k][0] == 'h' && command[k][1] == 't')
         {
             nrParam = command[k+1][0] - '0';
@@ -132,6 +121,36 @@ void collectingCommand (byte data_tcp[], int row, int col, byte datasize)
                 }
                 asc[i][0] = digitalRead(valve1+(i-1));
             }
+        }
+
+        if (k==(row))
+        {
+            break;
+        }
+        
+        if (command[k][0] == 'm' && command[k][1] == 'd')
+        {
+            nrParam = command[k+1][0] - '0';
+            mode[0][0] = command[k+2][0] - '0';
+            k=k+2+nrParam;
+        }
+
+        if (k==(row))
+        {
+            break;
+        }
+
+        if (command[k][0] == 's' && command[k][1] == 'd')
+        {
+            nrParam = command[k+1][0] - '0';
+            for (int b = 0; b < nrParam; b++)
+            {
+                for (int v = 0; v < col; v++)
+                {
+                    schedule[b][v] = command[k+2+b][v];
+                } 
+            }
+            k=k+2+nrParam;
         }
 
         if (k==(row))

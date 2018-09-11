@@ -107,6 +107,17 @@ void setASCParameter(float newParameter[])
   xSemaphoreGive(sem);
 }
 
+void samplingScheduler(int whichBag, float newParameter[])
+{
+  xSemaphoreTake(sem, portMAX_DELAY);
+  ascParameter[(2*whichBag)-2] = newParameter[0];
+  ascParameter[(2*whichBag)-1] = newParameter[1];
+  
+  xSemaphoreGive(sem);
+  Serial.println(ascParameter[(2*whichBag)-2]);
+  Serial.println(ascParameter[(2*whichBag)-1]);
+}
+
 void initValvesControl()
 {
   pinMode(valve1, OUTPUT);
@@ -537,6 +548,7 @@ void reading(void *pvParameters)
      
      break;
    }
+   
    flagPost(2);
    Serial.println("I'm leaving asc periodic");
    vTaskDelayUntil(&xLastWakeTime, (800 / portTICK_PERIOD_MS) );
