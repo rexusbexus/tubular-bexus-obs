@@ -177,15 +177,15 @@ void initHumSensor()
 
 void savingDataToSD(float temperatureData[], float humData[], float pressData[], float afData[])
 {
-  Serial.println("I'm at savingDataToSD");
+  // Serial.println("I'm at savingDataToSD");
 
   /*  If current file exceds a certain size
   //    create new file with a new name. 
   */
   delay(150);
-  Serial.print("EOF"); Serial.println(eof);
+  // Serial.print("EOF"); Serial.println(eof);
   root = SD.open("/");
-  Serial.println("SD OPEN.");
+  // Serial.println("SD OPEN.");
   if(root) {
     root.close();
      root = SD.open("/log/");
@@ -205,7 +205,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
      {
      fileNum = String(count);
      file = "/log/log"+fileNum+".txt";
-     Serial.print("Name of file: "); Serial.println(file);
+    //  Serial.print("Name of file: "); Serial.println(file);
      }
      
      nextFile.close();
@@ -218,7 +218,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
    if(dataLog.size()>(200*1024)) {
      count = 0;
      eof = false;
-     Serial.println("EOF. Set to false.");
+    //  Serial.println("EOF. Set to false.");
      
    }
    if(!dataLog) {
@@ -318,7 +318,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
 
     
   }
-  Serial.println("leaving SavingData");
+  // Serial.println("leaving SavingData");
   delay(10);
 }
 
@@ -357,7 +357,7 @@ std::vector<float> readData(int type)
 
 void initTempSensors()
 {
-  Serial.println("I'm at initTempSensors");
+  // Serial.println("I'm at initTempSensors");
   Wire.begin();
   for(int i=0;i<=(nrTempSensors-1);i++) 
   {
@@ -392,7 +392,7 @@ void sampler(void *pvParameters)
 
    while(1)
    {
-      Serial.println("I'm at sensor periodic");
+      // Serial.println("I'm at sensor periodic");
       //Serial.print("Time: ");
       //Serial.println(rtc.getSeconds());
       xHigherPriorityTaskWoken = pdFALSE;
@@ -421,7 +421,7 @@ void sampler(void *pvParameters)
         for(uint8_t i=0;i<(nrTempSensors-1);i++) {
             curTemperatureMeasurement[i] = DS1631.getTemperature(TEMP_ADDR+i);
         }
-        Serial.print("Temp sensor value: "); Serial.println(curTemperatureMeasurement[7]);
+        // Serial.print("Temp sensor value: "); Serial.println(curTemperatureMeasurement[7]);
 
         curTemperatureMeasurement[8] = pressSensor4.getTemp()/float(100);
         curPressureMeasurement[4] = pressSensor4.getPres()/float(100);
@@ -439,7 +439,7 @@ void sampler(void *pvParameters)
       }
       else
       {
-        Serial.println("I'm at simulation");
+        // Serial.println("I'm at simulation");
         /*Simulation*/
         int secondsNow = getCurrentTime();
         for (int seq = 0; seq < 7; seq++)
@@ -520,11 +520,12 @@ void sampler(void *pvParameters)
           curAFMeasurement[0] = afSensor.getAF();
 
           /*Read temperature from sensors*/
-        Serial.println("Temp reading");
+        // Serial.println("Temp reading");
         for(uint8_t i=0;i<(nrTempSensors-1);i++) {
             curTemperatureMeasurement[i] = DS1631.getTemperature(TEMP_ADDR+i);
         }
         curTemperatureMeasurement[8] = pressSensor4.getTemp()/float(100);
+
         
       }
 

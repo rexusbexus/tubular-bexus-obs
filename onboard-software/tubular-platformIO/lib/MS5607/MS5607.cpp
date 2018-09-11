@@ -114,8 +114,12 @@ uint32_t MS5607::readADC(int pinSelect) {
 
 void MS5607::ADC_calc(uint32_t ADCpress, uint32_t ADCtemp) {
 
-    int64_t deltaT  = ADCtemp - ((uint32_t)PROMbyte[5] * 256);
-    TEMP    = 2000 + ((deltaT * PROMbyte[6]) >> 23);
+    int32_t deltaT  = ADCtemp - (PROMbyte[5] << 8);
+    Serial.print("deltaT: "); Serial.println(deltaT);
+    Serial.print("Prombyte[6]: "); Serial.println(PROMbyte[6]);
+    TEMP    = (int32_t)2000 + ((deltaT * (int64_t)PROMbyte[6]) >> 23);
+    // TEMP    = (TEMP >> 23);
+    // TEMP    = (int32_t)2000 + TEMP;
 
     int64_t OFFSET  = ((int64_t)PROMbyte[2] << 17) + (((int64_t)PROMbyte[4] * deltaT) >> 6);
     if (OFFSET > 25769410560) { //min and max have to be defined per datasheet.
@@ -136,9 +140,10 @@ void MS5607::ADC_calc(uint32_t ADCpress, uint32_t ADCtemp) {
 	int32_t T2 = 0; 
     int64_t OFF2 = 0; 
     int64_t SENS2 = 0;
+    Serial.print("Temp: "); Serial.println(TEMP);
 	if(TEMP<2000) {
 	  T2 = ((deltaT * deltaT) >> 31);
-	  OFF2 = 61 * (TEMP - 2000) * (TEMP - 2000) >> 4;
+	  OFF2 = 61 * ((TEMP - 2000) * (TEMP - 2000)) >> 4;
 	  SENS2 = 2 * (TEMP - 2000) * (TEMP - 2000);
 	  if(TEMP<-1500) {
 	    OFF2 += 15 * (TEMP + 1500) * (TEMP + 1500);
@@ -151,7 +156,7 @@ void MS5607::ADC_calc(uint32_t ADCpress, uint32_t ADCtemp) {
 	
 	
 	pres = (((ADCpress * SENS) >> 21 ) - OFFSET) >> 15;
-	
+	Serial.print("Temp: "); Serial.println(TEMP);
   }
   
 int32_t MS5607::getTemp()

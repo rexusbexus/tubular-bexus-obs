@@ -35,7 +35,7 @@ void transmit() {
   // EthernetClient client = ethernet.checkClientAvailibility();
   // if(w5500.getPHYCFGR() == 191)
   // {
-  Serial.println("Transmitting");
+  // Serial.println("Transmitting");
   Udp.beginPacket(remote, localPort);
   Udp.write("gs,");
   Udp.write(rtc.unixtime());
