@@ -23,7 +23,7 @@ function varargout = groundStation_GUI(varargin)
 % Edit the above text to modify the response to help groundStation_GUI
 
 
-% Last Modified by GUIDE v2.5 31-Aug-2018 12:11:38
+% Last Modified by GUIDE v2.5 11-Sep-2018 10:22:29
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -632,10 +632,41 @@ switch get(get(handles.button_valve_cac, 'SelectedObject'), 'Tag')
         commandToBuild(22:23) = '0,';
 end
 
+
 % function commandToBuild = buildSensorCommand(handles)
 % commandToBuild(1:5) = 'ss,1,';
 % commandToBuild(6,7) = '
 
+%%%%%%%%%%%%%%%%%%%%%%
+function commandToBuild = buildScheduler(handles)
+% Determine the selected data set.
+str = get(handles.bags_menu,'String');
+val = get(handles.bags_menu,'Value');
+
+commandToBuild(1:5) = 'sd,3,';
+
+switch str{val}
+    case 'Bag 1'
+        commandToBuild(6:7) = '1,';
+    case 'Bag 2'
+        commandToBuild(6:7) = '2,';
+    case 'Bag 3'
+        commandToBuild(6:7) = '3,';
+    case 'Bag 4'
+        commandToBuild(6:7) = '4,';
+    case 'Bag 5'
+        commandToBuild(6:7) = '5,';
+    case 'Bag 6'
+        commandToBuild(6:7) = '6,';
+end
+
+firstParam = get(handles.first_parameter, 'String');
+secondParam = get(handles.second_parameter, 'String');
+
+commandToBuild = [commandToBuild, firstParam, ',', secondParam, ',']; 
+
+
+        
 
 % --- Executes on button press in send_telecommand.
 function send_telecommand_Callback(hObject, eventdata, handles)
@@ -664,6 +695,7 @@ id = 'tub,';
 modeCommand = [];
 heaterCommand = [];
 ascCommand = [];
+scheduleCommand = [];
 if (get(handles.check_mode_setting, 'Value') == 1)
     modeCommand = buildModeCommand(handles);
 end
@@ -673,13 +705,17 @@ end
 if (get(handles.check_valves_control, 'Value') == 1)
         ascCommand = buildAscCommand(handles);
 end
+if (get(handles.check_sampling_schedule, 'Value') == 1)
+    scheduleCommand = buildScheduler(handles);
+end
 
 
 nrSubCommand = get(handles.check_mode_setting, 'Value') + ...
                get(handles.check_heater_control, 'Value') +...
+               get(handles.check_sampling_schedule, 'Value') +...
                get(handles.check_valves_control, 'Value');
 strSubCommand = sprintf('%d,', nrSubCommand);
-command = [id strSubCommand modeCommand heaterCommand ascCommand];
+command = [id strSubCommand modeCommand heaterCommand ascCommand scheduleCommand];
 %=======
 % --- Executes during object creation, after setting all properties.
 function edit3_CreateFcn(hObject, eventdata, handles)
@@ -731,18 +767,18 @@ end
 
 
 
-function edit_parameters_Callback(hObject, eventdata, handles)
-% hObject    handle to edit_parameters (see GCBO)
+function first_parameter_Callback(hObject, eventdata, handles)
+% hObject    handle to first_parameter (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit_parameters as text
-%        str2double(get(hObject,'String')) returns contents of edit_parameters as a double
+% Hints: get(hObject,'String') returns contents of first_parameter as text
+%        str2double(get(hObject,'String')) returns contents of first_parameter as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit_parameters_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit_parameters (see GCBO)
+function first_parameter_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to first_parameter (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -802,6 +838,29 @@ function phase_menu_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function second_parameter_Callback(hObject, eventdata, handles)
+% hObject    handle to second_parameter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of second_parameter as text
+%        str2double(get(hObject,'String')) returns contents of second_parameter as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function second_parameter_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to second_parameter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');

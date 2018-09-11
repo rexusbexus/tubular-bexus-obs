@@ -33,6 +33,7 @@
 //extern float ascParameter[16];
 void initASC();
 void setASCParameter(float newParameter[16]);
+void samplingScheduler(int whichBag, float newParameter[]);
 void valvesControl(int valve, int cond);
 void pumpControl(int cond);
 int getValvePin(int whichBag);
