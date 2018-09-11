@@ -119,7 +119,7 @@ void executeScheduler(std::vector<std::vector<byte>> &scd)
       }
       // param.bytes[3] = byte(0);
       dummyParam[i-1] = atof(buf);
-      Serial.println(dummyParam[i-1]);
+      // Serial.println(dummyParam[i-1]);
     }
   }
   samplingScheduler(whichBag, dummyParam);

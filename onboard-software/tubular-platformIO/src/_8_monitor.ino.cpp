@@ -45,10 +45,10 @@ int flag[3] = {0};
 */
 void flagPost(int flagNr) {
   
-  Serial.print("At flagpost : "); Serial.println(flagNr);
+  // Serial.print("At flagpost : "); Serial.println(flagNr);
   flag[flagNr] = 1;
   if (flag[0] == 1 && flag[1] == 1 && flag[2] == 1) {
-    Serial.println("Kicking the can");
+    // Serial.println("Kicking the can");
     flag[0] = 0;
     flag[1] = 0;
     flag[2] = 0;
