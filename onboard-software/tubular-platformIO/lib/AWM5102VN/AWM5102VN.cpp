@@ -17,6 +17,7 @@ float AWM5102VN::getAF()
 	}
 	sensVal = sensVal/49;
 	float AF = 0;
-	AF = (10*((float(sensVal)*3.3/1023 - 0.33)) / (2.97)); //Notes: 1 Vdc = 0 SLPM
+	//AF = (10*((float(sensVal)*3.3/1023 - 0.33)) / (2.97)); //Notes: 1 Vdc = 0 SLPM
+	AF = (-3.233*pow((float(sensVal)*3.3/1023),2) + 11.2*(float(sensVal)*3.3/1023) -3.525);
 	return AF;
 }
