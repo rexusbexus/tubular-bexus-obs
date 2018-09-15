@@ -19,10 +19,11 @@ int secondsOpen;
 int flushStartTime;
 int pumpStartTime;
 int valveBagStartTime;
- int bagFillingTime [] = {10, 10, 10, 10, 10, 10};
-//int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
+//  int bagFillingTime [] = {10, 10, 10, 10, 10, 10};
+int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
 float current_volume = 0;
 int lastMeasurement = 0;
+extern float medianPressureAmbient;
 
 
 std::vector<float> getASCParam(int bag)
@@ -312,7 +313,7 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
   std::vector<float> current_flowrate = readData(3);
   current_flowrate[0] = current_flowrate[0]/60;
 
-  float volume_limit = 3;
+  float volume_limit = 2.4;
   float pressure_limit = 120;
   
   
@@ -320,36 +321,60 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
   {
     if (valveBag == closeState)
     {
+      // if (valveFlush == closeState)
+      // {
+      //   valvesControl(11, openState);
+      //   flushStartTime = getCurrentTime();
+        
+      // }
+      // else
+      // {
+      //   if (getCurrentTime() > flushStartTime+1)
+      //   {
+      //     if (pumpState == closeState)
+      //     {
+      //       pumpControl(openState);
+      //       pumpStartTime = getCurrentTime();
+      //     }
+      //     else
+      //     {
+      //       if (getCurrentTime() > (flushStartTime+flushingTime))
+      //       {
+      //         valvesControl(11, closeState);
+      //         valvesControl(bagcounter, openState);
+      //         valveBagStartTime = getCurrentTime();
+      //       }
+      //     }
+      //   }
+      // }
       if (valveFlush == closeState)
       {
-        valvesControl(11, openState);
-        flushStartTime = getCurrentTime();
-        
-      }
-      else
-      {
-        if (getCurrentTime() > flushStartTime+1)
-        {
+          if (pumpState == openState && (pumpStartTime+1 < getCurrentTime()))
+          {
+            valvesControl(11, openState);
+            flushStartTime = getCurrentTime();
+          }
+
           if (pumpState == closeState)
           {
             pumpControl(openState);
             pumpStartTime = getCurrentTime();
           }
-          else
+
+      }
+      else
+      {
+          if (getCurrentTime() > (flushStartTime+flushingTime))
           {
-            if (getCurrentTime() > (flushStartTime+flushingTime))
-            {
-              valvesControl(11, closeState);
-              valvesControl(bagcounter, openState);
-              valveBagStartTime = getCurrentTime();
-            }
+            valvesControl(11, closeState);
+            valvesControl(bagcounter, openState);
+            valveBagStartTime = getCurrentTime();
           }
-        }
       }
     }
     else
     {
-      float press_diff_in_bag = current_pressure[3] - current_pressure[0];
+      float press_diff_in_bag = current_pressure[3] - medianPressureAmbient;
       //press_diff_in_bag = float abs(press_diff_in_bag);
       if (lastMeasurement==0)
       {
@@ -398,43 +423,67 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
   std::vector<float> current_flowrate = readData(3);
   current_flowrate[0] = current_flowrate[0]/60;
 
-  float volume_limit = 3;
+  float volume_limit = 2.4;
   float pressure_limit = 120;
   
   if (descentSamplingLogic(meanPressureAmbient, ascParam))
   {
     if (valveBag == closeState)
     {
+      // if (valveFlush == closeState)
+      // {
+      //   valvesControl(11, openState);
+      //   flushStartTime = getCurrentTime();
+        
+      // }
+      // else
+      // {
+      //   if (getCurrentTime() > flushStartTime+1)
+      //   {
+      //     if (pumpState == closeState)
+      //     {
+      //       pumpControl(openState);
+      //       pumpStartTime = getCurrentTime();
+      //     }
+      //     else
+      //     {
+      //       if (getCurrentTime() > (flushStartTime+flushingTime))
+      //       {
+      //         valvesControl(11, closeState);
+      //         valvesControl(bagcounter, openState);
+      //         valveBagStartTime = getCurrentTime();
+      //       }
+      //     }
+      //   }
+      // }
       if (valveFlush == closeState)
       {
-        valvesControl(11, openState);
-        flushStartTime = getCurrentTime();
-        
-      }
-      else
-      {
-        if (getCurrentTime() > flushStartTime+1)
-        {
+          if (pumpState == openState && (pumpStartTime+1 < getCurrentTime()))
+          {
+            valvesControl(11, openState);
+            flushStartTime = getCurrentTime();
+          }
+
           if (pumpState == closeState)
           {
             pumpControl(openState);
             pumpStartTime = getCurrentTime();
           }
-          else
+
+      }
+      else
+      {
+          if (getCurrentTime() > (flushStartTime+flushingTime))
           {
-            if (getCurrentTime() > (flushStartTime+flushingTime))
-            {
-              valvesControl(11, closeState);
-              valvesControl(bagcounter, openState);
-              valveBagStartTime = getCurrentTime();
-            }
+            valvesControl(11, closeState);
+            valvesControl(bagcounter, openState);
+            valveBagStartTime = getCurrentTime();
           }
-        }
       }
     }
     else
     {
-      float press_diff_in_bag = current_pressure[3] - current_pressure[0];
+      float press_diff_in_bag = current_pressure[3] - medianPressureAmbient;
 
       if (lastMeasurement==0)
       {
@@ -496,7 +545,8 @@ void reading(void *pvParameters)
      currPressure = readData(2);
 
      /*Calculating mean pressure from several pressure sensors*/
-     meanPressureAmbient = (currPressure[0]+currPressure[1])/2;
+    //  meanPressureAmbient = (currPressure[0]+currPressure[1])/2;
+    meanPressureAmbient = medianPressureAmbient;
 
      switch (currMode){
      /*Standby*/

@@ -53,6 +53,7 @@ extern SemaphoreHandle_t sem;
 int samplingRate = 1000;
 int connectionTimeout = 70;
 int tcReceived;
+float medianPressureAmbient;
 
 File dataLog;
 File root;
@@ -382,7 +383,7 @@ void sampler(void *pvParameters)
    float curHumMeasurement[nrHumidSensors] = {0};
    float curAFMeasurement[nrAirFSensors] = {0};
    //float medianPressureAmbient;
-   float medianPressureAmbient;
+  //  float medianPressureAmbient;
    int currSamplingRate;
 
    static BaseType_t xHigherPriorityTaskWoken;
@@ -576,6 +577,9 @@ void sampler(void *pvParameters)
           break;
         }
       }
+
+      //Vacuum chamber purpose
+      medianPressureAmbient = curPressureMeasurement[4];
 
       //medianPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       // Serial.print("Pressure median Value: "); Serial.println(medianPressureAmbient);
