@@ -20,7 +20,7 @@ float DS1631::getTemperature(uint8_t ADDRESS) {
         Wire.beginTransmission(ADDRESS);
             Wire.write((int)(0xAA));        // @AA : Temperature
         i2c_transmission = Wire.endTransmission();
-        Serial.print("I2C_transmission: "); Serial.println(i2c_transmission);
+        // Serial.print("I2C_transmission: "); Serial.println(i2c_transmission);
         
         if (i2c_transmission==0) {
             Wire.requestFrom(ADDRESS,2);        // READ 2 bytes
