@@ -46,7 +46,7 @@ float DS1631::getTemperature(uint8_t ADDRESS) {
           }
           else {
             initDS1631(ADDRESS);
-            return -1000;
+            return (-1000-i2c_transmission);
             // Serial.print("Error at: "); Serial.println(i);
 
            }
