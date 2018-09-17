@@ -34,7 +34,7 @@
 #define staticPressPin 1
 
 
-#define safeModeThreshold 954.608
+#define safeModeThreshold 880
 #define pressDifferentThresholdneg -20
 #define pressDifferentThresholdpos 20
 

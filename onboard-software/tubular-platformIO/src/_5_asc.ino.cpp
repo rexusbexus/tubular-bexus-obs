@@ -20,7 +20,7 @@ int flushStartTime;
 int pumpStartTime;
 int valveBagStartTime;
 //  int bagFillingTime [] = {10, 10, 10, 10, 10, 10};
-int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
+int bagFillingTime [] = {180, 47, 53, 50, 48, 41};
 float current_volume = 0;
 int lastMeasurement = 0;
 extern float medianPressureAmbient;
@@ -314,7 +314,7 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
   current_flowrate[0] = current_flowrate[0]/60;
 
   float volume_limit = 2.4;
-  float pressure_limit = 120;
+  float pressure_limit = 112;
   
   
   if (ascentSamplingLogic(meanPressureAmbient, ascParam))
@@ -424,7 +424,7 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
   current_flowrate[0] = current_flowrate[0]/60;
 
   float volume_limit = 2.4;
-  float pressure_limit = 120;
+  float pressure_limit = 112;
   
   if (descentSamplingLogic(meanPressureAmbient, ascParam))
   {
