@@ -19,7 +19,7 @@
 
 int16_t status=0b0000000000000000;
 extern unsigned int localPort;
-IPAddress remote(1, 1, 1, 2);
+IPAddress remote(172,16,18,160);
 extern EthernetUDP Udp;
 extern RTCDue rtc;
 extern ethernet ethernet;

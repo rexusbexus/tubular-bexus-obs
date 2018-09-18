@@ -17,8 +17,8 @@ void ethernet::initEthernet()
     // w5500.setRetransmissionCount(uint8_t(0));
     // w5500.setRetransmissionTime(uint16_t(100));
     byte mac[] = { 0x2C, 0xF7, 0xF1, 0x08, 0x0F, 0x57 };
-    IPAddress ip(1, 1, 1, 1); //Local IPv4 adress
-    //IPAddress myDns(192,168,1, 1);
+    //IPAddress ip(1, 1, 1, 1); //Local IPv4 adress
+    IPAddress ip(172,16,18,161); // OFFFICAL IP adress for BX26
     //IPAddress gateway(192, 168, 1, 1);
     IPAddress subnet(255, 0, 0, 0);
     Ethernet.begin(mac, ip, subnet);

@@ -574,12 +574,13 @@ void sampler(void *pvParameters)
       for (int medianFind = 0; medianFind<=2; medianFind++){
         if (orderMedian[medianFind]==1) {
           medianPressureAmbient = curPressureMeasurement[medianFind];
+          
           break;
         }
       }
 
       //Vacuum chamber purpose
-      medianPressureAmbient = curPressureMeasurement[4];
+      //medianPressureAmbient = curPressureMeasurement[4];
 
       //medianPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       // Serial.print("Pressure median Value: "); Serial.println(medianPressureAmbient);
