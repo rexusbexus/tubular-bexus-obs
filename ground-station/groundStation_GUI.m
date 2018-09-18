@@ -176,7 +176,7 @@ function tcp_initialize_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 remPort=4000;      
-host='1.1.1.1';  
+host='172.16.18.161';  
 locPort=4000;
 
 t = tcpip(host,'RemotePort',remPort,'LocalPort',locPort, 'NetworkRole','Client', 'Timeout', 2);
@@ -220,7 +220,7 @@ function udp_initialize_Callback(hObject, eventdata, handles)
 
 %u = udp('1.1.1.1',8888);
 remPort=8888;      
-host='1.1.1.1';  
+host='172.16.18.161';  
 locPort=8888;
 u = udp(host,'RemotePort',remPort,'LocalPort',locPort); 
 u.InputBufferSize = 120;

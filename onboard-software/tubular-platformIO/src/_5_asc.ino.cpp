@@ -24,6 +24,8 @@ int bagFillingTime [] = {180, 47, 53, 50, 48, 41};
 float current_volume = 0;
 int lastMeasurement = 0;
 extern float medianPressureAmbient;
+int bagcounter = 1;
+File bagfile;
 
 
 std::vector<float> getASCParam(int bag)
@@ -96,6 +98,26 @@ void initAscParameters()
   }
   
 
+}
+
+int initBagCount()
+{
+  bagfile = SD.open("bagfile.txt");
+  char bagSign = 7; // Initilised to 7 since is the last bag and will cause the least amount of damage.
+  if(bagfile){
+    bagSign = bagfile.read();
+  }
+  return int(bagSign - '0');
+}
+
+bool incBagCounter(int savedBag)
+{
+  bagfile = SD.open("bagfile.txt", (O_READ | O_WRITE));
+  if (bagfile) {
+    bagfile.print(savedBag);
+    return true;
+  }
+  return false;
 }
 
 void setASCParameter(float newParameter[])
@@ -393,6 +415,7 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
         current_volume = 0;
         lastMeasurement = 0;
         bagcounter++;
+        incBagCounter(bagcounter);
       }
     }
   }
@@ -403,6 +426,7 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
       valvesControl(bagcounter, closeState);
       pumpControl(closeState);
       bagcounter++;
+      incBagCounter(bagcounter);
       current_volume = 0;
       lastMeasurement = 0;
       valvesControl(11, 0);
@@ -502,6 +526,7 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
         current_volume = 0;
         lastMeasurement = 0;
         bagcounter++;
+        incBagCounter(bagcounter);
       }
     }
   }
@@ -512,6 +537,7 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
       valvesControl(bagcounter, closeState);
       pumpControl(closeState);
       bagcounter++;
+      incBagCounter(bagcounter);
       current_volume = 0;
       lastMeasurement = 0;
       valvesControl(11, 0);
@@ -526,7 +552,7 @@ void reading(void *pvParameters)
    (void) pvParameters;
    std::vector<float> dummyParam(2);
    float ascParam[2];
-   int bagcounter = 1;
+   
    std::vector<float> currPressure(nrPressSensors);
    float meanPressureAmbient;
    uint8_t currMode;
@@ -625,6 +651,7 @@ void initPumpControl()
 void initASC()
 {
   // Serial.println("Im at initAsc");
+  bagcounter = initBagCount();
   initAscParameters();
   initPumpControl();
   initValvesControl();
