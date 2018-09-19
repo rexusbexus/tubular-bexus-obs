@@ -109,7 +109,7 @@ void executeScheduler(std::vector<std::vector<byte>> &scd)
   {
     if (i == 0)
     {
-      whichBag = scd[i][0];
+      whichBag = scd[i][0] - '0';
     }
     else
     {

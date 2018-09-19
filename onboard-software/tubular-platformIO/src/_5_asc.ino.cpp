@@ -20,7 +20,7 @@ int flushStartTime;
 int pumpStartTime;
 int valveBagStartTime;
 //  int bagFillingTime [] = {10, 10, 10, 10, 10, 10};
-int bagFillingTime [] = {180, 47, 53, 50, 48, 41};
+int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
 float current_volume = 0;
 int lastMeasurement = 0;
 extern float medianPressureAmbient;
@@ -137,6 +137,7 @@ void samplingScheduler(int whichBag, float newParameter[])
   ascParameter[(2*whichBag)-1] = newParameter[1];
   
   xSemaphoreGive(sem);
+  Serial.println(whichBag);
   Serial.println(ascParameter[(2*whichBag)-2]);
   Serial.println(ascParameter[(2*whichBag)-1]);
 }
@@ -562,12 +563,15 @@ void reading(void *pvParameters)
 
    while(1)
    {
-      // Serial.println("I'm at asc periodic");
+      Serial.println("I'm at asc periodic");
+      Serial.print("bagcounter: "); Serial.println(bagcounter);
       currMode = getMode();
      
      dummyParam = getASCParam(bagcounter);
      ascParam[0] = dummyParam[0]; // lower limit
      ascParam[1] = dummyParam[1]; // upper limit
+     Serial.println(ascParam[0]);
+     Serial.println(ascParam[1]);
      currPressure = readData(2);
 
      /*Calculating mean pressure from several pressure sensors*/
@@ -577,6 +581,7 @@ void reading(void *pvParameters)
      switch (currMode){
      /*Standby*/
      case standbyMode:
+     
      break;
      
      /*Normal - Ascent*/
@@ -626,7 +631,7 @@ void reading(void *pvParameters)
    }
 
    flagPost(2);
-  //  Serial.println("I'm leaving asc periodic");
+   Serial.println("I'm leaving asc periodic");
    vTaskDelayUntil(&xLastWakeTime, (800 / portTICK_PERIOD_MS) );
    }
 }
