@@ -178,12 +178,12 @@ void initHumSensor()
 
 void savingDataToSD(float temperatureData[], float humData[], float pressData[], float afData[])
 {
-  // Serial.println("I'm at savingDataToSD");
+  Serial.println("I'm at savingDataToSD");
 
   /*  If current file exceds a certain size
   //    create new file with a new name. 
   */
-  delay(150);
+  // delay(150);
   // Serial.print("EOF"); Serial.println(eof);
   root = SD.open("/");
   // Serial.println("SD OPEN.");
@@ -320,7 +320,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
     
   }
   // Serial.println("leaving SavingData");
-  delay(10);
+  // delay(10);
 }
 
 void setSamplingRate(int curSamplingRate)
@@ -529,6 +529,7 @@ void sampler(void *pvParameters)
 
         
       }
+        Serial.println("Saving data");
 
         /*Save pressure measurements*/
         writeData(curPressureMeasurement, 2);
@@ -544,7 +545,8 @@ void sampler(void *pvParameters)
       
         /*Save all data to SD*/
         savingDataToSD(curTemperatureMeasurement, curHumMeasurement, curPressureMeasurement, curAFMeasurement);
-        //Serial.println("Left SavingData");
+        // delay(150);
+        Serial.println("Left SavingData");
       
       int orderMedian[3]={0};
       if (curPressureMeasurement[0]>=curPressureMeasurement[1])
@@ -580,7 +582,7 @@ void sampler(void *pvParameters)
       }
 
       //Vacuum chamber purpose
-      //medianPressureAmbient = curPressureMeasurement[4];
+      medianPressureAmbient = curPressureMeasurement[4];
 
       //medianPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       // Serial.print("Pressure median Value: "); Serial.println(medianPressureAmbient);
@@ -625,7 +627,7 @@ void sampler(void *pvParameters)
       /*Check current sampling rate*/
       currSamplingRate = getSamplingRate();
       flagPost(0);
-      // Serial.println("I'm leaving sensor periodic");
+      Serial.println("I'm leaving sensor periodic");
       vTaskDelayUntil(&xLastWakeTime, (currSamplingRate / portTICK_PERIOD_MS) );
    }
 }

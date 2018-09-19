@@ -438,8 +438,8 @@ set(handles.status_mode, 'String', modeDisp);
 %   timePlot = [timePlot, time_str];
   plot(handles.axes4, tabledataHeight);
   
-  tableCompiled = [time(1,1), tabledataPressure(1,1:6), tabledataTemperature(1,1:9), tabledataAirflow(1,1), tabledataHumidity(1,1)];
-  dataBuffer = [dataBuffer; tableCompiled];
+%   tableCompiled = [time(1,1), tabledataPressure(1,1:6), tabledataTemperature(1,1:9), tabledataAirflow(1,1), tabledataHumidity(1,1)];
+%   dataBuffer = [dataBuffer; tableCompiled];s
   
  % write the data to file to row Ax
 %  range = sprintf("A%d", row);

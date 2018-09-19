@@ -42,6 +42,7 @@ void setup()
     pinMode(pressSensorPin6,OUTPUT);
     pinMode(pressSensorPin7,OUTPUT);
     pinMode(10, OUTPUT);
+    pinMode(LED, OUTPUT);
     Serial.begin(9600);
 
     digitalWrite(pressSensorPin1,HIGH);
@@ -52,12 +53,14 @@ void setup()
     digitalWrite(pressSensorPin6,HIGH);
     digitalWrite(pressSensorPin7,HIGH);
     digitalWrite(10,HIGH);
+    digitalWrite(LED, LOW);
 
     SPI.begin();
     // SD.end();
     if(!SD.begin(sdPin))
     {
       Serial.println("Card initialization failed");
+      digitalWrite(LED, HIGH);
       //return;
     }
     
