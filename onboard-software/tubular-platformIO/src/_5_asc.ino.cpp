@@ -20,11 +20,12 @@ int flushStartTime;
 int pumpStartTime;
 int valveBagStartTime;
 //  int bagFillingTime [] = {10, 10, 10, 10, 10, 10};
-int bagFillingTime [] = {44, 47, 53, 50, 48, 41};
+int bagFillingTime [totalBagNumber];// = {44, 47, 53, 50, 48, 41};
 float current_volume = 0;
 int lastMeasurement = 0;
 extern float medianPressureAmbient;
 int bagcounter = 1;
+bool samplingFlag = false;
 File bagfile;
 
 
@@ -97,6 +98,72 @@ void initAscParameters()
     Serial.println("Failed to open asc.txt");
   }
   
+}
+
+std::vector<int> processInitialTimeParameters(char timeParameters[])
+{
+  //Serial.println("I'm at processInitialTimeParameters");
+  //Serial.println(String(timeParameters));
+  std::vector<int> newTimeParameter(totalBagNumber);
+  
+  int i = 0; int z = 0;
+  //int sizeParam = sizeof(timeParameters)/sizeof(byte);
+  while(z<totalBagNumber)
+  {
+    int k = 0;
+    char buf[6] = {0};
+    while(1)
+    {
+      if (timeParameters[i] == ',')
+      {
+        i++;
+        break;
+      }
+      buf[k] = timeParameters[i];
+      
+      i++; k++;
+    }
+    newTimeParameter[z] = atoi(buf);
+    //Serial.println(newTimeParameter[z]);
+    z++;
+  }
+  return newTimeParameter;
+}
+
+void initbagfillingTime()
+{
+  
+  File timeParam = SD.open("fillTime.txt", FILE_READ);
+  if (timeParam)
+  {
+    char timeParameters[timeParam.size()];
+    int i = 0;
+    while (timeParam.available())
+    {
+        timeParameters[i] = timeParam.read();
+        i++;
+    }
+    //int newParameter[totalBagNumber];
+    std::vector<int> newParameterV = processInitialTimeParameters(timeParameters);
+    for (int timeP = 0; timeP < totalBagNumber; timeP++)
+    {
+        bagFillingTime[timeP] = newParameterV[timeP];
+    }
+    timeParam.close();
+    //bagFillingTime = newParameter;
+    //setASCParameter(newParameter);
+  }
+  else
+  {
+    int deafultBagFillingTime [] = {44, 47, 53, 50, 48, 41};
+    //int deafultBagFillingTime [] = {90, 70, 600, 20, 48, 41};
+    for (int timeP = 0; timeP < totalBagNumber; timeP++)
+    {
+    bagFillingTime [timeP] = deafultBagFillingTime[timeP];   
+    }
+    
+    Serial.println("Failed to open fillTime.txt");
+  } 
 
 }
 
@@ -338,38 +405,22 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 
   float volume_limit = 2.4;
   float pressure_limit = 112;
-  
-  
-  if (ascentSamplingLogic(meanPressureAmbient, ascParam))
+
+  if (samplingFlag == false)
   {
+    samplingFlag = ascentSamplingLogic(meanPressureAmbient, ascParam);
+  }
+  else
+  {
+    samplingFlag = samplingLimit(meanPressureAmbient, ascParam);
+  }
+  
+  
+  if (samplingFlag)
+  {
+    
     if (valveBag == closeState)
     {
-      // if (valveFlush == closeState)
-      // {
-      //   valvesControl(11, openState);
-      //   flushStartTime = getCurrentTime();
-        
-      // }
-      // else
-      // {
-      //   if (getCurrentTime() > flushStartTime+1)
-      //   {
-      //     if (pumpState == closeState)
-      //     {
-      //       pumpControl(openState);
-      //       pumpStartTime = getCurrentTime();
-      //     }
-      //     else
-      //     {
-      //       if (getCurrentTime() > (flushStartTime+flushingTime))
-      //       {
-      //         valvesControl(11, closeState);
-      //         valvesControl(bagcounter, openState);
-      //         valveBagStartTime = getCurrentTime();
-      //       }
-      //     }
-      //   }
-      // }
       if (valveFlush == closeState)
       {
           if (pumpState == openState && (pumpStartTime+1 < getCurrentTime()))
@@ -416,9 +467,11 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
         current_volume = 0;
         lastMeasurement = 0;
         bagcounter++;
+        samplingFlag = false;
         incBagCounter(bagcounter);
       }
     }
+
   }
   else
   {
@@ -428,6 +481,7 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
       pumpControl(closeState);
       bagcounter++;
       incBagCounter(bagcounter);
+      samplingFlag = false;
       current_volume = 0;
       lastMeasurement = 0;
       valvesControl(11, 0);
@@ -450,37 +504,21 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 
   float volume_limit = 2.4;
   float pressure_limit = 112;
+
+  if (samplingFlag == false)
+  {
+    samplingFlag = descentSamplingLogic(meanPressureAmbient, ascParam);
+  }
+  else
+  {
+    samplingFlag = samplingLimit(meanPressureAmbient, ascParam);
+  }
   
-  if (descentSamplingLogic(meanPressureAmbient, ascParam))
+
+  if (samplingFlag)
   {
     if (valveBag == closeState)
     {
-      // if (valveFlush == closeState)
-      // {
-      //   valvesControl(11, openState);
-      //   flushStartTime = getCurrentTime();
-        
-      // }
-      // else
-      // {
-      //   if (getCurrentTime() > flushStartTime+1)
-      //   {
-      //     if (pumpState == closeState)
-      //     {
-      //       pumpControl(openState);
-      //       pumpStartTime = getCurrentTime();
-      //     }
-      //     else
-      //     {
-      //       if (getCurrentTime() > (flushStartTime+flushingTime))
-      //       {
-      //         valvesControl(11, closeState);
-      //         valvesControl(bagcounter, openState);
-      //         valveBagStartTime = getCurrentTime();
-      //       }
-      //     }
-      //   }
-      // }
       if (valveFlush == closeState)
       {
           if (pumpState == openState && (pumpStartTime+1 < getCurrentTime()))
@@ -528,6 +566,7 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
         lastMeasurement = 0;
         bagcounter++;
         incBagCounter(bagcounter);
+        samplingFlag = false;
       }
     }
   }
@@ -542,6 +581,7 @@ int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
       current_volume = 0;
       lastMeasurement = 0;
       valvesControl(11, 0);
+      samplingFlag = false;
     }
   }
   
@@ -564,6 +604,11 @@ void reading(void *pvParameters)
    while(1)
    {
       Serial.println("I'm at asc periodic");
+      Serial.println("Bags Filling time:");
+      for (int timeP = 0; timeP < totalBagNumber; timeP++)
+      {
+        Serial.print("Bag Time: "); Serial.println(bagFillingTime[timeP]);
+      }
       Serial.print("bagcounter: "); Serial.println(bagcounter);
       currMode = getMode();
      
@@ -595,7 +640,10 @@ void reading(void *pvParameters)
      }
      else
      {
-       bagcounter = descentSequence(meanPressureAmbient, ascParam, bagcounter);
+       if (bagcounter <= totalBagNumber)
+       {
+        bagcounter = descentSequence(meanPressureAmbient, ascParam, bagcounter);
+       }
      }
      break;
      
@@ -610,7 +658,10 @@ void reading(void *pvParameters)
      }
      else
      {
-       bagcounter = ascentSequence(meanPressureAmbient, ascParam, bagcounter);
+       if (bagcounter <= totalBagNumber)
+       {
+         bagcounter = ascentSequence(meanPressureAmbient, ascParam, bagcounter);
+       }
      }
      break;
      
@@ -657,6 +708,7 @@ void initASC()
 {
   // Serial.println("Im at initAsc");
   bagcounter = initBagCount();
+  initbagfillingTime();
   initAscParameters();
   initPumpControl();
   initValvesControl();

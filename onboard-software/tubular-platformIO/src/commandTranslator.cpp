@@ -119,7 +119,7 @@ void collectingCommand (byte data_tcp[], int row, int col, byte datasize)
                     asc[i][0] = digitalRead(CACvalve);
                     break;
                 }
-                asc[i][0] = digitalRead(valve1+(i-1));
+                asc[i][0] = digitalRead(pumpPin+(i));
             }
         }
 

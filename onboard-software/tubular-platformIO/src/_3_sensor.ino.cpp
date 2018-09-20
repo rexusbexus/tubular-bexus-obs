@@ -582,7 +582,7 @@ void sampler(void *pvParameters)
       }
 
       //Vacuum chamber purpose
-      medianPressureAmbient = curPressureMeasurement[4];
+     // medianPressureAmbient = curPressureMeasurement[4];
 
       //medianPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
       // Serial.print("Pressure median Value: "); Serial.println(medianPressureAmbient);
