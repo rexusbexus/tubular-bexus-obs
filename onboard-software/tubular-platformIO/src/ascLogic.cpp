@@ -3,6 +3,7 @@
  * Project: Tubular-Bexus.
  * Authors: Tubular-Bexus software group.
 */
+#include <stdlib.h>
 
 bool ascentOrDescent(float ascParam[])
 {
@@ -18,7 +19,7 @@ bool ascentOrDescent(float ascParam[])
 
 bool ascentSamplingLogic(float meanPressureAmbient, float ascParam[])
 {
-    if (meanPressureAmbient <= ascParam[0] && meanPressureAmbient >= (ascParam[1]))
+    if (meanPressureAmbient <= ascParam[0])
     {
         
         return true;
@@ -31,7 +32,7 @@ bool ascentSamplingLogic(float meanPressureAmbient, float ascParam[])
 
 bool descentSamplingLogic(float meanPressureAmbient, float ascParam[])
 {
-    if (meanPressureAmbient >= ascParam[0] && meanPressureAmbient <= (ascParam[1]))
+    if (meanPressureAmbient >= ascParam[0])
     {
         
         return true;
@@ -40,5 +41,10 @@ bool descentSamplingLogic(float meanPressureAmbient, float ascParam[])
     {
         return false;
     }
+}
+
+bool samplingLimit(float meanPressureAmbient, float ascParam[]){
+    bool limit = abs(ascParam[1]-ascParam[0]) >= abs(meanPressureAmbient-ascParam[0]);
+    return limit;
 }
 
