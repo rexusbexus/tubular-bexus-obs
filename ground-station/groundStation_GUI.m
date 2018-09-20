@@ -71,7 +71,7 @@ tabledataPressure    = single(zeros(10,7));
 tabledataTemperature = single(zeros(10,10));
 tabledataHumidity    = single(zeros(10,1));
 tabledataHeight      = 0;
-row                = 3;
+row                = 0;
 dataBuffer         = [];
 time           = ["Not available";"Not available";"Not available";...
     "Not available";"Not available";"Not available";"Not available";...
@@ -219,6 +219,9 @@ function udp_initialize_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 %u = udp('1.1.1.1',8888);
+logFile = fopen('log/logFile.txt', 'wt');
+handles.logFile = logFile;
+
 remPort=8888;      
 host='172.16.18.161';  
 locPort=8888;
@@ -241,7 +244,10 @@ else
     set(handles.constat_udp, 'String', 'Connection Opened');
 end
 disp('udp initialized');
-guidata(gcbf, handles);
+
+
+
+guidata(hObject, handles);
 
 
 % --- Executes on button press in udp_stop.
@@ -255,6 +261,7 @@ stopasync(u);
 fclose(u);
 delete(u);
 clear u;
+fclose(handles.logFile);
 global dataBuffer;
 dataBuffer = [];
 
@@ -439,12 +446,10 @@ set(handles.status_mode, 'String', modeDisp);
   plot(handles.axes4, tabledataHeight);
   
 %   tableCompiled = [time(1,1), tabledataPressure(1,1:6), tabledataTemperature(1,1:9), tabledataAirflow(1,1), tabledataHumidity(1,1)];
-%   dataBuffer = [dataBuffer; tableCompiled];s
+  tableCompiled = [tabledataTemperature(1,1:9), tabledataPressure(1,1:6), tabledataAirflow(1,1), tabledataHumidity(1,1)];
   
- % write the data to file to row Ax
-%  range = sprintf("A%d", row);
-%  xlswrite('log/logFile.xls', tableCompiled, 'Sheet1', range);
-%  row = row + 1;
+  formatSpec = '%d:%d:%.0f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,\n';
+  fprintf(handles.logFile, formatSpec, evt.Data.AbsTime(4), evt.Data.AbsTime(5), evt.Data.AbsTime(6), tableCompiled);
   
   
  drawnow;
@@ -735,12 +740,11 @@ function save_data_Callback(hObject, eventdata, handles)
 % hObject    handle to save_data (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global dataBuffer row;
-range = sprintf("A%d", row);
+
+
 xlswrite('log/logFile.xls', dataBuffer, 'Sheet1', range);
-[r, c] = size(dataBuffer);
-row = row + r;
-dataBuffer  = [];
+
+
 
 
 % --- Executes on selection change in bags_menu.
