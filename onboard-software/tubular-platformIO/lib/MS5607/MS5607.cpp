@@ -1,7 +1,9 @@
 #include <MS5607.h>
 #include <SPI.h>
 
-
+/*
+Initate a MS5607 object.
+*/
 MS5607::MS5607(int PIN)
 {
 	_PIN=PIN; 
@@ -50,11 +52,8 @@ void MS5607::convertionD2(int i, int pinSelect) {
     SPI.endTransaction();
 }
 
-// Read the PROM
+// Read the 128b PROM
 // 0xA0 to 0xAE
-// Note!: 0<=i<=7
-// OBS! If one needs the entire 128b PROM one needs to 
-// read all the bytes individually 
 void MS5607::PROMread(int pinSelect)
 {   
     PROMbyte[8] = {0};
@@ -76,18 +75,6 @@ void MS5607::PROMread(int pinSelect)
         SPI.endTransaction();
     }
         
-        // SPI.beginTransaction(SPISettings(10000, MSBFIRST, SPI_MODE0));
-        // digitalWrite(pinSelect, LOW);
-
-        /*PROMbyte[0] = SPI.transfer(ROMcommand);
-        //Serial.print("PROMbyte: buffer "); Serial.println(PROMbyte[0]);
-        PROMbyte[0] = SPI.transfer16(0xFFFF);
-        
-        Serial.print("PROMbyte adress: "); Serial.print(ROMcommand); 
-        Serial.print(". Value: "); Serial.println(PROMbyte[0]);
-    
-        digitalWrite(pinSelect, HIGH);//chipSelectPin1
-        SPI.endTransaction();*/
 }
 
 // Read the ADC of the current selected chip
@@ -118,8 +105,6 @@ void MS5607::ADC_calc(uint32_t ADCpress, uint32_t ADCtemp) {
     Serial.print("deltaT: "); Serial.println(deltaT);
     Serial.print("Prombyte[6]: "); Serial.println(PROMbyte[6]);
     TEMP    = (int32_t)2000 + ((deltaT * (int64_t)PROMbyte[6]) >> 23);
-    // TEMP    = (TEMP >> 23);
-    // TEMP    = (int32_t)2000 + TEMP;
 
     int64_t OFFSET  = ((int64_t)PROMbyte[2] << 17) + (((int64_t)PROMbyte[4] * deltaT) >> 6);
     if (OFFSET > 25769410560) { //min and max have to be defined per datasheet.
