@@ -1,12 +1,18 @@
 #include "DS1631.h"
 
+/*Initate a temperature sensor for DS1631 over I2C
+  Transmitts an adress over the SDA. The sensor with 
+  the corresponding addres responds with a ACK, then 
+  the configuration is changed so that the sensor will
+  continuously convert to temperature.
+*/
 void DS1631::initDS1631(uint8_t ADDRESS)
 {
   Wire.begin();
 
     Wire.beginTransmission(ADDRESS);
       Wire.write(0xAC); // 0xAC : Acces Config
-      Wire.write(0x0C); // Continuous conversion & 12 bits resolution
+      Wire.write(0x0C); // Continuous conversion and 12 bits resolution
     Wire.endTransmission();
 
     Wire.beginTransmission(ADDRESS);
@@ -15,7 +21,14 @@ void DS1631::initDS1631(uint8_t ADDRESS)
     // Serial.println(ADDRESS);
 }
 
-
+/* getTemperature starts with a request to a sensor
+  at ADDRESS. If the transmission is a success the
+  function will request to bytes from sensor at 
+  ADRESS. This will contain the 12 bit temperature
+  value. Some proccesing is done to convert the two
+  bytes into a temperature. If the transmission is 
+  not a success it will return -(1000 + error code)
+*/
 float DS1631::getTemperature(uint8_t ADDRESS) { 
         Wire.beginTransmission(ADDRESS);
             Wire.write((int)(0xAA));        // @AA : Temperature
