@@ -494,6 +494,8 @@ int ascentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 
 int descentSequence(float meanPressureAmbient, float ascParam[], int bagcounter)
 {
+  digitalWrite(CACvalve, HIGH);
+
   int valveBag = digitalRead(getValvePin(bagcounter));
   int valveFlush = digitalRead(flushValve);
   int pumpState = digitalRead(pumpPin);
