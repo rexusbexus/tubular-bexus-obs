@@ -33,7 +33,7 @@ DS1631 DS1631;
 
 MS5607 pressSensor1(pressSensorPin1); //Ambient Pressure Sensor
 MS5607 pressSensor2(pressSensorPin2); //Ambient Pressure Sensor
-// MS5607 pressSensor3(pressSensorPin3); //ValveCenter Pressure Sensor
+MS5607 pressSensor3(pressSensorPin3); //ValveCenter Pressure Sensor
 MS5607 pressSensor4(pressSensorPin7); //ValveCenter Pressure Sensor
 Series3500 pressSensorStatic(staticPressPin); //Static pressure sensor pin
 HDC2010 humSensor(hdcADDR);
@@ -68,7 +68,7 @@ void initPressureSensor()
   if(!simulationOrNot){
   pressSensor1.PROMread(pressSensorPin1);
   pressSensor2.PROMread(pressSensorPin2);
-  // pressSensor3.PROMread(pressSensorPin3);
+  pressSensor3.PROMread(pressSensorPin3);
   pressSensor4.PROMread(pressSensorPin7);
   }
   else{
@@ -81,7 +81,7 @@ void resetPressureSensor()
    if(!simulationOrNot){
    pressSensor1.reset_sequence(pressSensorPin1);
    pressSensor2.reset_sequence(pressSensorPin2);
-  //  pressSensor3.reset_sequence(pressSensorPin3);
+   pressSensor3.reset_sequence(pressSensorPin3);
    pressSensor4.reset_sequence(pressSensorPin7);
    }
    else{
@@ -93,54 +93,41 @@ void resetPressureSensor()
 void pressSensorread()
 {
   if(!simulationOrNot){
-  //Start Convertion (of pressure) for all pressure sensor(s).
-        pressSensor1.convertionD1(4, pressSensorPin1);
-        delay(15);
-        pressSensor1.ADCpress = pressSensor1.readADC(pressSensorPin1);
-        delay(10);
-        pressSensor1.convertionD2(4, pressSensorPin1);
-        delay(15);
-        pressSensor1.ADCtemp = pressSensor1.readADC(pressSensorPin1);
-        
-        pressSensor2.convertionD1(4, pressSensorPin2);
-        delay(15);
-        pressSensor2.ADCpress = pressSensor2.readADC(pressSensorPin2);
-        delay(10);
-        pressSensor2.convertionD2(4, pressSensorPin2);
-        delay(15);
-        pressSensor2.ADCtemp = pressSensor2.readADC(pressSensorPin2);
-
-        // pressSensor3.convertionD1(4, pressSensorPin3);
-        pressSensor4.convertionD1(4, pressSensorPin7);
-        delay(15);
-        pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin7);
-        delay(10);
-        pressSensor4.convertionD2(4, pressSensorPin7);
-        delay(15);
-        pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin7);
-
         //Read pressure for all pressure sensor(s).
-        
-        // pressSensor3.ADCpress = pressSensor3.readADC(pressSensorPin3);
-        
+        //Start Convertion (of pressure) for all pressure sensor(s).
+        pressSensor1.convertionD1(4, pressSensorPin1);
+        pressSensor2.convertionD1(4, pressSensorPin2);
+        pressSensor3.convertionD1(4, pressSensorPin3);
+        pressSensor4.convertionD1(4, pressSensorPin7);
 
-        //Start Convertion (of temperature) for all pressure sensor(s).
-        
-        
-        // pressSensor3.convertionD2(4, pressSensorPin3);
-        
+        delay(15);
+
+        pressSensor1.ADCpress = pressSensor1.readADC(pressSensorPin1);
+        pressSensor2.ADCpress = pressSensor2.readADC(pressSensorPin2);
+        pressSensor3.ADCpress = pressSensor3.readADC(pressSensorPin3);
+        pressSensor4.ADCpress = pressSensor4.readADC(pressSensorPin7);
+
+        delay(10);
+
+         //Start Convertion (of temperature) for all pressure sensor(s).
+        pressSensor1.convertionD2(4, pressSensorPin1);
+        pressSensor2.convertionD2(4, pressSensorPin2);
+        pressSensor3.convertionD2(4, pressSensorPin3);
+        pressSensor4.convertionD2(4, pressSensorPin7);
+
+        delay(15);
 
         //Read temperature for all pressure sensor(s).
-        
-        
-        // pressSensor3.ADCtemp = pressSensor3.readADC(pressSensorPin3);
-        
+        pressSensor1.ADCtemp = pressSensor1.readADC(pressSensorPin1);
+        pressSensor2.ADCtemp = pressSensor2.readADC(pressSensorPin2);
+        pressSensor3.ADCtemp = pressSensor3.readADC(pressSensorPin3);
+        pressSensor4.ADCtemp = pressSensor4.readADC(pressSensorPin7);
 
         //Calculating the correct temperature and pressure.
         pressSensor1.ADC_calc(pressSensor1.ADCpress, pressSensor1.ADCtemp);
         pressSensor2.ADC_calc(pressSensor2.ADCpress, pressSensor2.ADCtemp);
-        // pressSensor3.ADC_calc(pressSensor3.ADCpress, pressSensor3.ADCtemp);
-        pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);
+        pressSensor3.ADC_calc(pressSensor3.ADCpress, pressSensor3.ADCtemp);
+        pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);   
   }
   else{
     pressSensor4.convertionD1(4, pressSensorPin7);
@@ -406,7 +393,7 @@ void sampler(void *pvParameters)
         /*Read pressure from sensors*/
         curPressureMeasurement[0] = pressSensor1.getPres()/float(100);
         curPressureMeasurement[1] = pressSensor2.getPres()/float(100);   
-        // curPressureMeasurement[2] = pressSensor3.getPres()/float(100);
+        curPressureMeasurement[2] = pressSensor3.getPres()/float(100);
         // curPressureMeasurement[3] = pressSensor4.getPres()/float(100);
         curPressureMeasurement[3] = pressSensorStatic.getPress();
 
@@ -443,7 +430,7 @@ void sampler(void *pvParameters)
         // Serial.println("I'm at simulation");
         /*Simulation*/
         int secondsNow = getCurrentTime();
-        for (int seq = 0; seq < 7; seq++)
+        for (int seq = 0; seq < (simulationPoints-1); seq++)
         {
           if (secondsNow > sim_data.simulationTime[seq] && secondsNow < sim_data.simulationTime[seq+1])
           {
@@ -459,60 +446,22 @@ void sampler(void *pvParameters)
                 curPressureMeasurement[l] = 0;
               }
             }
-            // for (int l = 0; l < nrTempSensors; l++)
-            // {
-            //   if (l<2)
-            //   {
-            //     curTemperatureMeasurement[l] = sim_data.temperatureSim[l][seq];
-            //   }
-            //   else
-            //   {
-            //     curTemperatureMeasurement[l] = 0;
-            //   }
-            // }
-            for (int l = 0; l < nrHumidSensors; l++)
-            {
-              curHumMeasurement[l] = sim_data.humSim[l][seq];
-            }
-            // for (int l = 0; l < nrAirFSensors; l++)
-            // {
-            //   curAFMeasurement[l] = sim_data.airflowSim[l][seq];
-            // }
           }
         }
-        if (secondsNow > sim_data.simulationTime[7])
+        if (secondsNow > sim_data.simulationTime[simulationPoints-1])
           {
             /*Read pressure from sensors*/
             for (int l = 0; l < nrPressSensors; l++)
             {
-              if (l<3)
+              if (l<4)
               {
-                curPressureMeasurement[l] = sim_data.pressureSim[l][7];
+                curPressureMeasurement[l] = sim_data.pressureSim[l][simulationPoints-1];
               }
               else
               {
                 curPressureMeasurement[l] = 0;
               }
             }
-            // for (int l = 0; l < nrTempSensors; l++)
-            // {
-            //   if (l<2)
-            //   {
-            //     curTemperatureMeasurement[l] = sim_data.temperatureSim[l][7];
-            //   }
-            //   else
-            //   {
-            //     curTemperatureMeasurement[l] = 0;
-            //   }
-            // }
-            for (int l = 0; l < nrHumidSensors; l++)
-            {
-              curHumMeasurement[l] = sim_data.humSim[l][7];
-            }
-            // for (int l = 0; l < nrAirFSensors; l++)
-            // {
-            //   curAFMeasurement[l] = sim_data.airflowSim[l][7];
-            // }
           }
           pressSensorread();
           //curPressureMeasurement[3] = pressSensorStatic.getPress();
@@ -524,6 +473,7 @@ void sampler(void *pvParameters)
         // Serial.println("Temp reading");
         for(uint8_t i=0;i<(nrTempSensors-1);i++) {
             curTemperatureMeasurement[i] = DS1631.getTemperature(TEMP_ADDR+i);
+            // Serial.print("Temperature reading: "); Serial.println(curTemperatureMeasurement[i]);
         }
         curTemperatureMeasurement[8] = pressSensor4.getTemp()/float(100);
 
@@ -584,8 +534,6 @@ void sampler(void *pvParameters)
       //Vacuum chamber purpose
      // medianPressureAmbient = curPressureMeasurement[4];
 
-      //medianPressureAmbient = (curPressureMeasurement[0]+curPressureMeasurement[1])/2;
-      // Serial.print("Pressure median Value: "); Serial.println(medianPressureAmbient);
       /*Calculating Pressure Difference*/
       pressDifference = calculatingPressureDifference(medianPressureAmbient);
       // Serial.println("Left press diff");
@@ -619,8 +567,8 @@ void sampler(void *pvParameters)
       // Serial.print("PHYCFGR : "); Serial.println(w5500.getPHYCFGR());
       if((tcReceived + connectionTimeout) < getCurrentTime() && getMode() == manual)
       {
-        //  client.stop();
-         //setMode(standbyMode); //Complicates testing
+         client.stop();
+         setMode(standbyMode); //Complicates testing
       }
 
       //Serial.println("Listen for GS");
