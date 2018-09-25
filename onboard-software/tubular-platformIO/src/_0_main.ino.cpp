@@ -65,6 +65,8 @@ void setup()
     digitalWrite(10,HIGH);
     digitalWrite(LED, LOW);
 
+    Wire.begin();
+    Wire.setClock(33000);
     SPI.begin();
     // SD.end();
     if(!SD.begin(sdPin))

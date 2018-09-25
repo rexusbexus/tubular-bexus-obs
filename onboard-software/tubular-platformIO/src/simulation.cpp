@@ -9,12 +9,12 @@
 std::vector<int> getSeconds(char all_data[])
 {
   // char buf[8];
-  std::vector<int> seconds(8);
+  std::vector<int> seconds(simulationPoints);
   int i = 0;  int b = 0;
-  while(b<8)
+  while(b<simulationPoints)
   {
     int k = 0;
-    char buf[8] = {0};
+    char buf[simulationPoints] = {0};
     while(1)
     {
       if (all_data[i] == ',')
@@ -156,14 +156,14 @@ std::vector<std::vector<int>> getAirflow(char all_data[])
 std::vector<std::vector<float>> getPressure(char all_data[])
 {
   
-  std::vector<std::vector<float>> pressure(4, std::vector<float> (8,0));
+  std::vector<std::vector<float>> pressure(4, std::vector<float> (simulationPoints,0));
   int i = 0;  int c = 0; int b = 0;
   while(b<4)
   {
     while(1)
     {
         int k = 0;
-        char buf[8] = {0};
+        char buf[simulationPoints] = {0};
         if (all_data[i] == '|')
         {
             i++; 
@@ -388,7 +388,7 @@ pressureSimulation getSimulationData ()
     std::vector<std::vector<float>> pressure = getPressure(press_data);
     for (int g = 0; g < 4; g++)
     {
-      for (int c = 0; c < 8; c++)
+      for (int c = 0; c < simulationPoints; c++)
       {
           Sim_struct.pressureSim[g][c] = pressure[g][c];
       }
@@ -425,7 +425,7 @@ pressureSimulation getSimulationData ()
     // Serial.println("Finished reading siTi.txt");
 
     std::vector<int> seconds = getSeconds(time_data);
-    for (int g = 0; g < 8; g++)
+    for (int g = 0; g < simulationPoints; g++)
     {
       Sim_struct.simulationTime[g] = seconds[g];
     }
