@@ -37,7 +37,7 @@ float DS1631::getTemperature(uint8_t ADDRESS) {
         
         if (i2c_transmission==0) {
             Wire.requestFrom(ADDRESS,2);        // READ 2 bytes
-            delay(15);
+            delay(1);
             Wire.available();                 // 1st byte
                 char msb = Wire.read();      // receive a byte
             Wire.available();                 // 2nd byte
@@ -58,6 +58,7 @@ float DS1631::getTemperature(uint8_t ADDRESS) {
             return tempCon;
           }
           else {
+            wire.end()
             initDS1631(ADDRESS);
             return (-1000-i2c_transmission);
             // Serial.print("Error at: "); Serial.println(i);
