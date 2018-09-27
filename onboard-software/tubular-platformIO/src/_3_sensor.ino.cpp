@@ -63,16 +63,19 @@ int count=0;
 String file = "";
 String fileNum = "";
 
+/*Must reset sensors before reading PROM on startup*/
 void initPressureSensor()
 {
   if(!simulationOrNot){
-  pressSensor1.PROMread(pressSensorPin1);
-  pressSensor2.PROMread(pressSensorPin2);
-  pressSensor3.PROMread(pressSensorPin3);
-  pressSensor4.PROMread(pressSensorPin7);
+    
+    //delay(3); 
+    pressSensor1.PROMread(pressSensorPin1);
+    pressSensor2.PROMread(pressSensorPin2);
+    pressSensor3.PROMread(pressSensorPin3);
+    pressSensor4.PROMread(pressSensorPin7);
   }
   else{
-  pressSensor4.PROMread(pressSensorPin7);
+    pressSensor4.PROMread(pressSensorPin7);
   }
 }
 
@@ -92,8 +95,9 @@ void resetPressureSensor()
 
 void pressSensorread()
 {
-  if(!simulationOrNot){
+  if(!simulationOrNot){// If Not in simullation do this.
         //Read pressure for all pressure sensor(s).
+
         //Start Convertion (of pressure) for all pressure sensor(s).
         pressSensor1.convertionD1(4, pressSensorPin1);
         pressSensor2.convertionD1(4, pressSensorPin2);
@@ -127,7 +131,11 @@ void pressSensorread()
         pressSensor1.ADC_calc(pressSensor1.ADCpress, pressSensor1.ADCtemp);
         pressSensor2.ADC_calc(pressSensor2.ADCpress, pressSensor2.ADCtemp);
         pressSensor3.ADC_calc(pressSensor3.ADCpress, pressSensor3.ADCtemp);
-        pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);   
+        pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);  
+
+        pressSensor4.reset_sequence(pressSensorPin7);
+        delay(5);
+        pressSensor4.PROMread(pressSensorPin7);  
   }
   else{
     pressSensor4.convertionD1(4, pressSensorPin7);
@@ -602,8 +610,7 @@ void initSensor()
       Serial.println("Succes getting simulation data");
    }
    
-  resetPressureSensor();  
-  
+  resetPressureSensor(); 
   initHumSensor(); 
   initTempSensors();
   initPressureSensor(); 

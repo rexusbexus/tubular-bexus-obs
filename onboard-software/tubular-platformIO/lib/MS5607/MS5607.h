@@ -11,7 +11,7 @@ class MS5607
         int _PIN;
         float pressure;
         int i;
-        int pinSelect;
+       // int pinSelect;
         uint8_t convertD1;
         uint8_t convertD2;
 		uint16_t PROMbyte[8];
@@ -24,6 +24,7 @@ class MS5607
     public:
         MS5607(int PIN);
         void reset_sequence(int pinSelect);
+        void reset_sequence_w_PROMread(int pinSelect);
         void convertionD1(int i, int pinSelect);
         void convertionD2(int i, int pinSelect);
         void PROMread(int pinSelect);
