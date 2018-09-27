@@ -173,6 +173,7 @@ int initBagCount()
   char bagSign = 7; // Initilised to 7 since is the last bag and will cause the least amount of damage.
   if(bagfile){
     bagSign = bagfile.read();
+    bagfile.close();
   }
   return int(bagSign - '0');
 }
@@ -182,6 +183,7 @@ bool incBagCounter(int savedBag)
   bagfile = SD.open("bagfile.txt", (O_READ | O_WRITE));
   if (bagfile) {
     bagfile.print(savedBag);
+    bagfile.close();
     return true;
   }
   return false;
@@ -606,19 +608,19 @@ void reading(void *pvParameters)
    while(1)
    {
       Serial.println("I'm at asc periodic");
-      Serial.println("Bags Filling time:");
-      for (int timeP = 0; timeP < totalBagNumber; timeP++)
-      {
-        Serial.print("Bag Time: "); Serial.println(bagFillingTime[timeP]);
-      }
+      // Serial.println("Bags Filling time:");
+      // for (int timeP = 0; timeP < totalBagNumber; timeP++)
+      // {
+      //   Serial.print("Bag Time: "); Serial.println(bagFillingTime[timeP]);
+      // }
       Serial.print("bagcounter: "); Serial.println(bagcounter);
       currMode = getMode();
      
      dummyParam = getASCParam(bagcounter);
      ascParam[0] = dummyParam[0]; // lower limit
      ascParam[1] = dummyParam[1]; // upper limit
-     Serial.println(ascParam[0]);
-     Serial.println(ascParam[1]);
+    //  Serial.println(ascParam[0]);
+    //  Serial.println(ascParam[1]);
      currPressure = readData(2);
 
      /*Calculating mean pressure from several pressure sensors*/
