@@ -9,7 +9,7 @@
 void DS1631::initDS1631(uint8_t ADDRESS)
 {
   Wire.begin();
-
+    if(digitalRead(20)==1){
     Wire.beginTransmission(ADDRESS);
       Wire.write(0xAC); // 0xAC : Acces Config
       Wire.write(0x0C); // Continuous conversion and 12 bits resolution
@@ -18,6 +18,7 @@ void DS1631::initDS1631(uint8_t ADDRESS)
     Wire.beginTransmission(ADDRESS);
       Wire.write((int)(0x51)); // Start Conversion
     Wire.endTransmission();
+    }
     // Serial.println(ADDRESS);
 }
 
@@ -30,18 +31,30 @@ void DS1631::initDS1631(uint8_t ADDRESS)
   not a success it will return -(1000 + error code)
 */
 float DS1631::getTemperature(uint8_t ADDRESS) { 
+        char msb;
+        char lsb;
+        i2c_transmission = 5;
+        if(digitalRead(20) == 1){
         Wire.beginTransmission(ADDRESS);
             Wire.write((int)(0xAA));        // @AA : Temperature
         i2c_transmission = Wire.endTransmission();
         // Serial.print("I2C_transmission: "); Serial.println(i2c_transmission);
+        }
         
         if (i2c_transmission==0) {
             Wire.requestFrom(ADDRESS,2);        // READ 2 bytes
             delay(1);
-            Wire.available();                 // 1st byte
-                char msb = Wire.read();      // receive a byte
-            Wire.available();                 // 2nd byte
-                char lsb = Wire.read()>>4;      // receive a byte
+            if(Wire.available())
+            {                 // 1st byte
+                msb = Wire.read();      // receive a byte
+            // Wire.available();                 // 2nd byte
+                lsb = Wire.read()>>4;      // receive a byte
+            }
+            else
+            {
+              msb = 0x00;
+              lsb = 0x00;
+            }
 
             // T° processing, works for 12-bits resolution
 
@@ -58,9 +71,17 @@ float DS1631::getTemperature(uint8_t ADDRESS) {
             return tempCon;
           }
           else {
-            wire.end()
+            pinMode(21, OUTPUT);
+            for(int i = 0; i<8; i++)
+            {
+              digitalWrite(21, LOW);
+              delayMicroseconds(3);
+              digitalWrite(21, HIGH);
+              delayMicroseconds(3);
+            }
+            pinMode(21, INPUT);
             initDS1631(ADDRESS);
-            return (-1000-i2c_transmission);
+            return (1000+i2c_transmission);
             // Serial.print("Error at: "); Serial.println(i);
 
            }

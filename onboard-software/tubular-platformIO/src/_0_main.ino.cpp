@@ -38,6 +38,16 @@
 void setup()
 {
     // pinMode(sdPin,OUTPUT);
+
+    pinMode(21, OUTPUT);
+    for(int i = 0; i<8; i++)
+    {
+      digitalWrite(21, LOW);
+      delayMicroseconds(3);
+      digitalWrite(21, HIGH);
+      delayMicroseconds(3);
+    }
+    pinMode(21, INPUT);
     pinMode(sdPin,OUTPUT);
     pinMode(pressSensorPin1,OUTPUT);
     pinMode(pressSensorPin2,OUTPUT);
@@ -60,6 +70,8 @@ void setup()
     digitalWrite(10,HIGH);
     digitalWrite(LED, LOW);
 
+    Wire.begin();
+    Wire.setClock(33000);
     SPI.begin();
     // SD.end();
     if(!SD.begin(sdPin))

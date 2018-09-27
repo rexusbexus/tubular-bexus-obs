@@ -3,12 +3,14 @@
 
 #include "sensorManager.h"
 
+const int simulationPoints = 12;
+
 struct pressureSimulation{
-  int simulationTime[8];
-  float pressureSim[4][8];
-  float temperatureSim[2][8];
-  float airflowSim[nrAirFSensors][8];
-  float humSim[nrHumidSensors][8];
+  int simulationTime[simulationPoints];
+  float pressureSim[4][simulationPoints];
+  float temperatureSim[2][simulationPoints];
+  float airflowSim[nrAirFSensors][simulationPoints];
+  float humSim[nrHumidSensors][simulationPoints];
 };
 
 bool checkSimulationOrNot();

@@ -101,6 +101,7 @@ uint32_t MS5607::readADC(int pinSelect) {
 
 void MS5607::ADC_calc(uint32_t ADCpress, uint32_t ADCtemp) {
 
+    int32_t dummy = pres;
     int32_t deltaT  = ADCtemp - (PROMbyte[5] << 8);
     Serial.print("deltaT: "); Serial.println(deltaT);
     Serial.print("Prombyte[6]: "); Serial.println(PROMbyte[6]);
@@ -141,6 +142,10 @@ void MS5607::ADC_calc(uint32_t ADCpress, uint32_t ADCtemp) {
 	
 	
 	pres = (((ADCpress * SENS) >> 21 ) - OFFSET) >> 15;
+    if(pres > 150000 || pres < 0)
+    {
+        pres = dummy;
+    }
 	Serial.print("Temp: "); Serial.println(TEMP);
   }
   
