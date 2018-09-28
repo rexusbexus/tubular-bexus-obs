@@ -97,7 +97,8 @@ void pressSensorread()
 {
   if(!simulationOrNot){// If Not in simullation do this.
         //Read pressure for all pressure sensor(s).
-
+        
+        pressSensor4.PROMread(pressSensorPin7); 
         //Start Convertion (of pressure) for all pressure sensor(s).
         pressSensor1.convertionD1(4, pressSensorPin1);
         pressSensor2.convertionD1(4, pressSensorPin2);
@@ -134,8 +135,8 @@ void pressSensorread()
         pressSensor4.ADC_calc(pressSensor4.ADCpress, pressSensor4.ADCtemp);  
 
         pressSensor4.reset_sequence(pressSensorPin7);
-        delay(5);
-        pressSensor4.PROMread(pressSensorPin7);  
+        //delay(5);
+         
   }
   else{
     pressSensor4.convertionD1(4, pressSensorPin7);
