@@ -44,5 +44,7 @@ void setSamplingRate(int curSamplingRate);
 void writeData(float curMeasurements [], int type);
 void savingDataToSD(float temperatureData[], float humData[], float pressData[], float afData[]);
 std::vector<float> readData(int type);
+void initPressureSensor();
+void resetPressureSensor();
 
 #endif

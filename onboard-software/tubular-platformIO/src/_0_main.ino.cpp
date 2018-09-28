@@ -29,7 +29,12 @@
 
 
 
-/*init*/
+/*init
+  The first function that gets run. Initates the SPI 
+  and the nessicary pins to run spi. Also starts the 
+  SD wich work over the SPI. The RTOS also starts in
+  this function.
+*/
 void setup()
 {
     // pinMode(sdPin,OUTPUT);

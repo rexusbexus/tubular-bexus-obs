@@ -22,6 +22,19 @@ void MS5607::reset_sequence(int pinSelect)
     SPI.endTransaction(); 
 }
 
+void MS5607::reset_sequence_w_PROMread(int pinSelect)
+{
+    SPI.beginTransaction(SPISettings(10000, MSBFIRST, SPI_MODE0));
+    digitalWrite(pinSelect, LOW);
+
+	SPI.transfer(0x1E);
+
+    digitalWrite(pinSelect, HIGH);
+    SPI.endTransaction(); 
+    delay(3);
+    PROMread(pinSelect);
+}
+
 // Conversion for D1 must be completed before ADC read
 // 0x40 will give OSR=256, i=1->OSR=512, i=4->OSR=4096
 // Note!: 0<=i<=4
@@ -147,6 +160,13 @@ void MS5607::ADC_calc(uint32_t ADCpress, uint32_t ADCtemp) {
         pres = dummy;
     }
 	Serial.print("Temp: "); Serial.println(TEMP);
+
+    /*if (ADCvalue > 16777216 || ADCvalue <0 ) {
+        reset_sequence(_PIN);
+        delay(3);
+        PROMread(_PIN);
+        Serial.print("Reset seq:"); Serial.println(_PIN);
+    }*/
   }
   
 int32_t MS5607::getTemp()
