@@ -65,14 +65,15 @@ calcHeightVector=0;
 
 global tabledataAirflow tabledataPressure tabledataTemperature ...
     tabledataHumidity green_light red_light tabledataHeight time timePlot... 
-    row dataBuffer; 
+    row dataBuffer t; 
 tabledataAirflow     = single(zeros(10,1));
 tabledataPressure    = single(zeros(10,7));
 tabledataTemperature = single(zeros(10,10));
 tabledataHumidity    = single(zeros(10,1));
-tabledataHeight      = 0;
+tabledataHeight      = [];
 row                = 0;
 dataBuffer         = [];
+t = [];
 time           = ["Not available";"Not available";"Not available";...
     "Not available";"Not available";"Not available";"Not available";...
     "Not available";"Not available";"Not available"];
@@ -107,6 +108,15 @@ setInitialState(handles, red_light);
 command = [];
 handles.command = command;
 %end of telecommand initialization
+
+%altitude figure conf
+xlabel(handles.axes4, 'Time [hr]');
+ylabel(handles.axes4, 'Altitude [m]');
+xlim(handles.axes4, 'manual');
+ylim(handles.axes4, 'manual');
+xlim(handles.axes4, [0 10]);
+ylim(handles.axes4, [0 36000]);
+grid(handles.axes4, 'on');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -271,7 +281,7 @@ function update_udpoutput(u, evt, handles)
 %global tabledata calcHeightVector;
 global tabledataAirflow tabledataPressure tabledataTemperature ...
     tabledataHumidity green_light red_light tabledataHeight time timePlot...
-    row dataBuffer; 
+    row dataBuffer t; 
 data=fread(u)';
 %disp(data);
 dataSize=length(data);
@@ -366,7 +376,7 @@ end
 time_str = sprintf("%d:%d:%.0f", evt.Data.AbsTime(4), evt.Data.AbsTime(5), evt.Data.AbsTime(6));
  %%   Write Pressure 
 pressSensorMean = sum(pressSensorVal)/length(pressSensorVal);
-tabledataPressure = [ pressSensorVal, pressSensorMean ; tabledataPressure(1:end-1,:)];
+tabledataPressure = [ pressSensorVal; tabledataPressure(1:end-1,:)];
 time = [time_str; time(1:end-1,:)];
 pressTable = [cellstr(time), num2cell(tabledataPressure)];
 % pressCell = table2cell(pressTable);
@@ -375,7 +385,7 @@ set(handles.table_pressure, 'Data', pressTable);
 
 %   Write temperature
 tempSensorMean =sum(tempSensorVal)/length(tempSensorVal);
-tabledataTemperature = [tempSensorVal, tempSensorMean; tabledataTemperature(1:end-1,:)];
+tabledataTemperature = [tempSensorVal; tabledataTemperature(1:end-1,:)];
 set(handles.table_temperature, 'Data', [cellstr(time), num2cell(tabledataTemperature)]);
 % drawnow;
 
@@ -436,14 +446,16 @@ set(handles.status_mode, 'String', modeDisp);
  R_gas_constant = 287.053;      % J/(kg K)
  gravity        = 9.81;         % m/s^2
  
- calcHeight = T_0_refernce/L_lapse_rate *((pressSensorMean/press_refernce)...
+ pressValue = medianFind(pressSensorVal);
+ 
+ calcHeight = T_0_refernce/L_lapse_rate *((pressValue/press_refernce)...
      ^(-(L_lapse_rate*R_gas_constant/gravity))-1);
  
   tabledataHeight = [tabledataHeight calcHeight];
-  %set(handles.axes4, 'altitude', tabledataHeight);
-  %axes(handles.axes4)
-%   timePlot = [timePlot, time_str];
-  plot(handles.axes4, tabledataHeight);
+  t = [t (length(tabledataHeight)/3600)];
+%   clf(handles.axes4, 'reset');
+  plot(handles.axes4, t, tabledataHeight);
+  
   
 %   tableCompiled = [time(1,1), tabledataPressure(1,1:6), tabledataTemperature(1,1:9), tabledataAirflow(1,1), tabledataHumidity(1,1)];
   tableCompiled = [tabledataTemperature(1,1:9), tabledataPressure(1,1:6), tabledataAirflow(1,1), tabledataHumidity(1,1)];
@@ -472,6 +484,17 @@ set(handles.status_mode, 'String', modeDisp);
  light_handles_vector(14)   = handles.ind_htr1.Children;
  light_handles_vector(15)   = handles.ind_htr2.Children;
  
+ function medianPressureReading = medianFind(pressSensor)
+ for i = 1:3
+     for j = 2:3
+         if (pressSensor(i) > pressSensor(j))
+             dummy = pressSensor(i);
+             pressSensor(i) = pressSensor(j);
+             pressSensor(j) = dummy;
+         end
+     end
+ end
+ medianPressureReading = pressSensor(2);
  
 function edit2_Callback(hObject, eventdata, handles)
 % hObject    handle to edit2 (see GCBO)
@@ -666,7 +689,11 @@ switch str{val}
 end
 
 firstParam = get(handles.first_parameter, 'String');
+firstParam = str2double(firstParam);
+firstParam = num2str(round(firstParam));
 secondParam = get(handles.second_parameter, 'String');
+secondParam = str2double(secondParam);
+secondParam = num2str(round(secondParam));
 
 commandToBuild = [commandToBuild, firstParam, ',', secondParam, ',']; 
 
