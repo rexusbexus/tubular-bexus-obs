@@ -635,6 +635,7 @@ void reading(void *pvParameters)
      
      /*Normal - Ascent*/
      case normalAscent:
+     digitalWrite(CACvalve, HIGH);
      if (ascentOrDescent(ascParam))
      {
        if (bagcounter <= totalBagNumber)
@@ -653,6 +654,7 @@ void reading(void *pvParameters)
      
      /*Normal - Descent*/
      case normalDescent:
+     digitalWrite(CACvalve, HIGH);
      if (!ascentOrDescent(ascParam))
      {
        if (bagcounter <= totalBagNumber)
