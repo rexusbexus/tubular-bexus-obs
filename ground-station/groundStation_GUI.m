@@ -67,8 +67,8 @@ global tabledataAirflow tabledataPressure tabledataTemperature ...
     tabledataHumidity green_light red_light tabledataHeight time timePlot... 
     row dataBuffer t; 
 tabledataAirflow     = single(zeros(10,1));
-tabledataPressure    = single(zeros(10,7));
-tabledataTemperature = single(zeros(10,10));
+tabledataPressure    = single(zeros(10,6));
+tabledataTemperature = single(zeros(10,9));
 tabledataHumidity    = single(zeros(10,1));
 tabledataHeight      = [];
 row                = 0;
@@ -454,7 +454,7 @@ set(handles.status_mode, 'String', modeDisp);
   tabledataHeight = [tabledataHeight calcHeight];
   t = [t (length(tabledataHeight)/3600)];
 %   clf(handles.axes4, 'reset');
-  plot(handles.axes4, t, tabledataHeight);
+  line(handles.axes4, t, tabledataHeight);
   
   
 %   tableCompiled = [time(1,1), tabledataPressure(1,1:6), tabledataTemperature(1,1:9), tabledataAirflow(1,1), tabledataHumidity(1,1)];
