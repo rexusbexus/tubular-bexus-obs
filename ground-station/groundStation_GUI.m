@@ -114,7 +114,7 @@ xlabel(handles.axes4, 'Time [hr]');
 ylabel(handles.axes4, 'Altitude [m]');
 xlim(handles.axes4, 'manual');
 ylim(handles.axes4, 'manual');
-xlim(handles.axes4, [0 10]);
+xlim(handles.axes4, [0 8]);
 ylim(handles.axes4, [0 36000]);
 grid(handles.axes4, 'on');
 
