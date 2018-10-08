@@ -51,7 +51,7 @@ pressureSimulation sim_data;
 bool simulationOrNot;
 extern SemaphoreHandle_t sem;
 int samplingRate = 1000;
-int connectionTimeout = 70;
+int connectionTimeout = 180;
 int tcReceived;
 float medianPressureAmbient;
 
@@ -578,6 +578,13 @@ void sampler(void *pvParameters)
       {
          client.stop();
          setMode(standbyMode); //Complicates testing
+        //  digitalWrite(CACvalve, LOW);
+        valvesControl(11, closeState);
+        pumpControl(closeState);
+        for (int sd = 1;sd <= 6; sd++)
+        {
+          valvesControl(sd, closeState);
+        }
       }
 
       //Serial.println("Listen for GS");
