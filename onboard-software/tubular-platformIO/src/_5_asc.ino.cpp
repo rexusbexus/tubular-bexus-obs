@@ -170,7 +170,7 @@ void initbagfillingTime()
 int initBagCount()
 {
   bagfile = SD.open("bagfile.txt");
-  char bagSign = 7; // Initilised to 7 since is the last bag and will cause the least amount of damage.
+  char bagSign = '7'; // Initilised to 7 since is the last bag and will cause the least amount of damage.
   if(bagfile){
     bagSign = bagfile.read();
     bagfile.close();
