@@ -114,8 +114,8 @@ xlabel(handles.axes4, 'Time [hr]');
 ylabel(handles.axes4, 'Altitude [m]');
 xlim(handles.axes4, 'manual');
 ylim(handles.axes4, 'manual');
-xlim(handles.axes4, [0 8]);
-ylim(handles.axes4, [0 36000]);
+xlim(handles.axes4, [0 10]);
+ylim(handles.axes4, [0 32000]);
 grid(handles.axes4, 'on');
 
 % Update handles structure
@@ -229,8 +229,22 @@ function udp_initialize_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 %u = udp('1.1.1.1',8888);
-logFile = fopen('log/logFile.txt', 'wt');
-handles.logFile = logFile;
+currentFolder = pwd;
+baseFileName = 'logFile.txt';
+fullFileName = fullfile(currentFolder, baseFileName);
+% if exist(fullFileName)
+%   % Open the file however you do
+%   
+% else
+%   % File does not exist.
+%   warningMessage = sprintf('%s does not exist', fullFileName);
+%   uiwait(warndlg(warningMessage));
+% end
+
+  [logFile, warnMessage] = fopen(fullFileName, 'wt');
+  handles.logFile = logFile;
+  handles.warnMessage = warnMessage;
+
 
 remPort=8888;      
 host='172.16.18.161';  
@@ -403,6 +417,7 @@ set(handles.table_airflow, 'Data', [cellstr(time), num2cell(tabledataAirflow)]);
 
 %%   Write status of valves
 light_hanles = light_handles(handles);
+expStatus = zeros(1,15);
 for i=1:15
     if(bitget(statusVal,i)==1)
         %axes(light_hanles(i+1));
@@ -416,7 +431,10 @@ for i=1:15
             set(light_hanles(i), 'Cdata', red_light)
         end
     end
+    expStatus(1,i) = bitget(statusVal,i);
 end
+
+
      
      
 %%   Write mode state
@@ -453,16 +471,20 @@ set(handles.status_mode, 'String', modeDisp);
  
   tabledataHeight = [tabledataHeight calcHeight];
   t = [t (length(tabledataHeight)/3600)];
-%   clf(handles.axes4, 'reset');
+  cla(handles.axes4);
   line(handles.axes4, t, tabledataHeight);
   
   
 %   tableCompiled = [time(1,1), tabledataPressure(1,1:6), tabledataTemperature(1,1:9), tabledataAirflow(1,1), tabledataHumidity(1,1)];
-  tableCompiled = [tabledataTemperature(1,1:9), tabledataPressure(1,1:6), tabledataAirflow(1,1), tabledataHumidity(1,1)];
+  tableCompiled = [tabledataTemperature(1,1:9), tabledataPressure(1,1:6), tabledataAirflow(1,1), tabledataHumidity(1,1), expStatus(1,1:7), expStatus(1,12:15), modeVal(1,1)];
   
-  formatSpec = '%d:%d:%.0f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,\n';
-  fprintf(handles.logFile, formatSpec, evt.Data.AbsTime(4), evt.Data.AbsTime(5), evt.Data.AbsTime(6), tableCompiled);
-  
+  formatSpec = '%d:%d:%.0f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.0f,%.0f,%.0f,%.0f,%.0f,%.0f,%.0f,%.0f,%.0f,%.0f,%.0f,%.0f,\n';
+  if (handles.logFile < 0)
+    warningMessage = handles.warnMessage;
+    uiwait(warndlg(warningMessage));
+  else
+      fprintf(handles.logFile, formatSpec, evt.Data.AbsTime(4), evt.Data.AbsTime(5), evt.Data.AbsTime(6), tableCompiled);
+  end
   
  drawnow;
 
