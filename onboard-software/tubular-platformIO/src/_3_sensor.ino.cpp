@@ -234,6 +234,7 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
      {
        String headers = "TIME, TEMPERATURE, PRESSURE, AIRFLOW, HUMIDITY,";
        dataLog.print(headers);
+       dataLog.println();
 
      }
      // Serial.println("I'm at dataLog");
@@ -297,6 +298,25 @@ void savingDataToSD(float temperatureData[], float humData[], float pressData[],
         dataString += "";
       }
     }
+    dataLog.print(dataString);
+
+    dataString = "";
+    dataString += String(digitalRead(pumpPin)); dataString += ",";
+    dataString += String(digitalRead(valve1)); dataString += ",";
+    dataString += String(digitalRead(valve2)); dataString += ",";
+    dataString += String(digitalRead(valve3)); dataString += ",";
+    dataString += String(digitalRead(valve4)); dataString += ",";
+    dataString += String(digitalRead(valve5)); dataString += ",";
+    dataString += String(digitalRead(valve6)); dataString += ",";
+    dataString += String(digitalRead(valve7)); dataString += ",";
+    dataString += String(digitalRead(valve8)); dataString += ",";
+    dataString += String(digitalRead(valve9)); dataString += ",";
+    dataString += String(digitalRead(valve10)); dataString += ",";
+    dataString += String(digitalRead(flushValve)); dataString += ",";
+    dataString += String(digitalRead(CACvalve)); dataString += ",";
+    dataString += String(digitalRead(htr1_pin)); dataString += ",";
+    dataString += String(digitalRead(htr2_pin)); dataString += ",";
+    
     dataLog.print(dataString);
 
     dataLog.println();
