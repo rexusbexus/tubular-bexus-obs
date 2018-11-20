@@ -22,6 +22,7 @@
 
 #include "ethernet.h"
 #include "_1_init.h"
+#include "_4_heater.h"
 #include "_5_asc.h"
 #include "_6_telemetry.h"
 #include "_8_monitor.h"
